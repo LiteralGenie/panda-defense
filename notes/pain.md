@@ -1,0 +1,3 @@
+panda creates globals by creating props on builtins module
+no type hints for common classes like...
+    render
