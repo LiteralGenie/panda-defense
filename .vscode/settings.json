@@ -1,0 +1,13 @@
+{
+  "[python]": {
+    "editor.wordBasedSuggestions": false,
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "isort.args": ["--profile", "black"],
+  "python.analysis.autoImportCompletions": true,
+  "autoDocstring.docstringFormat": "numpy-notypes"
+}
