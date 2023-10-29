@@ -1,4 +1,4 @@
-from panda3d.core import NodePath, PandaNode
+from panda3d.core import NodePath
 
 import g
 from renderable import Renderable, StatefulProp
@@ -28,15 +28,12 @@ class Map(Renderable):
         if not self.pnode:
             self.pnode = NodePath("")
 
-            board = g.loader.loadModel(
-                "data/assets/glTF-Sample-Models/2.0/ABeautifulGame/glTF/ABeautifulGame.gltf"
-            )
-            board.setScale(15)
-            board.setSz(0.01)
-            for child in board.getChildrenAsList():
-                if child.name != "Chessboard":
-                    child.removeNode()
-            board.reparentTo(self.pnode)
+            board = g.loader.loadModel("data/assets/board.gltf")
+            for idx_row in range(-10, 10):
+                for idx_col in range(-10, 10):
+                    b = self.pnode.attachNewNode("")
+                    b.setPos(idx_col * 2, idx_row * 2, 0)
+                    board.instanceTo(b)
 
             self.pnode.reparentTo(parent)
 
@@ -50,3 +47,6 @@ class Map(Renderable):
 
         for tower in self.state["towers"].current:
             tower.render(NodePath(self.pnode))
+
+    def _loadModel(self):
+        pass

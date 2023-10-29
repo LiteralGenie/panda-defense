@@ -13,7 +13,6 @@ class Unit(Renderable):
             self.pnode = Actor(
                 "data/assets/glTF-Sample-Models/2.0/BoomBox/glTF/BoomBox.gltf"
             )
-            self.pnode.getChild(0).setPos(0, -0.25, 0)
             self.pnode.getChild(0).setScale(20)
 
             self.pnode.setPos(0, 4, 0)

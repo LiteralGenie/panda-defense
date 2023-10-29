@@ -1,3 +1,4 @@
+import simplepbr
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import WindowProperties
 
@@ -12,14 +13,15 @@ class App(ShowBase):
 
     def __init__(self):
         super().__init__()
+        simplepbr.init()
 
-        self.camera.setPos(0, 0, 14)
+        self.camera.setPos(0, 0, 20)
         self.camera.setP(-90)
         self.disableMouse()
 
         properties = WindowProperties()
-        properties.setOrigin(3840, 0)
-        properties.setSize(1920, 1080)
+        properties.setOrigin(7680, 0)
+        properties.setSize(3840, 2160)
 
         self.win.requestProperties(properties)
 
