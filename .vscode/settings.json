@@ -5,8 +5,9 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": true
-    },
+    }
   },
+  // "python.analysis.typeCheckingMode": "strict",
   "isort.args": ["--profile", "black"],
   "python.analysis.autoImportCompletions": true,
   "autoDocstring.docstringFormat": "numpy-notypes"

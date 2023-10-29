@@ -1,0 +1,6 @@
+class NodePath:
+    def reparentTo(self, other: "NodePath") -> None: ...
+    def attachNewNode(self, node: "PandaNode") -> "NodePath": ...
+
+class PandaNode:
+    pass
