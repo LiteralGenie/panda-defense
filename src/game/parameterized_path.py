@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from game.scenario import Path, Point
+from game.scenario import Direction, Path, Point
 
 
 @dataclass
@@ -15,21 +15,11 @@ class ParameterizedPath:
 
     def __init__(self, path: Path):
         pos = path.start
-        dir = (0, 0)
+        dir = _dir_to_pt(path.segments[0].dir)
         self.points = [PointWithDirection(pos=pos, dir=dir)]
 
         for segment in path.segments:
-            step_x = 0
-            if segment.axis == "x":
-                step_x = 1
-            if segment.axis == "-x":
-                step_x = -1
-
-            step_y = 0
-            if segment.axis == "y":
-                step_y = 1
-            if segment.axis == "-y":
-                step_y = -1
+            (step_x, step_y) = _dir_to_pt(segment.dir)
 
             for _ in range(1, segment.dist):
                 pos = (pos[0] + step_x, pos[1] + step_y)
@@ -37,3 +27,19 @@ class ParameterizedPath:
                 self.points.append(PointWithDirection(pos=pos, dir=dir))
 
         self.length = len(self.points)
+
+
+def _dir_to_pt(dir: Direction) -> Point:
+    step_x = 0
+    if dir == "x":
+        step_x = 1
+    if dir == "-x":
+        step_x = -1
+
+    step_y = 0
+    if dir == "y":
+        step_y = 1
+    if dir == "-y":
+        step_y = -1
+
+    return (step_x, step_y)

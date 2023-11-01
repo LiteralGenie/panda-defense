@@ -28,14 +28,6 @@ async def play_game(ctx: PlayContext):
 
     game.next_tick = ctx.first_tick
 
-    first_round = game.scenario.rounds[0]
-    game.map.add_unit(
-        Unit(
-            path=ParameterizedPath(first_round.waves[0].path),
-            speed=0.25,
-        )
-    )
-
     game.map.add_tower(Tower())
 
     while game.round < len(game.scenario.rounds):
@@ -44,6 +36,7 @@ async def play_game(ctx: PlayContext):
 
 async def _play_round(ctx: PlayContext):
     game = ctx.game
+    game.round += 1
 
     while True:
         delay = game.next_tick - time.time()
@@ -55,6 +48,7 @@ async def _play_round(ctx: PlayContext):
         if delay > 0:
             await ctx.sleep_fn(delay)
 
+        game.tick += 1
         start = time.time()
 
         # Validate and apply actions
@@ -72,13 +66,38 @@ async def _play_round(ctx: PlayContext):
 
         # Stop loop on round end
         if is_round_end:
-            game.next_tick = game.next_tick + TICK_PERIOD_S
+            game.next_tick = game.next_tick + BUILD_TIME_S
             break
         else:
             game.next_tick = game.next_tick + TICK_PERIOD_S
+            continue
 
 
 def _update_game_state(ctx: PlayContext) -> bool:
+    _move_units(ctx)
+    _spawn_units(ctx)
+    # _apply_damage(ctx)
+    return False
+
+
+def _spawn_units(ctx: PlayContext):
+    tick = ctx.game.tick
+    round_idx = ctx.game.round
+    round_info = ctx.game.scenario.rounds[round_idx]
+
+    for wave in round_info.waves:
+        tick_end = (wave.enemies - 1) * wave.spawn_delay_ticks
+        is_spawn_tick = 0 == tick % wave.spawn_delay_ticks
+
+        if tick < tick_end and is_spawn_tick:
+            unit = Unit(
+                path=ParameterizedPath(wave.path),
+                speed=0.25,
+            )
+            ctx.game.map.add_unit(unit)
+
+
+def _move_units(ctx: PlayContext):
     # Move units
     units = ctx.game.map.units
     for u in units:
@@ -87,7 +106,3 @@ def _update_game_state(ctx: PlayContext) -> bool:
         # Remove unit if it completed path
         if u.dist >= u.path.length - 1:
             ctx.game.map.remove_unit(u)
-
-    # Apply tower damage
-
-    return False

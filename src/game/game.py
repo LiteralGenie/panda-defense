@@ -21,8 +21,8 @@ class Game(Renderable):
         self.map = Map()
         self.scenario = scenario
 
-        self.round = 0
-        self.tick = 0
+        self.round = -1
+        self.tick = -1
         self.next_tick = float("inf")
 
     def render(self, parent: NodePath, period_s: float):

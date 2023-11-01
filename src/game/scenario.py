@@ -2,12 +2,13 @@ from dataclasses import dataclass
 from typing import Literal
 
 Point = tuple[int, int]
+Direction = Literal["x", "-x", "y", "-y"]
 
 
 @dataclass
 class Segment:
     dist: int
-    axis: Literal["x", "-x", "y", "-y"]
+    dir: Direction
 
 
 @dataclass
@@ -19,6 +20,7 @@ class Path:
 @dataclass
 class Wave:
     enemies: int
+    spawn_delay_ticks: int
     path: Path
 
 

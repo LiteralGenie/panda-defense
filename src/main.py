@@ -15,7 +15,7 @@ def build_test_scenario():
     path = Path(
         start=(0, 10),
         segments=[
-            Segment(axis="-y", dist=20),
+            Segment(dir="-y", dist=3),
         ],
     )
 
@@ -23,6 +23,7 @@ def build_test_scenario():
         Wave(
             enemies=5,
             path=path,
+            spawn_delay_ticks=20,
         ),
     ]
 

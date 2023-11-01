@@ -11,7 +11,7 @@ class Unit(Renderable):
     dist: int = StatefulProp()
     intervals: dict
     path: ParameterizedPath
-    speed: int
+    speed: float  # todo: use Decimal
 
     def __init__(self, path: ParameterizedPath, speed: int):
         super().__init__()
@@ -26,7 +26,12 @@ class Unit(Renderable):
             self.pnode = Actor(
                 "data/assets/glTF-Sample-Models/2.0/BoomBox/glTF/BoomBox.gltf"
             )
+
             self.pnode.getChild(0).setScale(20)
+
+            start = self.path.points[0].pos
+            self.pnode.setPos(start[0], start[1], 0)
+
             self.pnode.reparentTo(parent)
 
         if self.state["dist"].needs_check:

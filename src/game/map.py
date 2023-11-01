@@ -51,7 +51,6 @@ class Map(Renderable):
                 for unit in deleted:
                     unit.delete()
 
-        #
         for unit in units_change.current:
             unit.render(NodePath(self.pnode), period_s)
 
