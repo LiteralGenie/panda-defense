@@ -4,3 +4,6 @@ class NodePath:
 
 class PandaNode:
     pass
+
+class Point3:
+    def __init__(self, x: float, y: float, z: float): ...
