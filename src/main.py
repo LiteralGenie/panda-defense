@@ -1,11 +1,34 @@
+import time
+
 import simplepbr
 from direct.showbase.ShowBase import ShowBase
+from direct.task.Task import Task
 from panda3d.core import WindowProperties
 
-import g
-from map import Map
-from tower import Tower
-from unit import Unit
+from game.game import Game
+from game.map import Map
+from game.play import PlayContext, play_game
+from game.scenario import Path, Round, Scenario, Segment, Wave
+
+
+def build_test_scenario():
+    path = Path(
+        start=(0, 10),
+        segments=[
+            Segment(axis="-y", dist=20),
+        ],
+    )
+
+    waves = [
+        Wave(
+            enemies=5,
+            path=path,
+        ),
+    ]
+
+    round = Round(waves=waves)
+
+    return Scenario(rounds=[round])
 
 
 class App(ShowBase):
@@ -15,7 +38,7 @@ class App(ShowBase):
         super().__init__()
         simplepbr.init()
 
-        self.camera.setPos(0, 0, 20)
+        self.camera.setPos(0, 0, 40)
         self.camera.setP(-90)
         self.disableMouse()
 
@@ -25,13 +48,15 @@ class App(ShowBase):
 
         self.win.requestProperties(properties)
 
-        self.map = Map()
-        self.map.add_unit(Unit())
-        self.map.add_tower(Tower())
-        self.map.render(self.render)
+        self.game = Game(scenario=build_test_scenario())
 
-    def add_map(self, map: Map):
-        self.map = map
+        ctx = PlayContext(
+            game=self.game,
+            first_tick=time.time(),
+            render=True,
+            sleep_fn=Task.pause,
+        )
+        self.task_mgr.add(play_game(ctx))
 
 
 app = App()

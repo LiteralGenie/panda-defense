@@ -1,14 +1,14 @@
 from direct.actor.Actor import Actor
 from panda3d.core import NodePath
 
-from renderable import Renderable
+from game.renderable import Renderable
 
 
 class Tower(Renderable):
     def __init__(self):
         super().__init__()
 
-    def render(self, parent: NodePath):
+    def render(self, parent: NodePath, period_s: float):
         if not self.pnode:
             self.pnode = Actor(
                 "data/assets/glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf",
@@ -20,3 +20,5 @@ class Tower(Renderable):
             self.pnode.setH(-90)
 
             self.pnode.reparentTo(parent)
+
+        super().save_props()

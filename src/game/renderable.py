@@ -1,3 +1,4 @@
+import copy
 from abc import ABC, abstractmethod
 
 from panda3d.core import NodePath, PandaNode
@@ -12,8 +13,12 @@ class Renderable(ABC):
         self.state = dict()
 
     @abstractmethod
-    def render(self, parent: NodePath):
+    def render(self, parent: NodePath, period_s: float):
         ...
+
+    def save_props(self):
+        for prop in self.state.values():
+            prop.save()
 
 
 class State:
@@ -31,8 +36,8 @@ class State:
     def mark_for_check(self):
         self.needs_check = True
 
-    def reset(self):
-        self.prev = self._current.copy()
+    def save(self):
+        self.prev = copy.copy(self.current)
         self.first_change = False
 
 

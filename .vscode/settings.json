@@ -4,11 +4,11 @@
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+      "source.organizeImports": true,
+      "source.fixAll": true,
     }
   },
   // "python.analysis.typeCheckingMode": "strict",
-  "isort.args": ["--profile", "black"],
   "python.analysis.autoImportCompletions": true,
-  "autoDocstring.docstringFormat": "numpy-notypes"
+  "python.analysis.fixAll": ["source.convertImportFormat", "source.unusedImports"],
 }
