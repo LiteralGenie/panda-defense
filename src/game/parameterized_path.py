@@ -1,13 +1,22 @@
+from dataclasses import dataclass
+
 from game.scenario import Path, Point
 
 
+@dataclass
+class PointWithDirection:
+    pos: Point
+    dir: Point
+
+
 class ParameterizedPath:
-    points: list[Point]
+    points: list[PointWithDirection]
     length: int
 
     def __init__(self, path: Path):
         pos = path.start
-        self.points = [pos]
+        dir = (0, 0)
+        self.points = [PointWithDirection(pos=pos, dir=dir)]
 
         for segment in path.segments:
             step_x = 0
@@ -24,6 +33,7 @@ class ParameterizedPath:
 
             for _ in range(1, segment.dist):
                 pos = (pos[0] + step_x, pos[1] + step_y)
-                self.points.append(pos)
+                dir = (step_x, step_y)
+                self.points.append(PointWithDirection(pos=pos, dir=dir))
 
         self.length = len(self.points)

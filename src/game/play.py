@@ -32,7 +32,7 @@ async def play_game(ctx: PlayContext):
     game.map.add_unit(
         Unit(
             path=ParameterizedPath(first_round.waves[0].path),
-            speed=1,
+            speed=0.25,
         )
     )
 

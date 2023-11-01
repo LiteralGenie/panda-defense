@@ -1,3 +1,5 @@
+import math
+
 from direct.actor.Actor import Actor
 from panda3d.core import NodePath, Point3
 
@@ -28,14 +30,18 @@ class Unit(Renderable):
             self.pnode.reparentTo(parent)
 
         if self.state["dist"].needs_check:
-            coords = self.path.points[self.dist]
+            frac, idx = math.modf(self.dist)
+            idx = int(idx)
+
+            pt = self.path.points[idx]
+            new_pos = (pt.pos[0] + frac * pt.dir[0], pt.pos[1] + frac * pt.dir[1])
 
             if ivl := self.intervals.get("pos"):
                 ivl.pause()
 
             self.intervals["pos"] = self.pnode.posInterval(
                 period_s,
-                Point3(coords[0], coords[1], 0),
+                Point3(new_pos[0], new_pos[1], 0),
             )
             self.intervals["pos"].start()
 
