@@ -13,23 +13,27 @@ from game.scenario import Path, Round, Scenario, Segment, Wave
 
 def build_test_scenario():
     path = Path(
+        id=1,
         start=(0, 10),
         segments=[
-            Segment(dir="-y", dist=3),
+            Segment(dir="-y", dist=10),
         ],
     )
 
     waves = [
         Wave(
             enemies=5,
-            path=path,
-            spawn_delay_ticks=20,
+            id_path=path.id,
+            spawn_delay_ticks=4,
         ),
     ]
 
     round = Round(waves=waves)
 
-    return Scenario(rounds=[round])
+    return Scenario(
+        rounds=[round],
+        paths={path.id: path},
+    )
 
 
 class App(ShowBase):

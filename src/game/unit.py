@@ -8,7 +8,7 @@ from game.renderable import Renderable, StatefulProp
 
 
 class Unit(Renderable):
-    dist: int = StatefulProp()
+    dist: float = StatefulProp()  # type: ignore
     intervals: dict
     path: ParameterizedPath
     speed: float  # todo: use Decimal

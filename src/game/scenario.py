@@ -13,6 +13,7 @@ class Segment:
 
 @dataclass
 class Path:
+    id: int
     start: Point
     segments: list[Segment]
 
@@ -20,8 +21,8 @@ class Path:
 @dataclass
 class Wave:
     enemies: int
+    id_path: int
     spawn_delay_ticks: int
-    path: Path
 
 
 @dataclass
@@ -32,3 +33,4 @@ class Round:
 @dataclass
 class Scenario:
     rounds: list[Round]
+    paths: dict[int, Path]

@@ -1,3 +1,4 @@
+import dataclasses
 import sys
 import time
 from dataclasses import dataclass
@@ -23,18 +24,26 @@ class PlayContext:
     sleep_fn: Callable
 
 
+@dataclass
+class _Cache:
+    ppaths: dict[int, ParameterizedPath] = dataclasses.field(default_factory=dict)
+
+
 async def play_game(ctx: PlayContext):
     game = ctx.game
 
     game.next_tick = ctx.first_tick
 
+    cache = _Cache()
+    cache.ppaths = {id: ParameterizedPath(p) for id, p in game.scenario.paths.items()}
+
     game.map.add_tower(Tower())
 
     while game.round < len(game.scenario.rounds):
-        await _play_round(ctx)
+        await _play_round(ctx, cache)
 
 
-async def _play_round(ctx: PlayContext):
+async def _play_round(ctx: PlayContext, cache: _Cache):
     game = ctx.game
     game.round += 1
 
@@ -57,7 +66,7 @@ async def _play_round(ctx: PlayContext):
         game.action_queue = []
 
         # Update game state
-        is_round_end = _update_game_state(ctx)
+        is_round_end = _update_game_state(ctx, cache)
 
         # Raise warning if this tick took a while to finish
         elapsed = time.time() - start
@@ -73,14 +82,14 @@ async def _play_round(ctx: PlayContext):
             continue
 
 
-def _update_game_state(ctx: PlayContext) -> bool:
-    _move_units(ctx)
-    _spawn_units(ctx)
+def _update_game_state(ctx: PlayContext, cache: _Cache) -> bool:
+    _spawn_units(ctx, cache)
+    _move_units(ctx, cache)
     # _apply_damage(ctx)
     return False
 
 
-def _spawn_units(ctx: PlayContext):
+def _spawn_units(ctx: PlayContext, cache: _Cache):
     tick = ctx.game.tick
     round_idx = ctx.game.round
     round_info = ctx.game.scenario.rounds[round_idx]
@@ -91,13 +100,13 @@ def _spawn_units(ctx: PlayContext):
 
         if tick < tick_end and is_spawn_tick:
             unit = Unit(
-                path=ParameterizedPath(wave.path),
+                path=cache.ppaths[wave.id_path],
                 speed=0.25,
             )
             ctx.game.map.add_unit(unit)
 
 
-def _move_units(ctx: PlayContext):
+def _move_units(ctx: PlayContext, cache: _Cache):
     # Move units
     units = ctx.game.map.units
     for u in units:
