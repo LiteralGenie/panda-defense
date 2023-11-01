@@ -1,11 +1,11 @@
 from panda3d.core import NodePath
 
 from game.map import Map
-from game.renderable import Renderable
+from game.renderable import Stateful
 from game.scenario import Scenario
 
 
-class Game(Renderable):
+class Game(Stateful):
     action_queue: list
     map: Map
     scenario: Scenario
@@ -18,7 +18,7 @@ class Game(Renderable):
         super().__init__()
 
         self.action_queue = []
-        self.map = Map()
+        self.map = Map(scenario.paths)
         self.scenario = scenario
 
         self.round = -1

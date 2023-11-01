@@ -1,12 +1,10 @@
-import dataclasses
 import sys
 import time
 from dataclasses import dataclass
-from typing import Callable
+from typing import Awaitable, Callable
 
 import g
 from game.game import Game
-from game.parameterized_path import ParameterizedPath
 from game.tower import Tower
 from game.unit import Unit
 
@@ -21,12 +19,12 @@ class PlayContext:
 
     first_tick: float
     render: bool
-    sleep_fn: Callable
+    sleep_fn: Callable[[float], Awaitable[None]]
 
 
 @dataclass
 class _Cache:
-    ppaths: dict[int, ParameterizedPath] = dataclasses.field(default_factory=dict)
+    pass
 
 
 async def play_game(ctx: PlayContext):
@@ -35,9 +33,8 @@ async def play_game(ctx: PlayContext):
     game.next_tick = ctx.first_tick
 
     cache = _Cache()
-    cache.ppaths = {id: ParameterizedPath(p) for id, p in game.scenario.paths.items()}
 
-    game.map.add_tower(Tower())
+    game.map.add_tower(Tower((1, 1)))
 
     while game.round < len(game.scenario.rounds):
         await _play_round(ctx, cache)
@@ -51,7 +48,8 @@ async def _play_round(ctx: PlayContext, cache: _Cache):
         delay = game.next_tick - time.time()
         if delay > 0 and ctx.render:
             # Render game state if we have time before next tick
-            # (This should happen every tick unless potato processor causes backlogged updates)
+            # (This should happen every tick unless potato processor causes
+            #  backlogged updates that skip this rendering step)
             game.render(g.render, delay)
             delay = game.next_tick - time.time()
         if delay > 0:
@@ -100,18 +98,18 @@ def _spawn_units(ctx: PlayContext, cache: _Cache):
 
         if tick < tick_end and is_spawn_tick:
             unit = Unit(
-                path=cache.ppaths[wave.id_path],
                 speed=0.25,
             )
-            ctx.game.map.add_unit(unit)
+            lane = ctx.game.map.lanes[wave.id_path]
+            lane.add_unit(unit)
 
 
 def _move_units(ctx: PlayContext, cache: _Cache):
     # Move units
-    units = ctx.game.map.units
-    for u in units:
-        u.dist += u.speed
+    for lane in ctx.game.map.lanes.values():
+        for unit in lane.units:
+            unit.dist += unit.speed
 
-        # Remove unit if it completed path
-        if u.dist >= u.path.length - 1:
-            ctx.game.map.remove_unit(u)
+            # Remove unit if it completed path
+            if unit.dist >= lane.ppath.length - 1:
+                lane.remove_unit(unit)

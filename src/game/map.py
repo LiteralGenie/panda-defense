@@ -1,32 +1,42 @@
 from panda3d.core import NodePath
 
 import g
-from game.renderable import Renderable, StatefulProp
+from game.parameterized_path import ParameterizedPath
+from game.renderable import Stateful, StatefulProp
+from game.scenario import Path
 from game.tower import Tower
 from game.unit import Unit
 
 
-class Map(Renderable):
-    units: list[Unit] = StatefulProp()  # type: ignore
-    towers: list[Tower] = StatefulProp()  # type: ignore
+class Lane:
+    ppath: ParameterizedPath
+    units: list[Unit]
 
-    def __init__(self):
-        super().__init__()
-
+    def __init__(self, ppath: ParameterizedPath):
+        self.ppath = ppath
         self.units = []
-        self.towers = []
 
     def add_unit(self, unit: Unit):
         self.units.append(unit)
-        self.state["units"].mark_for_check()
 
     def remove_unit(self, unit: Unit):
-        self.units = [u for u in self.units if u is not unit]
-        self.state["units"].mark_for_check()
+        self.units = [u for u in self.units if u is not unit]  # todo: faster deletion
+        unit.delete()
 
-    def add_tower(self, tower: Tower):
-        self.towers.append(tower)
-        self.state["towers"].mark_for_check()
+    def render(self, parent: NodePath, period_s: float):
+        for unit in self.units:
+            unit.render(parent, period_s, self.ppath)
+
+
+class Map(Stateful):
+    lanes: dict[int, Lane]
+    towers: list[Tower] = StatefulProp()  # type: ignore
+
+    def __init__(self, paths: dict[int, Path]):
+        super().__init__()
+
+        self.lanes = self._init_lanes(paths)
+        self.towers = []
 
     def render(self, parent: NodePath, period_s: float):
         if not self.pnode:
@@ -41,23 +51,20 @@ class Map(Renderable):
 
             self.pnode.reparentTo(parent)
 
-        # Remove deleted units from scene graph
-        units_change = self.state["units"]
-        if units_change.needs_check:
-            if units_change.prev:
-                deleted: list[Unit] = [
-                    old for old in units_change.prev if old not in units_change.current
-                ]
-                for unit in deleted:
-                    unit.delete()
-
-        for unit in units_change.current:
-            unit.render(NodePath(self.pnode), period_s)
+        for path in self.lanes.values():
+            path.render(NodePath(self.pnode), period_s)
 
         for tower in self.state["towers"].current:
             tower.render(NodePath(self.pnode), period_s)
 
         super().save_props()
 
-    def _loadModel(self):
-        pass
+    def add_tower(self, tower: Tower):
+        self.towers.append(tower)
+        self.state["towers"].mark_for_check()
+
+    @classmethod
+    def _init_lanes(cls, paths: dict[int, Path]) -> dict[int, Lane]:
+        ppaths = {id: ParameterizedPath(p) for id, p in paths.items()}
+        result = {id: Lane(p) for id, p in ppaths.items()}
+        return result

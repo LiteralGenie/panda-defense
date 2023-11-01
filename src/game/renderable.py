@@ -1,20 +1,16 @@
 import copy
-from abc import ABC, abstractmethod
+from abc import ABC
 
-from panda3d.core import NodePath, PandaNode
+from panda3d.core import PandaNode
 
 
-class Renderable(ABC):
+class Stateful(ABC):
     pnode: PandaNode
     state: dict[str, "State"]
 
     def __init__(self):
         self.pnode = None
         self.state = dict()
-
-    @abstractmethod
-    def render(self, parent: NodePath, period_s: float):
-        ...
 
     def save_props(self):
         for prop in self.state.values():
@@ -47,13 +43,13 @@ class StatefulProp:
     def __init__(self):
         self._name = ""
 
-    def __set_name__(self, owner: Renderable, name):
+    def __set_name__(self, owner: Stateful, name):
         self._name = name
 
-    def __get__(self, obj: Renderable, objtype=None):
+    def __get__(self, obj: Stateful, objtype=None):
         obj.state.setdefault(self._name, State(None))
         return obj.state[self._name].current
 
-    def __set__(self, obj: Renderable, value):
+    def __set__(self, obj: Stateful, value):
         obj.state.setdefault(self._name, State(None))
         obj.state[self._name].set(value)
