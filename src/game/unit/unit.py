@@ -12,6 +12,7 @@ class Unit(Stateful):
     pnode: Actor | None
 
     dist: float = StatefulProp()  # type: ignore
+    health: int
     speed: float  # todo: use Decimal
 
     _intervals: dict[str, Interval]
@@ -21,6 +22,7 @@ class Unit(Stateful):
         self.pnode = None
 
         self.dist = 0
+        self.health = 100
         self.speed = speed
 
         self._intervals = dict()

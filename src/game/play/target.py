@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from game.parameterized_path import ParameterizedPath
 from game.play.range_cache import RangeCache
 from game.tower import Tower
-from game.unit import Unit
+from game.unit.unit import Unit
 from utils.misc_utils import find_or_throw
 
 

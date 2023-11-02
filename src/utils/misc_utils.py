@@ -69,7 +69,7 @@ def find_index_sorted(
 def find_insertion_index(
     xs_sorted: list[T],
     target: T,
-    return_largest_idx: bool = True,
+    return_largest_idx: bool = False,
 ) -> int:
     """
     Find index such that (target > items_before_index) and (target <= items_at_or_after_index)

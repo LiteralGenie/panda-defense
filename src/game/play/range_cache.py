@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from game.parameterized_path import ParameterizedPath
 from game.range import Range
 from game.scenario import Point
-from game.unit import Unit
+from game.unit.unit import Unit
 from utils.misc_utils import find_insertion_index, split_with_lookback
 
 
@@ -81,7 +81,7 @@ class RangeCache:
             params = [path.point_to_param(pt) for pt in pts]
 
             # Consolidate consecutive params into intervals
-            params = sorted(p for p in params if p)
+            params = sorted(p for p in params if p is not None)
             grouped = split_with_lookback(params, lambda prev, curr: curr - prev > 1)
 
             intervals[path.id] = [PathInterval(grp[0], grp[-1]) for grp in grouped]

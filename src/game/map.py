@@ -5,7 +5,7 @@ from game.parameterized_path import ParameterizedPath
 from game.scenario import Path
 from game.stateful import Stateful, StatefulProp
 from game.tower import Tower
-from game.unit import Unit
+from game.unit.unit import Unit
 
 
 class Lane:

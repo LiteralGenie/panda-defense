@@ -1,28 +1,17 @@
 import sys
 import time
-from dataclasses import dataclass
-from typing import Awaitable, Callable
 
 import g
-from game.game import Game
-from game.play.damage import apply_damage
+from game.play.apply_damage import apply_damage
 from game.play.play_cache import PlayCache
+from game.play.play_context import PlayContext
 from game.play.range_cache import RangeCache
-from game.tower import Tower
-from game.unit import Unit
+from game.towers.basic import BasicTower
+from game.unit.unit import Unit
 
 TICK_FREQ_S = 4
 TICK_PERIOD_S = 1 / TICK_FREQ_S
 BUILD_TIME_S = 30
-
-
-@dataclass
-class PlayContext:
-    game: Game
-
-    first_tick: float
-    render: bool
-    sleep_fn: Callable[[float], Awaitable[None]]
 
 
 async def play_game(ctx: PlayContext):
@@ -34,7 +23,7 @@ async def play_game(ctx: PlayContext):
         ranges=RangeCache([lane.ppath for lane in game.map.lanes.values()]),
     )
 
-    game.map.add_tower(Tower((1, 1)))
+    game.map.add_tower(BasicTower(pos=(1, 1)))
 
     for i in range(len(game.scenario.rounds)):
         game.round = i

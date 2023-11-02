@@ -7,7 +7,8 @@ from panda3d.core import WindowProperties
 
 from game.game import Game
 from game.map import Map
-from game.play import PlayContext, play_game
+from game.play.play import play_game
+from game.play.play_context import PlayContext
 from game.scenario import Path, Round, Scenario, Segment, Wave
 
 
@@ -16,22 +17,33 @@ def build_test_scenario():
         id=1,
         start=(0, 10),
         segments=[
-            Segment(dir="-y", dist=10),
+            Segment(dir="-y", dist=20),
         ],
     )
 
-    waves = [
-        Wave(
-            enemies=5,
-            id_path=path.id,
-            spawn_delay_ticks=4,
+    rounds = [
+        Round(
+            waves=[
+                Wave(
+                    enemies=5,
+                    id_path=path.id,
+                    spawn_delay_ticks=4,
+                )
+            ]
+        ),
+        Round(
+            waves=[
+                Wave(
+                    enemies=15,
+                    id_path=path.id,
+                    spawn_delay_ticks=2,
+                )
+            ]
         ),
     ]
 
-    round = Round(waves=waves)
-
     return Scenario(
-        rounds=[round],
+        rounds=rounds,
         paths={path.id: path},
     )
 

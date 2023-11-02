@@ -3,7 +3,7 @@ from abc import ABC
 from direct.actor.Actor import Actor
 from panda3d.core import NodePath
 
-from game.range import PyramidalRange, Range
+from game.range import Range
 from game.scenario import Point
 from game.stateful import Stateful, StatefulProp
 
@@ -14,12 +14,12 @@ class Tower(Stateful, ABC):
     pos: Point = StatefulProp()  # type: ignore
     range: Range
 
-    def __init__(self, pos: Point):
+    def __init__(self, pos: Point, range: Range):
         super().__init__()
         self.pnode = None
 
         self.pos = pos
-        self.range = PyramidalRange(2)
+        self.range = range
 
     def render(self, parent: NodePath, period_s: float):
         if not self.pnode:

@@ -38,12 +38,12 @@ class PyramidalRange(Range):
         # Build the upper quarter
         #       x
         #      xxx
-        for i in range(radius):
+        for i in range(1, radius + 1):
             # center tile
             pts.add((0, i))
 
             # left / right wings
-            for j in range(i):
+            for j in range(1, radius - i + 1):
                 pts.add((-j, i))
                 pts.add((j, i))
 
