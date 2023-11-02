@@ -4,7 +4,9 @@ from dataclasses import dataclass
 from typing import Awaitable, Callable
 
 import g
+from game.cache.range_cache import RangeCache
 from game.game import Game
+from game.target import find_tower_targets
 from game.tower import Tower
 from game.unit import Unit
 
@@ -24,7 +26,7 @@ class PlayContext:
 
 @dataclass
 class _Cache:
-    pass
+    ranges: RangeCache
 
 
 async def play_game(ctx: PlayContext):
@@ -32,7 +34,9 @@ async def play_game(ctx: PlayContext):
 
     game.next_tick = ctx.first_tick
 
-    cache = _Cache()
+    cache = _Cache(
+        ranges=RangeCache([lane.ppath for lane in game.map.lanes.values()]),
+    )
 
     game.map.add_tower(Tower((1, 1)))
 
@@ -83,8 +87,12 @@ async def _play_round(ctx: PlayContext, cache: _Cache):
 def _update_game_state(ctx: PlayContext, cache: _Cache) -> bool:
     _spawn_units(ctx, cache)
     _move_units(ctx, cache)
-    # _apply_damage(ctx)
-    return False
+    _sort_units(ctx, cache)
+
+    _apply_damage(ctx, cache)
+
+    all_dead = all(len(lane.units) == 0 for lane in ctx.game.map.lanes.values())
+    return all_dead
 
 
 def _spawn_units(ctx: PlayContext, cache: _Cache):
@@ -105,7 +113,6 @@ def _spawn_units(ctx: PlayContext, cache: _Cache):
 
 
 def _move_units(ctx: PlayContext, cache: _Cache):
-    # Move units
     for lane in ctx.game.map.lanes.values():
         for unit in lane.units:
             unit.dist += unit.speed
@@ -113,3 +120,15 @@ def _move_units(ctx: PlayContext, cache: _Cache):
             # Remove unit if it completed path
             if unit.dist >= lane.ppath.length - 1:
                 lane.remove_unit(unit)
+
+
+def _sort_units(ctx: PlayContext, cache: _Cache):
+    # Sort units by distance traveled
+    for lane in ctx.game.map.lanes.values():
+        lane.units.sort(key=lambda u: u.dist)
+
+
+def _apply_damage(ctx: PlayContext, cache: _Cache):
+    for tower in ctx.game.map.towers:
+        units = {path_id: lane.units for path_id, lane in ctx.game.map.lanes.items()}
+        targets = find_tower_targets(tower, units, cache.ranges)
