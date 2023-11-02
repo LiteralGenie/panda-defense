@@ -83,7 +83,6 @@ def find_insertion_index(
 
     idx_mn = 0
     idx_mx = len(xs_sorted) - 1
-    idx_pivot = idx_mn + (idx_mx - idx_mn) // 2
 
     def lt(a: T, b: T, eq: bool) -> bool:
         if eq:
@@ -92,12 +91,13 @@ def find_insertion_index(
             return a < b
 
     while (idx_mx - idx_mn) > 1:
+        idx_pivot = idx_mn + (idx_mx - idx_mn) // 2
         pivot = xs_sorted[idx_pivot]
 
         if lt(target, pivot, eq=not return_largest_idx):
-            idx_mx = pivot
+            idx_mx = idx_pivot
         else:
-            idx_mn = pivot
+            idx_mn = idx_pivot
 
     result = idx_mx
     if return_largest_idx:
