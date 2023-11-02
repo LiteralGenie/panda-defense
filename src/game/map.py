@@ -2,17 +2,21 @@ from panda3d.core import NodePath
 
 import g
 from game.parameterized_path import ParameterizedPath
-from game.renderable import Stateful, StatefulProp
 from game.scenario import Path
+from game.stateful import Stateful, StatefulProp
 from game.tower import Tower
 from game.unit import Unit
 
 
 class Lane:
+    pnode: NodePath | None
+
     ppath: ParameterizedPath
     units: list[Unit]
 
     def __init__(self, ppath: ParameterizedPath):
+        self.pnode = None
+
         self.ppath = ppath
         self.units = []
 
@@ -29,11 +33,14 @@ class Lane:
 
 
 class Map(Stateful):
+    pnode: NodePath | None
+
     lanes: dict[int, Lane]
     towers: list[Tower] = StatefulProp()  # type: ignore
 
     def __init__(self, paths: dict[int, Path]):
         super().__init__()
+        self.pnode = None
 
         self.lanes = self._init_lanes(paths)
         self.towers = []

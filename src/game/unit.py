@@ -5,19 +5,20 @@ from direct.interval.Interval import Interval
 from panda3d.core import NodePath, Point3
 
 from game.parameterized_path import ParameterizedPath
-from game.renderable import Stateful, StatefulProp
+from game.stateful import Stateful, StatefulProp
 
 
 class Unit(Stateful):
+    pnode: Actor | None
+
     dist: float = StatefulProp()  # type: ignore
     speed: float  # todo: use Decimal
 
     _intervals: dict[str, Interval]
 
-    pnode: Actor
-
     def __init__(self, speed: float):
         super().__init__()
+        self.pnode = None
 
         self.dist = 0
         self.speed = speed

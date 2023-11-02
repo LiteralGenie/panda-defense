@@ -2,16 +2,19 @@ from direct.actor.Actor import Actor
 from panda3d.core import NodePath
 
 from game.range import PyramidalRange, Range
-from game.renderable import Stateful, StatefulProp
 from game.scenario import Point
+from game.stateful import Stateful, StatefulProp
 
 
 class Tower(Stateful):
+    pnode: Actor | None
+
     pos: Point = StatefulProp()  # type: ignore
     range: Range
 
     def __init__(self, pos: Point):
         super().__init__()
+        self.pnode = None
 
         self.pos = pos
         self.range = PyramidalRange(2)

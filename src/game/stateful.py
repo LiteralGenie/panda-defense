@@ -1,11 +1,8 @@
 import copy
 from abc import ABC
 
-from panda3d.core import NodePath, PandaNode
-
 
 class Stateful(ABC):
-    pnode: PandaNode | NodePath
     state: dict[str, "State"]
 
     def __init__(self):

@@ -40,13 +40,16 @@ async def play_game(ctx: PlayContext):
 
     game.map.add_tower(Tower((1, 1)))
 
-    while game.round < len(game.scenario.rounds):
+    for i in range(len(game.scenario.rounds)):
+        game.round = i
+        print(f"Round {game.round}")
         await _play_round(ctx, cache)
+
+    print(f"Game end")
 
 
 async def _play_round(ctx: PlayContext, cache: _Cache):
     game = ctx.game
-    game.round += 1
 
     while True:
         delay = game.next_tick - time.time()
