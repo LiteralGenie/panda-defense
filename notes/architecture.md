@@ -14,3 +14,13 @@
             interval spans the period between ticks
 
     (diagram)
+
+### decoupling via VDOM doesn't work
+    Inferring what to render from changes in game state isn't always possible.
+    
+    eg a tower attacking an enemy doesn't trigger any changes in tower state but the tower should have some kind of attack / rotation animation
+    
+    a sillier example is "if game ends, friendlies should start a celebratory animation"
+
+### decoupling via message queue
+    more direct approach than listening for state changes is having a message queue that's updated on every state change. It's almost the same as just rendering directly but like the state change approach still allows intercepting the render call (to either drop it because server build or it was for an old frame that was superceded)
