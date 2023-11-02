@@ -1,3 +1,5 @@
+from abc import ABC
+
 from direct.actor.Actor import Actor
 from panda3d.core import NodePath
 
@@ -6,7 +8,7 @@ from game.scenario import Point
 from game.stateful import Stateful, StatefulProp
 
 
-class Tower(Stateful):
+class Tower(Stateful, ABC):
     pnode: Actor | None
 
     pos: Point = StatefulProp()  # type: ignore

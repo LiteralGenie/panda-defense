@@ -4,9 +4,10 @@ from dataclasses import dataclass
 from typing import Awaitable, Callable
 
 import g
-from game.cache.range_cache import RangeCache
 from game.game import Game
-from game.target import find_tower_targets
+from game.play.damage import apply_damage
+from game.play.play_cache import PlayCache
+from game.play.range_cache import RangeCache
 from game.tower import Tower
 from game.unit import Unit
 
@@ -24,17 +25,12 @@ class PlayContext:
     sleep_fn: Callable[[float], Awaitable[None]]
 
 
-@dataclass
-class _Cache:
-    ranges: RangeCache
-
-
 async def play_game(ctx: PlayContext):
     game = ctx.game
 
     game.next_tick = ctx.first_tick
 
-    cache = _Cache(
+    cache = PlayCache(
         ranges=RangeCache([lane.ppath for lane in game.map.lanes.values()]),
     )
 
@@ -48,7 +44,7 @@ async def play_game(ctx: PlayContext):
     print(f"Game end")
 
 
-async def _play_round(ctx: PlayContext, cache: _Cache):
+async def _play_round(ctx: PlayContext, cache: PlayCache):
     game = ctx.game
 
     while True:
@@ -87,18 +83,18 @@ async def _play_round(ctx: PlayContext, cache: _Cache):
             continue
 
 
-def _update_game_state(ctx: PlayContext, cache: _Cache) -> bool:
+def _update_game_state(ctx: PlayContext, cache: PlayCache) -> bool:
     _spawn_units(ctx, cache)
     _move_units(ctx, cache)
     _sort_units(ctx, cache)
 
-    _apply_damage(ctx, cache)
+    apply_damage(ctx, cache)
 
     all_dead = all(len(lane.units) == 0 for lane in ctx.game.map.lanes.values())
     return all_dead
 
 
-def _spawn_units(ctx: PlayContext, cache: _Cache):
+def _spawn_units(ctx: PlayContext, cache: PlayCache):
     tick = ctx.game.tick
     round_idx = ctx.game.round
     round_info = ctx.game.scenario.rounds[round_idx]
@@ -115,7 +111,7 @@ def _spawn_units(ctx: PlayContext, cache: _Cache):
             lane.add_unit(unit)
 
 
-def _move_units(ctx: PlayContext, cache: _Cache):
+def _move_units(ctx: PlayContext, cache: PlayCache):
     for lane in ctx.game.map.lanes.values():
         for unit in lane.units:
             unit.dist += unit.speed
@@ -125,13 +121,7 @@ def _move_units(ctx: PlayContext, cache: _Cache):
                 lane.remove_unit(unit)
 
 
-def _sort_units(ctx: PlayContext, cache: _Cache):
+def _sort_units(ctx: PlayContext, cache: PlayCache):
     # Sort units by distance traveled
     for lane in ctx.game.map.lanes.values():
         lane.units.sort(key=lambda u: u.dist)
-
-
-def _apply_damage(ctx: PlayContext, cache: _Cache):
-    for tower in ctx.game.map.towers:
-        units = {path_id: lane.units for path_id, lane in ctx.game.map.lanes.items()}
-        targets = find_tower_targets(tower, units, cache.ranges)
