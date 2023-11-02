@@ -1,6 +1,7 @@
 import math
 
 from direct.actor.Actor import Actor
+from direct.interval.Interval import Interval
 from panda3d.core import NodePath, Point3
 
 from game.parameterized_path import ParameterizedPath
@@ -11,7 +12,9 @@ class Unit(Stateful):
     dist: float = StatefulProp()  # type: ignore
     speed: float  # todo: use Decimal
 
-    _intervals: dict
+    _intervals: dict[str, Interval]
+
+    pnode: Actor
 
     def __init__(self, speed: float):
         super().__init__()

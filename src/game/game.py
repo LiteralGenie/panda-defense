@@ -1,11 +1,10 @@
 from panda3d.core import NodePath
 
 from game.map import Map
-from game.renderable import Stateful
 from game.scenario import Scenario
 
 
-class Game(Stateful):
+class Game:
     action_queue: list
     map: Map
     scenario: Scenario

@@ -5,8 +5,6 @@ from game.range import PyramidalRange, Range
 from game.renderable import Stateful, StatefulProp
 from game.scenario import Point
 
-# class
-
 
 class Tower(Stateful):
     pos: Point = StatefulProp()  # type: ignore
