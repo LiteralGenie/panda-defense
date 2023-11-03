@@ -20,6 +20,7 @@ class Path:
 
 @dataclass
 class Wave:
+    id: int
     enemies: int
     id_path: int
     spawn_delay_ticks: int

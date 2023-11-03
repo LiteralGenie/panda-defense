@@ -23,7 +23,7 @@ class Renderable(Generic[Events, NodeType], ABC):
     def render(self, period_s: float) -> None:
         ...
 
-    def get_latest_render(self, ev_type: Type[T]) -> T | None:
+    def get_latest_event(self, ev_type: Type[T]) -> T | None:
         return find(
             self.render_queue,
             lambda ev: isinstance(ev, ev_type),

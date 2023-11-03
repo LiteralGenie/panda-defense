@@ -35,5 +35,5 @@ class Tower(Renderable[RenderTowerEvents, "Actor"], ABC):
             self.pnode.setH(-90)
             self.pnode.reparentTo(g.render)
 
-        if self.get_latest_render(RenderTowerPosition):
+        if self.get_latest_event(RenderTowerPosition):
             self.pnode.setPos(self.pos[0], self.pos[1], 0)

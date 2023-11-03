@@ -21,6 +21,7 @@ def build_test_scenario():
         Round(
             waves=[
                 Wave(
+                    id=1,
                     enemies=5,
                     id_path=path.id,
                     spawn_delay_ticks=4,
@@ -30,6 +31,7 @@ def build_test_scenario():
         Round(
             waves=[
                 Wave(
+                    id=2,
                     enemies=15,
                     id_path=path.id,
                     spawn_delay_ticks=2,

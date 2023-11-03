@@ -10,10 +10,16 @@ from game.play.range_cache import RangeCache
 from game.scenario import Scenario
 from game.tower.basic import BasicTower
 from game.tower.render_tower_events import RenderTowerPosition
-from game.unit.render_unit_events import RenderUnitMovement, RenderUnitPosition
-from game.unit.unit import Unit
+from game.unit.render_unit_events import (
+    RenderUnitDeath,
+    RenderUnitMovement,
+    RenderUnitPosition,
+)
+from game.unit.unit import Unit, UnitStatus
+from game.unit.unit_manager import UnitManager
+from utils.misc_utils import find_or_throw
 
-TICK_FREQ_S = 4
+TICK_FREQ_S = 24
 TICK_PERIOD_S = 1 / TICK_FREQ_S
 BUILD_TIME_S = 30
 
@@ -32,6 +38,7 @@ async def play_game(scenario: Scenario, sleep_fn: SleepFunction):
     cache = PlayCache(
         ppaths=ppaths,
         ranges=RangeCache(list(ppaths.values())),
+        start_ticks={0: 0},
     )
 
     tower = BasicTower(pos=(1, 1))
@@ -39,15 +46,23 @@ async def play_game(scenario: Scenario, sleep_fn: SleepFunction):
     tower.render_queue.append(RenderTowerPosition())
 
     for i in range(len(game.scenario.rounds)):
-        game.round = i
-        print(f"Round {game.round}")
+        game.round_idx = i
+        cache.start_ticks[game.round_idx] = game.tick + 1
+
+        print(f"Round {game.round_idx}")
         await _play_round(ctx, cache)
+
+        # Clear out render queues
+        ctx.game.render(0)
 
     print(f"Game end")
 
 
 async def _play_round(ctx: PlayContext, cache: PlayCache):
     game = ctx.game
+
+    game.unit_mgr = UnitManager()
+    _init_units_for_round(ctx, cache)
 
     while True:
         delay = game.next_tick - time.time()
@@ -86,50 +101,49 @@ async def _play_round(ctx: PlayContext, cache: PlayCache):
             continue
 
 
+def _init_units_for_round(ctx: PlayContext, cache: PlayCache):
+    for wave in ctx.game.current_round.waves:
+        for _ in range(wave.enemies):
+            unit = Unit(
+                id_wave=wave.id,
+                ppath=cache.ppaths[wave.id_path],
+                speed=0.25,
+            )
+            ctx.game.unit_mgr.add(unit)
+
+
 def _update_game_state(ctx: PlayContext, cache: PlayCache) -> bool:
     _spawn_units(ctx, cache)
     _move_units(ctx, cache)
-    _sort_units(ctx, cache)
 
     apply_damage(ctx, cache)
 
-    all_dead = len(ctx.game.units) == 0
+    all_dead = len(list(ctx.game.unit_mgr)) == len(ctx.game.unit_mgr.dead)
     return all_dead
 
 
 def _spawn_units(ctx: PlayContext, cache: PlayCache):
-    tick = ctx.game.tick
-    round_idx = ctx.game.round
-    round_info = ctx.game.scenario.rounds[round_idx]
+    # calculate ticks since round began
+    round_idx = ctx.game.round_idx
+    ticks_elapsed = ctx.game.tick - cache.start_ticks[round_idx]
 
-    for wave in round_info.waves:
+    for wave in ctx.game.current_round.waves:
         tick_end = (wave.enemies - 1) * wave.spawn_delay_ticks
-        is_spawn_tick = 0 == tick % wave.spawn_delay_ticks
+        is_spawn_tick = 0 == ticks_elapsed % wave.spawn_delay_ticks
 
-        if tick <= tick_end and is_spawn_tick:
-            unit = Unit(
-                ppath=cache.ppaths[wave.id_path],
-                speed=0.25,
-            )
-            ctx.game.units.append(unit)
-            unit.render_queue.append(RenderUnitPosition())
+        if ticks_elapsed <= tick_end and is_spawn_tick:
+            units = ctx.game.unit_mgr.list_from_wave(wave.id)
+            u = find_or_throw(units, lambda u: u.status == UnitStatus.PRESPAWN)
+            ctx.game.unit_mgr.set_status(u, UnitStatus.ALIVE)
+            u.render_queue.append(RenderUnitPosition())
 
 
 def _move_units(ctx: PlayContext, cache: PlayCache):
-    to_delete: set[Unit] = set()
-
-    for unit in ctx.game.units:
-        unit.dist += unit.speed
+    for unit in ctx.game.unit_mgr.alive:
+        ctx.game.unit_mgr.set_dist(unit, unit.dist + unit.speed)
         unit.render_queue.append(RenderUnitMovement())
 
         # Remove unit if it completed path
         if unit.dist >= unit.ppath.length - 1:
-            to_delete.add(unit)
-
-    ctx.game.units = [u for u in ctx.game.units if u not in to_delete]
-    [u.delete() for u in to_delete]
-
-
-def _sort_units(ctx: PlayContext, cache: PlayCache):
-    # Sort units by distance traveled
-    ctx.game.units.sort(key=lambda u: u.dist)
+            ctx.game.unit_mgr.set_status(unit, UnitStatus.DEAD)
+            unit.render_queue.append(RenderUnitDeath())

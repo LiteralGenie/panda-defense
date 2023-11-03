@@ -11,4 +11,9 @@ class RenderUnitMovement:
     pass
 
 
-RenderUnitEvents = RenderUnitPosition | RenderUnitMovement
+@dataclass
+class RenderUnitDeath:
+    pass
+
+
+RenderUnitEvents = RenderUnitPosition | RenderUnitMovement | RenderUnitDeath

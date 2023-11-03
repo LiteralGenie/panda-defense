@@ -1,9 +1,11 @@
+from enum import Enum
 from math import modf
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from game.parameterized_path import ParameterizedPath
 from game.renderable import Renderable
 from game.unit.render_unit_events import (
+    RenderUnitDeath,
     RenderUnitEvents,
     RenderUnitMovement,
     RenderUnitPosition,
@@ -14,22 +16,39 @@ if TYPE_CHECKING:
     from direct.interval.Interval import Interval
 
 
+class UnitStatus(Enum):
+    PRESPAWN = "PRESPAWN"
+    ALIVE = "ALIVE"
+    DEAD = "DEAD"
+
+
 class Unit(Renderable[RenderUnitEvents, "Actor"]):
+    _id_counter: ClassVar[int] = 0
+
+    id: int
+    id_wave: int
+
     dist: float
     health: int
     ppath: ParameterizedPath
     speed: float  # todo: use Decimal
+    status: UnitStatus
 
     _intervals: dict[str, "Interval"]
 
-    def __init__(self, ppath: ParameterizedPath, speed: float):
+    def __init__(self, id_wave: int, ppath: ParameterizedPath, speed: float):
         super().__init__()
         self.pnode = None
+
+        self.__class__._id_counter += 1
+        self.id = self._id_counter
+        self.id_wave = id_wave
 
         self.dist = 0
         self.health = 100
         self.ppath = ppath
         self.speed = speed
+        self.status = UnitStatus.PRESPAWN
 
         self._intervals = dict()
 
@@ -39,18 +58,23 @@ class Unit(Renderable[RenderUnitEvents, "Actor"]):
 
         import g
 
+        # Don't spawn units after death
+        if not self.render_queue:
+            return
+
         if not self.pnode:
+            print("spawning actor")
             self.pnode = Actor(
                 "data/assets/glTF-Sample-Models/2.0/BoomBox/glTF/BoomBox.gltf"
             )
             self.pnode.getChild(0).setScale(20)
             self.pnode.reparentTo(g.render)
 
-        if self.get_latest_render(RenderUnitPosition):
+        if self.get_latest_event(RenderUnitPosition):
             pos = self.ppath.points[int(self.dist)].pos
             self.pnode.setPos(pos[0], pos[1], 0)
 
-        if self.get_latest_render(RenderUnitMovement):
+        if self.get_latest_event(RenderUnitMovement):
             pos = self.ppath.points[int(self.dist)].pos
 
             frac, idx = modf(self.dist)
@@ -68,7 +92,11 @@ class Unit(Renderable[RenderUnitEvents, "Actor"]):
             )
             self._intervals["pos"].start()
 
+        if self.get_latest_event(RenderUnitDeath):
+            self.delete()
+
     def delete(self):
         if self.pnode:
             self.pnode.cleanup()
             self.pnode.removeNode()
+            self.pnode = None
