@@ -2,6 +2,7 @@ import sys
 import time
 
 from game.game import Game
+from game.map import Map
 from game.parameterized_path import ParameterizedPath
 from game.play.apply_damage import apply_damage
 from game.play.play_cache import PlayCache
@@ -19,7 +20,7 @@ from game.unit.unit import Unit, UnitStatus
 from game.unit.unit_manager import UnitManager
 from utils.misc_utils import find_or_throw
 
-TICK_FREQ_S = 4
+TICK_FREQ_S = 24
 TICK_PERIOD_S = 1 / TICK_FREQ_S
 BUILD_TIME_S = 30
 
@@ -56,6 +57,7 @@ async def play_game(scenario: Scenario, sleep_fn: SleepFunction):
         ctx.game.render(0)
 
     print(f"Game end")
+    _teardown()
 
 
 async def _play_round(ctx: PlayContext, cache: PlayCache):
@@ -94,6 +96,7 @@ async def _play_round(ctx: PlayContext, cache: PlayCache):
 
         # Stop loop on round end
         if is_round_end:
+            print("Build phase")
             game.next_tick = game.next_tick + BUILD_TIME_S
             break
         else:
@@ -151,3 +154,16 @@ def _move_units(ctx: PlayContext, cache: PlayCache):
         if unit.dist >= unit.ppath.length - 1:
             ctx.game.unit_mgr.set_status(unit, UnitStatus.DEAD)
             unit.render_queue.append(RenderUnitDeath())
+
+
+def _teardown():
+    actors = [Unit]
+    for a in actors:
+        if a.model:
+            a.model.cleanup()
+            a.model.removeNode()
+
+    renderables = [Map]
+    for r in renderables:
+        if r.model:
+            r.model.removeNode()

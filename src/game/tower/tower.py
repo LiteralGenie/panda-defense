@@ -7,10 +7,10 @@ from game.scenario import Point
 from game.tower.render_tower_events import RenderTowerEvents, RenderTowerPosition
 
 if TYPE_CHECKING:
-    from direct.actor.Actor import Actor
+    from panda3d.core import NodePath
 
 
-class Tower(Renderable[RenderTowerEvents, "Actor"], ABC):
+class Tower(Renderable[RenderTowerEvents, "NodePath"], ABC):
     pos: Point
     range: Range
 
@@ -23,14 +23,19 @@ class Tower(Renderable[RenderTowerEvents, "Actor"], ABC):
 
     def render(self, period_s: float):
         from direct.actor.Actor import Actor
+        from panda3d.core import NodePath
 
         import g
 
-        if not self.pnode:
-            self.pnode = Actor(
+        if not self.__class__.model:
+            self.__class__.model = Actor(
                 "data/assets/glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf",
-                dict(),
             )
+
+        if not self.pnode:
+            self.pnode = NodePath("")
+            self.__class__.model.instanceTo(self.pnode)
+
             self.pnode.getChild(0).setScale(15)
             self.pnode.setH(-90)
             self.pnode.reparentTo(g.render)

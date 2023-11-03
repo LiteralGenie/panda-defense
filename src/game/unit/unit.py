@@ -12,8 +12,8 @@ from game.unit.render_unit_events import (
 )
 
 if TYPE_CHECKING:
-    from direct.actor.Actor import Actor
     from direct.interval.Interval import Interval
+    from panda3d.core import NodePath
 
 
 class UnitStatus(Enum):
@@ -22,7 +22,7 @@ class UnitStatus(Enum):
     DEAD = "DEAD"
 
 
-class Unit(Renderable[RenderUnitEvents, "Actor"]):
+class Unit(Renderable[RenderUnitEvents, "NodePath"]):
     _id_counter: ClassVar[int] = 0
 
     id: int
@@ -54,7 +54,7 @@ class Unit(Renderable[RenderUnitEvents, "Actor"]):
 
     def render(self, period_s: float):
         from direct.actor.Actor import Actor
-        from panda3d.core import Point3
+        from panda3d.core import NodePath, Point3
 
         import g
 
@@ -62,10 +62,15 @@ class Unit(Renderable[RenderUnitEvents, "Actor"]):
         if not self.render_queue:
             return
 
-        if not self.pnode:
-            self.pnode = Actor(
+        if not self.__class__.model:
+            self.__class__.model = Actor(
                 "data/assets/glTF-Sample-Models/2.0/BoomBox/glTF/BoomBox.gltf"
             )
+
+        if not self.pnode:
+            self.pnode = NodePath("")
+            self.__class__.model.instanceTo(self.pnode)
+
             self.pnode.getChild(0).setScale(20)
             self.pnode.reparentTo(g.render)
 
@@ -96,6 +101,5 @@ class Unit(Renderable[RenderUnitEvents, "Actor"]):
 
     def delete(self):
         if self.pnode:
-            self.pnode.cleanup()
             self.pnode.removeNode()
             self.pnode = None

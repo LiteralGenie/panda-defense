@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Generic, Type, TypeVar
+from typing import TYPE_CHECKING, ClassVar, Generic, Type, TypeVar
 
 from utils.misc_utils import find
 
@@ -12,6 +12,7 @@ T = TypeVar("T")
 
 
 class Renderable(Generic[Events, NodeType], ABC):
+    model: "ClassVar[NodeType | None]" = None  # type: ignore
     pnode: "NodeType | None"
     render_queue: list[Events]
 
