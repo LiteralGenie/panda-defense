@@ -3,8 +3,17 @@ from typing import Any, Callable, TypeVar
 T = TypeVar("T")
 
 
-def find_or_throw(xs: list[T], is_match: Callable[[T], bool]) -> T:
-    idx = find_index(xs, is_match)
+def find(xs: list[T], is_match: Callable[[T], bool], reverse: bool = False) -> T | None:
+    idx = find_index(xs, is_match, reverse=reverse)
+    if idx is None:
+        return None
+    return xs[idx]
+
+
+def find_or_throw(
+    xs: list[T], is_match: Callable[[T], bool], reverse: bool = False
+) -> T:
+    idx = find_index(xs, is_match, reverse=reverse)
     if idx is None:
         raise Exception("Not found")
     return xs[idx]
@@ -17,7 +26,10 @@ def find_index(
 ) -> int | None:
     """Find smallest index that satisfies is_match()"""
 
-    it = range(0, len(xs), 1) if not reverse else range(len(xs), -1, -1)
+    if len(xs) == 0:
+        return None
+
+    it = range(0, len(xs), 1) if not reverse else range(len(xs) - 1, -1, -1)
 
     for idx in it:
         x = xs[idx]

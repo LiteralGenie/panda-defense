@@ -1,6 +1,6 @@
 from game.range import PyramidalRange
 from game.scenario import Point
-from game.tower import Tower
+from game.tower.tower import Tower
 
 
 class BasicTower(Tower):

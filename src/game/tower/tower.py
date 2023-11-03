@@ -1,17 +1,17 @@
 from abc import ABC
-
-from direct.actor.Actor import Actor
-from panda3d.core import NodePath
+from typing import TYPE_CHECKING
 
 from game.range import Range
+from game.renderable import Renderable
 from game.scenario import Point
-from game.stateful import Stateful, StatefulProp
+from game.tower.render_tower_events import RenderTowerEvents, RenderTowerPosition
+
+if TYPE_CHECKING:
+    from direct.actor.Actor import Actor
 
 
-class Tower(Stateful, ABC):
-    pnode: Actor | None
-
-    pos: Point = StatefulProp()  # type: ignore
+class Tower(Renderable[RenderTowerEvents, "Actor"], ABC):
+    pos: Point
     range: Range
 
     def __init__(self, pos: Point, range: Range):
@@ -21,7 +21,11 @@ class Tower(Stateful, ABC):
         self.pos = pos
         self.range = range
 
-    def render(self, parent: NodePath, period_s: float):
+    def render(self, period_s: float):
+        from direct.actor.Actor import Actor
+
+        import g
+
         if not self.pnode:
             self.pnode = Actor(
                 "data/assets/glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf",
@@ -29,9 +33,7 @@ class Tower(Stateful, ABC):
             )
             self.pnode.getChild(0).setScale(15)
             self.pnode.setH(-90)
-            self.pnode.reparentTo(parent)
+            self.pnode.reparentTo(g.render)
 
-        if self.state["pos"].needs_check:
+        if self.get_latest_render(RenderTowerPosition):
             self.pnode.setPos(self.pos[0], self.pos[1], 0)
-
-        super().save_props()

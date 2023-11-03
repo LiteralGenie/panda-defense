@@ -1,14 +1,10 @@
-import time
-
 import simplepbr
 from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import Task
 from panda3d.core import WindowProperties
 
-from game.game import Game
 from game.map import Map
 from game.play.play import play_game
-from game.play.play_context import PlayContext
 from game.scenario import Path, Round, Scenario, Segment, Wave
 
 
@@ -65,15 +61,7 @@ class App(ShowBase):
 
         self.win.requestProperties(properties)
 
-        self.game = Game(scenario=build_test_scenario())
-
-        ctx = PlayContext(
-            game=self.game,
-            first_tick=time.time(),
-            render=True,
-            sleep_fn=Task.pause,
-        )
-        self.task_mgr.add(play_game(ctx))
+        self.task_mgr.add(play_game(build_test_scenario(), Task.pause))
 
 
 app = App()

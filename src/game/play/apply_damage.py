@@ -2,15 +2,21 @@ import math
 
 from game.play.play_cache import PlayCache
 from game.play.play_context import PlayContext
-from game.play.target import consolidate_targets, find_tower_targets
-from game.towers.basic import BasicTower
+from game.play.target import find_tower_targets, flatten_targets
+from game.tower.basic import BasicTower
+from game.unit.unit import Unit
 
 
 def apply_damage(ctx: PlayContext, cache: PlayCache):
-    lanes = ctx.game.map.lanes
-    units = {path_id: lane.units for path_id, lane in ctx.game.map.lanes.items()}
+    # todo: why not store units pre-grouped by lane?
+    #       so we can skip this grouping step every tick
+    units: dict[int, list[Unit]] = {p.id: [] for p in ctx.game.scenario.paths.values()}
+    for u in ctx.game.units:
+        pid = u.ppath.id
+        units[pid].append(u)
 
-    for tower in ctx.game.map.towers:
+    to_delete: set[Unit] = set()
+    for tower in ctx.game.towers:
         if isinstance(tower, BasicTower):
             tower.attack_speed_guage += tower.attack_speed
             rem, attacks = math.modf(tower.attack_speed_guage)
@@ -18,7 +24,7 @@ def apply_damage(ctx: PlayContext, cache: PlayCache):
 
             if attacks > 0:
                 targets = find_tower_targets(tower, units, cache.ranges)
-                targets = consolidate_targets(targets)
+                targets = flatten_targets(targets)
 
                 if targets:
                     print(f"Attacking {len(targets)} targets {attacks:.0f} times")
@@ -31,9 +37,13 @@ def apply_damage(ctx: PlayContext, cache: PlayCache):
                     tgt = targets[tgt_idx]
                     tgt.unit.health -= tower.damage
                     print("Target HP:", tgt.unit.health)
+                    # render: damage
 
                     if tgt.unit.health <= 0:
-                        lanes[tgt.path.id].remove_unit(tgt.unit)
+                        to_delete.add(tgt.unit)
                         tgt_idx += 1
         else:
             raise Exception(f"Unknown tower type: {tower.__class__.__name__}", tower)
+
+    ctx.game.units = [u for u in ctx.game.units if u not in to_delete]
+    [u.delete() for u in to_delete]

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from game.parameterized_path import ParameterizedPath
 from game.play.range_cache import RangeCache
-from game.tower import Tower
+from game.tower.tower import Tower
 from game.unit.unit import Unit
 from utils.misc_utils import find_or_throw
 
@@ -42,7 +42,7 @@ def find_tower_targets(
     return targets_by_path
 
 
-def consolidate_targets(targets_by_path: TargetsByPath) -> list[Target]:
+def flatten_targets(targets_by_path: TargetsByPath) -> list[Target]:
     """Consolidate targets from all paths into single sorted list"""
 
     result: list[Target] = []

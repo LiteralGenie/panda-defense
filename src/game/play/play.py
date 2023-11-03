@@ -1,12 +1,16 @@
 import sys
 import time
 
-import g
+from game.game import Game
+from game.parameterized_path import ParameterizedPath
 from game.play.apply_damage import apply_damage
 from game.play.play_cache import PlayCache
-from game.play.play_context import PlayContext
+from game.play.play_context import PlayContext, SleepFunction
 from game.play.range_cache import RangeCache
-from game.towers.basic import BasicTower
+from game.scenario import Scenario
+from game.tower.basic import BasicTower
+from game.tower.render_tower_events import RenderTowerPosition
+from game.unit.render_unit_events import RenderUnitMovement, RenderUnitPosition
 from game.unit.unit import Unit
 
 TICK_FREQ_S = 4
@@ -14,16 +18,25 @@ TICK_PERIOD_S = 1 / TICK_FREQ_S
 BUILD_TIME_S = 30
 
 
-async def play_game(ctx: PlayContext):
+async def play_game(scenario: Scenario, sleep_fn: SleepFunction):
+    game = Game(scenario, time.time())
+
+    ctx = PlayContext(
+        game=game,
+        render=True,
+        sleep_fn=sleep_fn,
+    )
     game = ctx.game
 
-    game.next_tick = ctx.first_tick
-
+    ppaths = {id: ParameterizedPath(p) for id, p in ctx.game.scenario.paths.items()}
     cache = PlayCache(
-        ranges=RangeCache([lane.ppath for lane in game.map.lanes.values()]),
+        ppaths=ppaths,
+        ranges=RangeCache(list(ppaths.values())),
     )
 
-    game.map.add_tower(BasicTower(pos=(1, 1)))
+    tower = BasicTower(pos=(1, 1))
+    game.towers.append(tower)
+    tower.render_queue.append(RenderTowerPosition())
 
     for i in range(len(game.scenario.rounds)):
         game.round = i
@@ -42,12 +55,13 @@ async def _play_round(ctx: PlayContext, cache: PlayCache):
             # Render game state if we have time before next tick
             # (This should happen every tick unless potato processor causes
             #  backlogged updates that skip this rendering step)
-            game.render(g.render, delay)
+            game.render(delay)
             delay = game.next_tick - time.time()
         if delay > 0:
             await ctx.sleep_fn(delay)
 
         game.tick += 1
+        print(game.tick)
         start = time.time()
 
         # Validate and apply actions
@@ -79,7 +93,7 @@ def _update_game_state(ctx: PlayContext, cache: PlayCache) -> bool:
 
     apply_damage(ctx, cache)
 
-    all_dead = all(len(lane.units) == 0 for lane in ctx.game.map.lanes.values())
+    all_dead = len(ctx.game.units) == 0
     return all_dead
 
 
@@ -92,25 +106,30 @@ def _spawn_units(ctx: PlayContext, cache: PlayCache):
         tick_end = (wave.enemies - 1) * wave.spawn_delay_ticks
         is_spawn_tick = 0 == tick % wave.spawn_delay_ticks
 
-        if tick < tick_end and is_spawn_tick:
+        if tick <= tick_end and is_spawn_tick:
             unit = Unit(
+                ppath=cache.ppaths[wave.id_path],
                 speed=0.25,
             )
-            lane = ctx.game.map.lanes[wave.id_path]
-            lane.add_unit(unit)
+            ctx.game.units.append(unit)
+            unit.render_queue.append(RenderUnitPosition())
 
 
 def _move_units(ctx: PlayContext, cache: PlayCache):
-    for lane in ctx.game.map.lanes.values():
-        for unit in lane.units:
-            unit.dist += unit.speed
+    to_delete: set[Unit] = set()
 
-            # Remove unit if it completed path
-            if unit.dist >= lane.ppath.length - 1:
-                lane.remove_unit(unit)
+    for unit in ctx.game.units:
+        unit.dist += unit.speed
+        unit.render_queue.append(RenderUnitMovement())
+
+        # Remove unit if it completed path
+        if unit.dist >= unit.ppath.length - 1:
+            to_delete.add(unit)
+
+    ctx.game.units = [u for u in ctx.game.units if u not in to_delete]
+    [u.delete() for u in to_delete]
 
 
 def _sort_units(ctx: PlayContext, cache: PlayCache):
     # Sort units by distance traveled
-    for lane in ctx.game.map.lanes.values():
-        lane.units.sort(key=lambda u: u.dist)
+    ctx.game.units.sort(key=lambda u: u.dist)
