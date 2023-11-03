@@ -19,7 +19,7 @@ from game.unit.unit import Unit, UnitStatus
 from game.unit.unit_manager import UnitManager
 from utils.misc_utils import find_or_throw
 
-TICK_FREQ_S = 24
+TICK_FREQ_S = 4
 TICK_PERIOD_S = 1 / TICK_FREQ_S
 BUILD_TIME_S = 30
 
@@ -132,7 +132,11 @@ def _spawn_units(ctx: PlayContext, cache: PlayCache):
         is_spawn_tick = 0 == ticks_elapsed % wave.spawn_delay_ticks
 
         if ticks_elapsed <= tick_end and is_spawn_tick:
-            units = ctx.game.unit_mgr.list_from_wave(wave.id)
+            units = ctx.game.unit_mgr.select(
+                id_wave=wave.id,
+                status=UnitStatus.PRESPAWN,
+                fetch_one=True,
+            )
             u = find_or_throw(units, lambda u: u.status == UnitStatus.PRESPAWN)
             ctx.game.unit_mgr.set_status(u, UnitStatus.ALIVE)
             u.render_queue.append(RenderUnitPosition())

@@ -17,12 +17,13 @@ class Target:
         return self.path.length - self.unit.dist
 
 
-TargetsByPath = dict[int, list[Target]]
+_Id = int
+TargetsByPath = dict[_Id, list[Target]]
 
 
 def find_tower_targets(
     tower: Tower,
-    units_sorted: dict[int, list[Unit]],
+    units_sorted: dict[_Id, list[Unit]],
     cache: RangeCache,
 ) -> TargetsByPath:
     """Find targets in range of tower, grouped by path"""

@@ -10,6 +10,11 @@ from utils.misc_utils import find
 
 
 def apply_damage(ctx: PlayContext, cache: PlayCache):
+    units = {
+        ppath.id: ctx.game.unit_mgr.select(id_path=ppath.id)
+        for ppath in cache.ppaths.values()
+    }
+
     for tower in ctx.game.towers:
         if isinstance(tower, BasicTower):
             tower.attack_speed_guage += tower.attack_speed
@@ -17,9 +22,7 @@ def apply_damage(ctx: PlayContext, cache: PlayCache):
             tower.attack_speed_guage = rem
 
             if attacks > 0:
-                targets = find_tower_targets(
-                    tower, ctx.game.unit_mgr.by_path, cache.ranges
-                )
+                targets = find_tower_targets(tower, units, cache.ranges)
                 targets = flatten_targets(targets)
                 targets = [tgt.unit for tgt in targets]
 

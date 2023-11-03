@@ -1,20 +1,19 @@
-from dataclasses import dataclass
-from typing import Generic, Iterator, TypeVar
-
-from sortedcontainers import SortedKeyList
+import sqlite3
+from sqlite3 import Connection
+from typing import Iterator, Literal, NotRequired, TypedDict, Unpack
 
 from game.unit.unit import Unit, UnitStatus
+from utils.where_builder import WhereBuilder
 
 _Id = int
-_UnitIds = set[int]
-
-T = TypeVar("T")
 
 
-@dataclass
-class _WeightedUnitId(Generic[T]):
-    id: int
-    weight: T
+class _Filters(TypedDict):
+    id_path: NotRequired[_Id]
+    id_wave: NotRequired[_Id]
+
+    dist: NotRequired[float]
+    status: NotRequired[UnitStatus]
 
 
 class UnitManager:
@@ -22,83 +21,107 @@ class UnitManager:
 
     _units: dict[_Id, Unit]
 
-    _units_by_path: dict[_Id, SortedKeyList[_WeightedUnitId[float], float]]
-    _units_by_status: dict[UnitStatus, _UnitIds]
-    _units_by_wave: dict[_Id, _UnitIds]
+    _db: Connection
 
     def __init__(self):
         self._units = dict()
 
-        self._units_by_path = dict()
-        self._units_by_status = dict()
-        self._units_by_wave = dict()
+        self._db = self._init_db()
 
     def add(self, unit: Unit):
         self._units[unit.id] = unit
-        self._add_by_path(unit)
-        self._add_by_status(unit)
-        self._add_by_wave(unit)
+        self._insert(unit)
 
     def set_dist(self, unit: Unit, dist: float):
-        old = _WeightedUnitId(id=unit.id, weight=unit.dist)
-        self._units_by_path[unit.ppath.id].remove(old)
-
         unit.dist = dist
-        self._add_by_path(unit)
+        self._insert(unit)
 
     def set_status(self, unit: Unit, status: UnitStatus):
-        self._units_by_status[unit.status].remove(unit.id)
-
         unit.status = status
-        self._add_by_status(unit)
+        self._insert(unit)
 
-    def _add_by_path(self, unit: Unit):
-        self._units_by_path.setdefault(unit.ppath.id, SortedKeyList(key=self._weigh))
+    def select(
+        self,
+        fetch_one: bool = False,
+        order_by: Literal["id"] = "id",
+        descending: bool = False,
+        **filters: Unpack[_Filters],
+    ) -> list[Unit]:
+        wb = WhereBuilder()
 
-        item = _WeightedUnitId(id=unit.id, weight=unit.dist)
-        self._units_by_path[unit.ppath.id].add(item)
+        if id_wave := filters.get("id_wave"):
+            wb.add("id_wave = ?", [id_wave])
 
-    def _add_by_status(self, unit: Unit):
-        self._units_by_status.setdefault(unit.status, set())
-        self._units_by_status[unit.status].add(unit.id)
+        if id_path := filters.get("id_path"):
+            wb.add("id_path = ?", [id_path])
 
-    def _add_by_wave(self, unit: Unit):
-        self._units_by_wave.setdefault(unit.id_wave, set())
-        self._units_by_wave[unit.id_wave].add(unit.id)
+        if dist := filters.get("dist"):
+            wb.add("dist = ?", [dist])
 
-    @staticmethod
-    def _weigh(wui: _WeightedUnitId[T]) -> T:
-        return wui.weight
+        if status := filters.get("status"):
+            wb.add("status = ?", [status.value])
+
+        asc_or_desc = "DESC" if descending else "ASC"
+
+        where, values = wb.print()
+
+        query = self._db.execute(
+            f"""
+            SELECT id FROM units
+            {where}
+            ORDER BY {order_by} {asc_or_desc}
+            """,
+            values,
+        )
+
+        rows = [query.fetchone()] if fetch_one else query.fetchall()
+        return [self._units[r["id"]] for r in rows]
+
+    def clear(self) -> None:
+        self._units.clear()
+        self._db.execute("DELETE FROM units")
+
+    def _init_db(self) -> Connection:
+        db = sqlite3.connect(":memory:", detect_types=True)
+        db.row_factory = sqlite3.Row
+
+        db.execute(
+            """
+            CREATE TABLE units (
+                id          INTEGER     PRIMARY KEY,
+                id_wave     INTEGER,
+                id_path     INTEGER,
+
+                dist        REAL,
+                status      TEXT
+            )
+            """
+        )
+
+        return db
+
+    def _insert(self, unit: Unit):
+        self._db.execute(
+            """
+            INSERT OR REPLACE INTO units
+                (id, id_wave, id_path, dist, status)
+            VALUES
+                (?, ?, ?, ?, ?)
+            """,
+            [unit.id, unit.id_wave, unit.ppath.id, unit.dist, unit.status.value],
+        )
 
     def __iter__(self) -> Iterator[Unit]:
         yield from self._units.values()
 
     @property
     def prespawn(self) -> list[Unit]:
-        ids = self._units_by_status.get(UnitStatus.PRESPAWN, set())
-        return [self._units[id] for id in ids]
+        return self.select(status=UnitStatus.PRESPAWN)
 
     @property
     def alive(self) -> list[Unit]:
-        ids = self._units_by_status.get(UnitStatus.ALIVE, set())
-        return [self._units[id] for id in ids]
+        return self.select(status=UnitStatus.ALIVE)
 
     @property
     def dead(self) -> list[Unit]:
-        ids = self._units_by_status.get(UnitStatus.DEAD, set())
-        return [self._units[id] for id in ids]
-
-    @property
-    def by_path(self) -> dict[int, list[Unit]]:
-        return {
-            id_path: [self._units[wui.id] for wui in wuis]
-            for id_path, wuis in self._units_by_path.items()
-        }
-
-    def list_from_path(self, id_path: int) -> list[Unit]:
-        wuis = self._units_by_path[id_path]
-        return [self._units[x.id] for x in wuis]
-
-    def list_from_wave(self, id_wave: int) -> list[Unit]:
-        ids = self._units_by_wave.get(id_wave, set())
-        return [self._units[id] for id in ids]
+        return self.select(status=UnitStatus.DEAD)

@@ -63,7 +63,6 @@ class Unit(Renderable[RenderUnitEvents, "Actor"]):
             return
 
         if not self.pnode:
-            print("spawning actor")
             self.pnode = Actor(
                 "data/assets/glTF-Sample-Models/2.0/BoomBox/glTF/BoomBox.gltf"
             )
