@@ -26,7 +26,11 @@ def find_tower_targets(
     units_sorted: dict[_Id, list[Unit]],
     cache: RangeCache,
 ) -> TargetsByPath:
-    """Find targets in range of tower, grouped by path"""
+    """
+    Find targets in range of tower, grouped by path
+
+    units_sorted should be ordered by dist ascending
+    """
 
     ivl_map = cache.get(tower.pos, tower.range)
 
@@ -36,7 +40,7 @@ def find_tower_targets(
         targets_by_path[id_path] = []
 
         for ivl in intervals:
-            units = ivl.find_units_sorted(units_sorted[id_path])
+            units = ivl.filter_units(units_sorted[id_path])
             targets = [Target(unit=unit, path=path) for unit in units]
             targets_by_path[id_path].extend(targets)
 

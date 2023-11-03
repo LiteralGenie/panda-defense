@@ -15,7 +15,7 @@ class PathInterval:
         self.start = start
         self.end = end
 
-    def find_units_sorted(self, units_sorted: list[Unit]) -> list[Unit]:
+    def filter_units(self, units_sorted: list[Unit]) -> list[Unit]:
         if not len(units_sorted):
             return []
 

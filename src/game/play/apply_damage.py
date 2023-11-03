@@ -11,7 +11,9 @@ from utils.misc_utils import find
 
 def apply_damage(ctx: PlayContext, cache: PlayCache):
     units = {
-        ppath.id: ctx.game.unit_mgr.select(id_path=ppath.id)
+        ppath.id: ctx.game.unit_mgr.select(
+            id_path=ppath.id, status=UnitStatus.ALIVE, order_by="dist"
+        )
         for ppath in cache.ppaths.values()
     }
 

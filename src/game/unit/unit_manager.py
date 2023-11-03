@@ -43,11 +43,11 @@ class UnitManager:
     def select(
         self,
         fetch_one: bool = False,
-        order_by: Literal["id"] = "id",
+        order_by: Literal["id", "id_wave", "id_path", "dist", "status", "dist"] = "id",
         descending: bool = False,
         **filters: Unpack[_Filters],
     ) -> list[Unit]:
-        wb = WhereBuilder()
+        wb = WhereBuilder("AND")
 
         if id_wave := filters.get("id_wave"):
             wb.add("id_wave = ?", [id_wave])

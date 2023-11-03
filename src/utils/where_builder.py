@@ -1,19 +1,21 @@
 from itertools import chain
 from typing import Any, Literal, Type
 
+WhereBuilderMode = Literal["AND", "OR"]
+
 
 class _EmptyList:
     pass
 
 
 class WhereBuilder:
-    mode: Literal["AND", "OR"]
+    mode: WhereBuilderMode
     builders: "list[WhereBuilder]"
     conditions: list[str]
     values: list[list[Any]]
 
-    def __init__(self):
-        self.mode = "AND"
+    def __init__(self, mode: WhereBuilderMode = "AND"):
+        self.mode = mode
         self.builders = []
         self.conditions = []
         self.values = []
