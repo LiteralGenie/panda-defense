@@ -18,7 +18,6 @@ from game.unit.render_unit_events import (
 )
 from game.unit.unit import Unit, UnitStatus
 from game.unit.unit_manager import UnitManager
-from utils.misc_utils import find_or_throw
 
 TICK_FREQ_S = 24
 TICK_PERIOD_S = 1 / TICK_FREQ_S
@@ -89,7 +88,9 @@ async def _play_round(ctx: PlayContext, cache: PlayCache):
         # Update game state
         is_round_end = _update_game_state(ctx, cache)
 
-        # Raise warning if this tick took a while to finish
+        # Calculations should never (consistently) run over than tick period
+        # (assuming the tick times are constant and reproducible
+        #  simplifies a lot of the client-server and multiplayer syncing)
         elapsed = time.time() - start
         if elapsed > TICK_PERIOD_S * 0.8:
             print(f"Mid-tick calculations took {elapsed * 1000:.0f}ms", file=sys.stderr)
@@ -135,12 +136,11 @@ def _spawn_units(ctx: PlayContext, cache: PlayCache):
         is_spawn_tick = 0 == ticks_elapsed % wave.spawn_delay_ticks
 
         if ticks_elapsed <= tick_end and is_spawn_tick:
-            units = ctx.game.unit_mgr.select(
+            u = ctx.game.unit_mgr.select(
                 id_wave=wave.id,
                 status=UnitStatus.PRESPAWN,
                 fetch_one=True,
-            )
-            u = find_or_throw(units, lambda u: u.status == UnitStatus.PRESPAWN)
+            )[0]
             ctx.game.unit_mgr.set_status(u, UnitStatus.ALIVE)
             u.render_queue.append(RenderUnitPosition())
 
@@ -160,7 +160,7 @@ def _teardown():
     actors = [Unit]
     for a in actors:
         if a.model:
-            a.model.cleanup()
+            a.model.cleanup() # type: ignore
             a.model.removeNode()
 
     renderables = [Map]
