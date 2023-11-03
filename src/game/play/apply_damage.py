@@ -4,7 +4,8 @@ from game.play.play_cache import PlayCache
 from game.play.play_context import PlayContext
 from game.play.target import find_tower_targets, flatten_targets
 from game.tower.basic import BasicTower
-from game.unit.render_unit_events import RenderUnitDeath
+from game.tower.render_tower_events import RenderTowerAttack
+from game.unit.render_unit_events import RenderUnitDamage, RenderUnitDeath
 from game.unit.unit import UnitStatus
 from utils.misc_utils import find
 
@@ -35,7 +36,9 @@ def apply_damage(ctx: PlayContext, cache: PlayCache):
 
                     tgt.health -= tower.damage
                     print("Target HP:", tgt.health)
-                    # render: damage
+
+                    tgt.render_queue.append(RenderTowerAttack())
+                    tgt.render_queue.append(RenderUnitDamage())
 
                     if tgt.health <= 0:
                         ctx.game.unit_mgr.set_status(tgt, UnitStatus.DEAD)

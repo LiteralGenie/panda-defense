@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from game.range import Range
 from game.renderable import Renderable
 from game.scenario import Point
-from game.tower.render_tower_events import RenderTowerEvents, RenderTowerPosition
+from game.tower.render_tower_events import RenderTowerAttack, RenderTowerEvents, RenderTowerPosition
 
 if TYPE_CHECKING:
     from panda3d.core import NodePath
@@ -42,3 +42,6 @@ class Tower(Renderable[RenderTowerEvents, "NodePath"], ABC):
 
         if self.get_latest_event(RenderTowerPosition):
             self.pnode.setPos(self.pos[0], self.pos[1], 0)
+        
+        if self.get_latest_event(RenderTowerAttack):
+            pass

@@ -6,4 +6,9 @@ class RenderTowerPosition:
     pass
 
 
-RenderTowerEvents = RenderTowerPosition
+@dataclass
+class RenderTowerAttack:
+    pass
+
+
+RenderTowerEvents = RenderTowerPosition | RenderTowerAttack

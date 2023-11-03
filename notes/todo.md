@@ -1,5 +1,4 @@
 logging
-dont create new actor with same model for all units
 push rendering into its own thread / process
 units should not move diagonally
 
@@ -9,3 +8,4 @@ units should not move diagonally
         just skip rendering if not-spawned or dead
         trades more memory for faster deletions
 [x] use in-memory db for UnitManager
+[x] dont create new actor with same model for all units
