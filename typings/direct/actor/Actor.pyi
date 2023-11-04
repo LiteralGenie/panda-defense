@@ -1,6 +1,0 @@
-from direct.interval.Interval import Interval
-from panda3d.core import NodePath
-
-class Actor(NodePath):
-    def __init__(self, models: str, anims: dict[str, str] = dict()) -> None: ...
-    def cleanup(self) -> Interval: ...
