@@ -8,6 +8,11 @@ actor docs missing functions
     lerp helpers like posInterval()
 practical distinction between PandaNode and NodePath is muddled
     which constructors / functions accept which?
+(!) directgui coords are funky
+    on a landscape screen, no way to specify "X occupies 10% of the screen width"
+        (and is positioned with left edge starting at 90%_of_viewport)
+    because the min / max x coord depends on the vertical axis height
+    workaround is to manually recalculate layout when window size changes
 
 # python
 generics suck

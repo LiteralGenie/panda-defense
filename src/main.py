@@ -55,13 +55,13 @@ class App(ShowBase):
 
         self.camera.setPos(0, 0, 40)
         self.camera.setP(-90)
-        self.disableMouse()
+        self.disable_mouse()
 
         properties = WindowProperties()
-        properties.setOrigin(7680, 0)
-        properties.setSize(3840, 2160)
+        properties.set_origin(7680, 0)
+        properties.set_size(3840, 2160)
 
-        self.win.requestProperties(properties)
+        self.win.request_properties(properties)
 
         self.task_mgr.add(play_game(build_test_scenario(), Task.pause))
 

@@ -77,7 +77,7 @@ async def _play_round(ctx: PlayContext, cache: PlayCache):
             await ctx.sleep_fn(delay)
 
         game.tick += 1
-        print(game.tick)
+        # print("Tick", game.tick)
         start = time.time()
 
         # Validate and apply actions
@@ -160,7 +160,7 @@ def _teardown():
     actors = [Unit]
     for a in actors:
         if a.model:
-            a.model.cleanup() # type: ignore
+            a.model.cleanup()  # type: ignore
             a.model.removeNode()
 
     renderables = [Map]

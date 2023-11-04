@@ -1,10 +1,16 @@
+from typing import TYPE_CHECKING
+
 from game.map import Map
+from game.renderable import Renderable
 from game.scenario import Round, Scenario
 from game.tower.tower import Tower
 from game.unit.unit_manager import UnitManager
 
+if TYPE_CHECKING:
+    from game.gui.battle_gui import BattleGui
 
-class Game:
+
+class Game(Renderable[None, "BattleGui"]):
     action_queue: list[None]
     scenario: Scenario
 
@@ -33,6 +39,11 @@ class Game:
         self.unit_mgr = UnitManager()
 
     def render(self, period_s: float):
+        from game.gui.battle_gui import BattleGui
+
+        if not self.pnode:
+            self.pnode = BattleGui()
+
         self.map.render(period_s)
         self.map.render_queue = []
 

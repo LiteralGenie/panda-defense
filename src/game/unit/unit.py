@@ -34,7 +34,7 @@ class Unit(Renderable[RenderUnitEvents, "NodePath"]):
     speed: float  # todo: use Decimal
     status: UnitStatus
 
-    _intervals: dict[str, "Interval"]
+    _intervals: "dict[str, Interval]"
 
     def __init__(self, id_wave: int, ppath: ParameterizedPath, speed: float):
         super().__init__()

@@ -6,15 +6,15 @@ from utils.misc_utils import find
 if TYPE_CHECKING:
     from panda3d.core import NodePath
 
-Events = TypeVar("Events")
-NodeType = TypeVar("NodeType", bound="NodePath")
+RenderEventType = TypeVar("RenderEventType")
+NodeType = TypeVar("NodeType")
 T = TypeVar("T")
 
 
-class Renderable(Generic[Events, NodeType], ABC):
+class Renderable(Generic[RenderEventType, NodeType], ABC):
     model: "ClassVar[NodeType | None]" = None  # type: ignore
     pnode: "NodeType | None"
-    render_queue: list[Events]
+    render_queue: list[RenderEventType]
 
     def __init__(self):
         self.pnode = None
@@ -29,4 +29,4 @@ class Renderable(Generic[Events, NodeType], ABC):
             self.render_queue,
             lambda ev: isinstance(ev, ev_type),
             reverse=True,
-        )
+        )  # type: ignore
