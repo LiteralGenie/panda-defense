@@ -9,7 +9,7 @@ from utils.gui_utils import get_w, set_relative_frame_size
 
 
 class BattleGui(DirectObject):
-    root: DirectFrame
+    sidebar: DirectFrame
     sidebar: DirectFrame
     tower_grid: TowerGrid
 
@@ -26,29 +26,22 @@ class BattleGui(DirectObject):
         self.accept("aspectRatioChanged", lambda: self._recalculate_layout())
 
     def _init_nodes(self):
-        self.root = DirectFrame(
+        self.sidebar = DirectFrame(
             g.aspect2d,
-            frameSize=(-0.1, 0.1, -0.1, 0.1),
-            frameColor=(0, 0, 1, 0),
+            frameColor=(0, 1, 0, 0.5),
             state=DGG.NORMAL,
         )
         # self.root.bind(
         #     DGG.B1PRESS, lambda *args, **kwargs: print("root B1PRESS"), [self.root]
         # )
-        self.root.bind(
-            DGG.B1RELEASE, lambda *args, **kwargs: print("root B1RELEASE"), [self.root]
-        )
+        # self.root.bind(
+        #     DGG.B1RELEASE, lambda *args, **kwargs: print("root B1RELEASE"), [self.root]
+        # )
         # self.root.bind(DGG.CURSORMOVE, lambda _: print("root CURSORMOVE"))
         # self.root.bind(DGG.WITHIN, lambda _: print("root WITHIN"))
         # self.root.bind(DGG.WITHOUT, lambda _: print("root WITHOUT"))
 
-        self.sidebar = DirectFrame(
-            self.root,
-            frameColor=(0, 1, 0, 0.5),
-        )
-
         self.tower_grid = TowerGrid(
-            root=self.sidebar,
             parent=self.sidebar,
             num_cols=self.TILE_COLS,
             gap_percent=self.TILE_GAP_PERCENT,
@@ -74,7 +67,7 @@ class BattleGui(DirectObject):
         vp_wh = (vp_width, vp_height)
 
         # Create invisible global layer for capturing events
-        self.root["frameSize"] = (min_x, max_x, min_y, max_y)
+        self.sidebar["frameSize"] = (min_x, max_x, min_y, max_y)
 
         # Create pane pinned to right, with origin at top-left
         set_relative_frame_size(self.sidebar, vp_wh, (0.1, -1))

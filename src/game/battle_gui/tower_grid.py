@@ -11,7 +11,6 @@ from utils.gui_utils import get_w
 class TowerGrid:
     """Grid of square tiles, filling top rows first"""
 
-    root: DirectFrame
     parent: DirectFrame
     grid_container: NestedDirectFrame
     children: list[TowerTile]
@@ -21,12 +20,10 @@ class TowerGrid:
 
     def __init__(
         self,
-        root: DirectFrame,
         parent: DirectFrame,
         num_cols: int,
         gap_percent: float,
     ):
-        self.root = root
         self.parent = parent
         self.grid_container = NestedDirectFrame(parent)
         self.children = []
@@ -42,7 +39,6 @@ class TowerGrid:
         idx = len(self.children)
         self.children.append(
             TowerTile(
-                self.root,
                 self.grid_container,
                 text=f"T{idx}",
                 text_scale=0.05,
@@ -54,6 +50,10 @@ class TowerGrid:
 
         if recalculate_layout:
             self._recalculate_child_layout(len(self.children) - 1)
+
+    def delete(self):
+        for child in self.children:
+            child.delete()
 
     def _recalculate_child_layout(self, idx: int):
         child = self.children[idx]
