@@ -1,84 +1,32 @@
-from typing import Any, ClassVar
+from typing import Any
 
 from direct.gui.DirectGui import DirectFrame
-from direct.showbase import DirectObject
-from panda3d.core import NodePath, TextNode
+from panda3d.core import TextNode
 
-import g
-from game.gui.nested_direct_frame import NestedDirectFrame
-from utils.gui_utils import get_w, set_relative_frame_size
-
-
-class BattleGui(DirectObject.DirectObject):
-    root: NodePath
-    tower_grid: "TowerGrid"
-
-    # Percentage of viewport width
-    ROOT_WIDTH: ClassVar[float] = 0.1
-    TILE_COLS: ClassVar[int] = 2
-    # Relative to side length of each tile
-    TILE_GAP_PERCENT: ClassVar[float] = 0.05
-
-    def __init__(self):
-        self._init_nodes()
-        self.recalculate_layout()
-
-        self.accept("aspectRatioChanged", lambda: self.recalculate_layout())
-
-    def _init_nodes(self):
-        self.root = DirectFrame(
-            g.aspect2d,
-            frameColor=(0, 1, 0, 0.5),
-        )
-
-        self.tower_grid = TowerGrid(
-            gap_percent=self.TILE_GAP_PERCENT,
-            num_cols=self.TILE_COLS,
-            parent=self.root,
-        )
-        for _ in range(7):
-            self.tower_grid.create_tile(
-                recalculate_layout=False,
-            )
-
-    def delete(self):
-        pass
-
-    def recalculate_layout(self):
-        # Constants
-        min_x = -g.base.get_aspect_ratio()
-        max_x = -min_x
-        vp_width = max_x - min_x
-
-        min_y = -1
-        max_y = 1
-        vp_height = max_y - min_y
-
-        vp_wh = (vp_width, vp_height)
-
-        # Create pane pinned to right, with origin at top-left
-        set_relative_frame_size(self.root, vp_wh, (0.1, -1))
-        self.root.set_pos((max_x - get_w(self.root), 0, max_y))
-
-        self.tower_grid.recalculate_layout()
+from game.battle_gui.nested_direct_frame import NestedDirectFrame
+from game.battle_gui.tower_tile import TowerTile
+from utils.gui_utils import get_w
 
 
 class TowerGrid:
     """Grid of square tiles, filling top rows first"""
 
+    root: DirectFrame
     parent: DirectFrame
     grid_container: NestedDirectFrame
-    children: list[NestedDirectFrame]
+    children: list[TowerTile]
 
     gap_percent: float
     num_cols: int
 
     def __init__(
         self,
+        root: DirectFrame,
         parent: DirectFrame,
         num_cols: int,
         gap_percent: float,
     ):
+        self.root = root
         self.parent = parent
         self.grid_container = NestedDirectFrame(parent)
         self.children = []
@@ -93,7 +41,8 @@ class TowerGrid:
     def create_tile(self, recalculate_layout: bool = True, **kwargs: Any):
         idx = len(self.children)
         self.children.append(
-            NestedDirectFrame(
+            TowerTile(
+                self.root,
                 self.grid_container,
                 text=f"T{idx}",
                 text_scale=0.05,
@@ -123,8 +72,13 @@ class TowerGrid:
         child.set_frame_size(((self._side_length), -self._side_length))
 
         half_sl = (self._side_length) / 2
-        child.inner_frame["text_pos"] = (half_sl, -(half_sl + self._gap_length))
-        child.inner_frame["frameColor"] = (idx / (len(self.children) - 1), 0, 0, 0.5)
+        child.content.inner_frame["text_pos"] = (half_sl, -(half_sl + self._gap_length))
+        child.content.inner_frame["frameColor"] = (
+            idx / (len(self.children) - 1),
+            0,
+            0,
+            0.5,
+        )
 
     @property
     def _side_length(self) -> float:

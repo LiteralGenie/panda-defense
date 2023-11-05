@@ -35,7 +35,7 @@ def apply_damage(ctx: PlayContext, cache: PlayCache):
                         break
 
                     tgt.health -= tower.damage
-                    print("Target HP:", tgt.health)
+                    # print(f"Enemy {tgt.id} HP: {tgt.health}")
 
                     tgt.render_queue.append(RenderTowerAttack())
                     tgt.render_queue.append(RenderUnitDamage())

@@ -7,7 +7,7 @@ from game.tower.tower import Tower
 from game.unit.unit_manager import UnitManager
 
 if TYPE_CHECKING:
-    from game.gui.battle_gui import BattleGui
+    from game.battle_gui.battle_gui import BattleGui
 
 
 class Game(Renderable[None, "BattleGui"]):
@@ -39,7 +39,7 @@ class Game(Renderable[None, "BattleGui"]):
         self.unit_mgr = UnitManager()
 
     def render(self, period_s: float):
-        from game.gui.battle_gui import BattleGui
+        from game.battle_gui.battle_gui import BattleGui
 
         if not self.pnode:
             self.pnode = BattleGui()

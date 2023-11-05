@@ -1,5 +1,7 @@
 from panda3d.core import NodePath
 
+import g
+
 
 def set_frame_size(pnode: "NodePath", wh: tuple[float, float]):
     w, h = wh
@@ -29,3 +31,9 @@ def get_h(pnode: "NodePath") -> float:
         print("Node has no frame size", pnode)
         return 0.111
     return sz[3] - sz[2]  # type: ignore
+
+
+def get_mouse_pos() -> tuple[float, float] | None:
+    node = g.base.mouseWatcherNode
+    if node.hasMouse():
+        return (node.getMouseX(), node.getMouseY())
