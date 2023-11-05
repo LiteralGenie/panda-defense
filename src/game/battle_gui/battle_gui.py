@@ -31,15 +31,6 @@ class BattleGui(DirectObject):
             frameColor=(0, 1, 0, 0.5),
             state=DGG.NORMAL,
         )
-        # self.root.bind(
-        #     DGG.B1PRESS, lambda *args, **kwargs: print("root B1PRESS"), [self.root]
-        # )
-        # self.root.bind(
-        #     DGG.B1RELEASE, lambda *args, **kwargs: print("root B1RELEASE"), [self.root]
-        # )
-        # self.root.bind(DGG.CURSORMOVE, lambda _: print("root CURSORMOVE"))
-        # self.root.bind(DGG.WITHIN, lambda _: print("root WITHIN"))
-        # self.root.bind(DGG.WITHOUT, lambda _: print("root WITHOUT"))
 
         self.tower_grid = TowerGrid(
             parent=self.sidebar,

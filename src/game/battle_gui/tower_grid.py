@@ -1,9 +1,7 @@
-from typing import Any
-
 from direct.gui.DirectGui import DirectFrame
 from panda3d.core import TextNode
 
-from game.battle_gui.nested_direct_frame import NestedDirectFrame
+from game.battle_gui.better_direct_frame import BetterDirectFrame
 from game.battle_gui.tower_tile import TowerTile
 from utils.gui_utils import get_w
 
@@ -12,7 +10,7 @@ class TowerGrid:
     """Grid of square tiles, filling top rows first"""
 
     parent: DirectFrame
-    grid_container: NestedDirectFrame
+    grid_container: BetterDirectFrame
     children: list[TowerTile]
 
     gap_percent: float
@@ -25,7 +23,7 @@ class TowerGrid:
         gap_percent: float,
     ):
         self.parent = parent
-        self.grid_container = NestedDirectFrame(parent)
+        self.grid_container = BetterDirectFrame(parent)
         self.children = []
 
         self.gap_percent = gap_percent
@@ -35,7 +33,7 @@ class TowerGrid:
         for i in range(len(self.children)):
             self._recalculate_child_layout(i)
 
-    def create_tile(self, recalculate_layout: bool = True, **kwargs: Any):
+    def create_tile(self, recalculate_layout: bool = True):
         idx = len(self.children)
         self.children.append(
             TowerTile(
@@ -44,7 +42,6 @@ class TowerGrid:
                 text_scale=0.05,
                 text_align=TextNode.ACenter,
                 text_pos=(0.0, 0.0),
-                **kwargs,
             )
         )
 
@@ -72,8 +69,8 @@ class TowerGrid:
         child.set_frame_size(((self._side_length), -self._side_length))
 
         half_sl = (self._side_length) / 2
-        child.content.inner_frame["text_pos"] = (half_sl, -(half_sl + self._gap_length))
-        child.content.inner_frame["frameColor"] = (
+        child["text_pos"] = (half_sl, -(half_sl + self._gap_length))
+        child["frameColor"] = (
             idx / (len(self.children) - 1),
             0,
             0,

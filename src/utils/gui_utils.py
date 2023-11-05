@@ -20,16 +20,14 @@ def set_relative_frame_size(
 def get_w(pnode: "NodePath") -> float:
     sz = pnode["frameSize"]  # type: ignore
     if not sz:
-        print("Node has no frame size", pnode)
-        return 0.111
+        raise Exception("Node has no frame size", pnode)
     return sz[1] - sz[0]  # type: ignore
 
 
 def get_h(pnode: "NodePath") -> float:
     sz = pnode["frameSize"]  # type: ignore
     if not sz:
-        print("Node has no frame size", pnode)
-        return 0.111
+        raise Exception("Node has no frame size", pnode)
     return sz[3] - sz[2]  # type: ignore
 
 

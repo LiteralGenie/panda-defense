@@ -30,3 +30,10 @@ targeting logic is overengineered
         on each tick we then iterate over each interval and search for enemies (which involves a one-time sorting the enemies by distance traveled)
     at the very least, the intermediary types / functions shouldnt pollute autocomplete suggestions somehow
 
+component communication
+    MVC works nice for some parts
+        play (controller) updates game state (model)
+        animations (view) for individual are mostly derived from current game state
+        key is that each model / view is independent (eg unit animations dont depend on tower animations)
+            controller handles interconnection but the model / views dont really care
+            technically some animations need to be synced (turret rotation and unit movement) but controller can cheat and sync these
