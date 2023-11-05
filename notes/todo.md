@@ -1,22 +1,24 @@
 # now
-tower shop
 tower placement
 
 # later
+gold / health
 ingame gui
 main menu
+campaign levels
+replayable levels
 settings menu
+logging
+progression
+db schema
+art
 camera controls
         pan / zoom
         orthogonal view
 
 # eventually
-progression
 market
-art
-db schema
 deploy server
-logging
 units should not move diagonally
 
 
@@ -33,6 +35,8 @@ organize render_queue into queue-per-event-type
 push rendering into its own thread / process
 
 
+# done
+[x] tower shop
 [x] get rid of vdom tree, everything should be child of render
 [x] replace render-via-state-tracking with render-via-message-queue
 [x] investigate pre-generating all enemies for a wave

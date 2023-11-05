@@ -29,3 +29,4 @@ targeting logic is overengineered
 
         on each tick we then iterate over each interval and search for enemies (which involves a one-time sorting the enemies by distance traveled)
     at the very least, the intermediary types / functions shouldnt pollute autocomplete suggestions somehow
+
