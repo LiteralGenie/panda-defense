@@ -59,7 +59,7 @@ class DragListeners(Generic[_StartData, _MoveData], TypedDict):
     #    there was a drag_start but never a drag_move (ie a click)
     #    multiple drag_starts (probably mobile)
     #    cancel() was invoked
-    on_drag_cancel: Callable[[], None]
+    on_drag_cancel: Callable[[DragState[_StartData, _MoveData] | None], None]
 
 
 class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
@@ -75,7 +75,7 @@ class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
          if it's important to avoid click events)
     """
 
-    POLL_FREQ_S: ClassVar[float] = 0.1
+    POLL_FREQ_S: ClassVar[float] = 0.05
 
     listeners: DragListeners[_StartData, _MoveData]
     state: DragState[_StartData, _MoveData] | None
@@ -159,7 +159,7 @@ class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
         self._deleteState()
 
     def drag_cancel(self):
-        self.listeners["on_drag_cancel"]()
+        self.listeners["on_drag_cancel"](self.state)
         self._deleteState()
 
     def delete(self):

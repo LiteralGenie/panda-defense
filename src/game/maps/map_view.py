@@ -22,9 +22,9 @@ class MapView:
             for idx_col in range(-15, 15):
                 b = pnode.attachNewNode("")
                 b.setPos(idx_col * 2 - 0.5, idx_row * 2 - 0.5, 0)
-                self.model.instanceTo(b)
+                self.model.instance_to(b)
 
-        pnode.reparentTo(g.render)
+        pnode.reparent_to(g.render)
 
         return pnode
 

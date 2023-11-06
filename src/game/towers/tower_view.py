@@ -25,10 +25,10 @@ class TowerView(ABC):
 
     def _init_model(self) -> Actor:
         pnode = NodePath("")
-        self.__class__.model.instanceTo(pnode)
+        self.__class__.model.instance_to(pnode)
 
         pnode.getChild(0).setScale(20)
-        pnode.reparentTo(g.render)
+        pnode.reparent_to(g.render)
 
         return pnode  # type: ignore
 
