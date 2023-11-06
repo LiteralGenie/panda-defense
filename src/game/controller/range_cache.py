@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
 from game.parameterized_path import ParameterizedPath
-from game.range import Range
-from game.unit.unit import Unit
+from game.towers.range import Range
+from game.units.unit_model import UnitModel
 from utils.misc_utils import find_insertion_index, split_with_lookback
 from utils.types import Point2
 
@@ -15,7 +15,7 @@ class PathInterval:
         self.start = start
         self.end = end
 
-    def filter_units(self, units_sorted: list[Unit]) -> list[Unit]:
+    def filter_units(self, units_sorted: list[UnitModel]) -> list[UnitModel]:
         if not len(units_sorted):
             return []
 

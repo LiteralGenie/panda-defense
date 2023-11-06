@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import lru_cache
+from typing import Any
 
 from utils.types import Point2
 
@@ -10,6 +11,9 @@ class Range(ABC):
     @abstractmethod
     def id(self) -> str:
         ...
+
+    def serialize(self) -> Any:
+        return dict(points=self.points)
 
 
 class PyramidalRange(Range):
@@ -72,3 +76,8 @@ class PyramidalRange(Range):
     def id(self) -> str:
         name = self.__class__.__name__
         return f"{name}_{self.radius}"
+
+    def serialize(self):
+        d = super().serialize()
+        d["radius"] = self.radius
+        return d

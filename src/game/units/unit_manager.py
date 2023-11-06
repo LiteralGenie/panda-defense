@@ -2,7 +2,7 @@ import sqlite3
 from sqlite3 import Connection
 from typing import Iterator, Literal, NotRequired, TypedDict, Unpack
 
-from game.unit.unit import Unit, UnitStatus
+from game.units.unit_model import UnitModel, UnitStatus
 from utils.where_builder import WhereBuilder
 
 _Id = int
@@ -19,7 +19,7 @@ class _Filters(TypedDict):
 class UnitManager:
     """Store a list of units and create db-like indices"""
 
-    _units: dict[_Id, Unit]
+    _units: dict[_Id, UnitModel]
 
     _db: Connection
 
@@ -28,16 +28,16 @@ class UnitManager:
 
         self._db = self._init_db()
 
-    def add(self, unit: Unit):
+    def add(self, unit: UnitModel):
         self._units[unit.id] = unit
         self._insert(unit)
 
-    def set_dist(self, unit: Unit, dist: float):
-        unit.dist = dist
+    def set_dist(self, unit: UnitModel, dist: float):
+        unit.set_dist(dist)
         self._insert(unit)
 
-    def set_status(self, unit: Unit, status: UnitStatus):
-        unit.status = status
+    def set_status(self, unit: UnitModel, status: UnitStatus):
+        unit.set_status(status)
         self._insert(unit)
 
     def select(
@@ -46,7 +46,7 @@ class UnitManager:
         order_by: Literal["id", "id_wave", "id_path", "dist", "status", "dist"] = "id",
         descending: bool = False,
         **filters: Unpack[_Filters],
-    ) -> list[Unit]:
+    ) -> list[UnitModel]:
         wb = WhereBuilder("AND")
 
         if id_wave := filters.get("id_wave"):
@@ -100,7 +100,7 @@ class UnitManager:
 
         return db
 
-    def _insert(self, unit: Unit):
+    def _insert(self, unit: UnitModel):
         self._db.execute(
             """
             INSERT OR REPLACE INTO units
@@ -111,17 +111,17 @@ class UnitManager:
             [unit.id, unit.id_wave, unit.ppath.id, unit.dist, unit.status.value],
         )
 
-    def __iter__(self) -> Iterator[Unit]:
+    def __iter__(self) -> Iterator[UnitModel]:
         yield from self._units.values()
 
     @property
-    def prespawn(self) -> list[Unit]:
+    def prespawn(self) -> list[UnitModel]:
         return self.select(status=UnitStatus.PRESPAWN)
 
     @property
-    def alive(self) -> list[Unit]:
+    def alive(self) -> list[UnitModel]:
         return self.select(status=UnitStatus.ALIVE)
 
     @property
-    def dead(self) -> list[Unit]:
+    def dead(self) -> list[UnitModel]:
         return self.select(status=UnitStatus.DEAD)

@@ -1,38 +1,32 @@
-from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, TypedDict
 
 from utils.types import Point2
 
 Direction = Literal["x", "-x", "y", "-y"]
 
 
-@dataclass
-class Segment:
+class Segment(TypedDict):
     dist: int
     dir: Direction
 
 
-@dataclass
-class Path:
+class Path(TypedDict):
     id: int
     start: Point2
     segments: list[Segment]
 
 
-@dataclass
-class Wave:
+class Wave(TypedDict):
     id: int
     enemies: int
     id_path: int
     spawn_delay_ticks: int
 
 
-@dataclass
-class Round:
+class Round(TypedDict):
     waves: list[Wave]
 
 
-@dataclass
-class Scenario:
+class Scenario(TypedDict):
     rounds: list[Round]
     paths: dict[int, Path]

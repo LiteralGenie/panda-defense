@@ -37,3 +37,7 @@ component communication
         key is that each model / view is independent (eg unit animations dont depend on tower animations)
             controller handles interconnection but the model / views dont really care
             technically some animations need to be synced (turret rotation and unit movement) but controller can cheat and sync these
+
+multiprocessing...
+    serializing / deserializing dataclasses
+    no intersection type

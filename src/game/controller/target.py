@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 
+from game.controller.range_cache import RangeCache
 from game.parameterized_path import ParameterizedPath
-from game.play.range_cache import RangeCache
-from game.tower.tower import Tower
-from game.unit.unit import Unit
+from game.towers.tower_model import TowerModel
+from game.units.unit_model import UnitModel
 from utils.misc_utils import find_or_throw
 
 
 @dataclass
 class Target:
-    unit: Unit
+    unit: UnitModel
     path: ParameterizedPath
 
     @property
@@ -22,8 +22,8 @@ TargetsByPath = dict[_Id, list[Target]]
 
 
 def find_tower_targets(
-    tower: Tower,
-    units_sorted: dict[_Id, list[Unit]],
+    tower: TowerModel,
+    units_sorted: dict[_Id, list[UnitModel]],
     cache: RangeCache,
 ) -> TargetsByPath:
     """

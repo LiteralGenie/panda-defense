@@ -1,16 +1,16 @@
 from direct.gui.DirectGui import DirectFrame
 from panda3d.core import TextNode
 
-from game.battle_gui.better_direct_frame import BetterDirectFrame
-from game.battle_gui.tower_tile import TowerTile
-from game.game import Game
+from game.game_gui.better_direct_frame import BetterDirectFrame
+from game.game_gui.tower_tile import TowerTile
+from game.view.game_view_globals import GameViewGlobals
 from utils.gui_utils import get_w
 
 
 class TowerGrid:
     """Grid of square tiles, filling top rows first"""
 
-    game: Game
+    globals: GameViewGlobals
     parent: DirectFrame
     grid_container: BetterDirectFrame
     children: list[TowerTile]
@@ -20,12 +20,12 @@ class TowerGrid:
 
     def __init__(
         self,
-        game: Game,
+        globals: GameViewGlobals,
         parent: DirectFrame,
         num_cols: int,
         gap_percent: float,
     ):
-        self.game = game
+        self.globals = globals
         self.parent = parent
         self.grid_container = BetterDirectFrame(parent)
         self.children = []
@@ -41,7 +41,7 @@ class TowerGrid:
         idx = len(self.children)
         self.children.append(
             TowerTile(
-                game=self.game,
+                globals=self.globals,
                 parent=self.grid_container,
                 text=f"T{idx}",
                 text_scale=0.05,

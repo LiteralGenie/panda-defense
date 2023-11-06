@@ -3,9 +3,9 @@ from typing import Any
 
 from direct.gui.DirectGui import DirectFrame
 
-from game.battle_gui.better_direct_frame import BetterDirectFrame
-from game.battle_gui.drag_and_drop import DragAndDrop, DragState
-from game.game import Game
+from game.game_gui.better_direct_frame import BetterDirectFrame
+from game.game_gui.drag_and_drop import DragAndDrop, DragState
+from game.view.game_view_globals import GameViewGlobals
 from utils.gui_utils import mpos_to_real_pos
 from utils.types import Point2, Point2f
 
@@ -26,9 +26,9 @@ _DndState = DragState[_StartData, _MoveData]
 
 class TowerTile(BetterDirectFrame):
     dnd: DragAndDrop[_StartData, _MoveData]
-    game: Game
+    globals: GameViewGlobals
 
-    def __init__(self, parent: DirectFrame, game: Game, **kwargs: Any):
+    def __init__(self, parent: DirectFrame, globals: GameViewGlobals, **kwargs: Any):
         super().__init__(parent, **kwargs)
 
         self.dnd = DragAndDrop(
@@ -38,7 +38,7 @@ class TowerTile(BetterDirectFrame):
             on_drag_end=self._on_drag_end,
             on_drag_cancel=self._on_drag_cancel,
         )
-        self.game = game
+        self.globals = globals
 
     def delete(self):
         self.dnd.delete()
@@ -47,11 +47,12 @@ class TowerTile(BetterDirectFrame):
         print("on_drag_start cb")
 
         invalid_tiles: set[Point2] = set()
-        for tower in self.game.towers:
-            invalid_tiles.add(tower.pos)
+        for tower in self.globals.state["towers"].values():
+            invalid_tiles.add(tower["pos"])
 
-        for path in self.game.scenario.paths.values():
-            start = path.start
+        for path in self.globals.cache.ppaths.values():
+            for point in path.points:
+                invalid_tiles.add(point.pos)
 
     def _on_drag_move(self, pos: Point2f, time: float, prev: _DndState):
         print("on_drag_move cb")

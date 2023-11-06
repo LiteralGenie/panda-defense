@@ -1,31 +1,28 @@
 import math
 
-from game.play.play_cache import PlayCache
-from game.play.play_context import PlayContext
-from game.play.target import find_tower_targets, flatten_targets
-from game.tower.basic import BasicTower
-from game.tower.render_tower_events import RenderTowerAttack
-from game.unit.render_unit_events import RenderUnitDamage, RenderUnitDeath
-from game.unit.unit import UnitStatus
+from game.controller.controller_context import ControllerContext
+from game.controller.target import find_tower_targets, flatten_targets
+from game.towers.basic.basic_tower_model import BasicTowerModel
+from game.units.unit_model import UnitStatus
 from utils.misc_utils import find
 
 
-def apply_damage(ctx: PlayContext, cache: PlayCache):
+def apply_damage(ctx: ControllerContext):
     units = {
         ppath.id: ctx.game.unit_mgr.select(
             id_path=ppath.id, status=UnitStatus.ALIVE, order_by="dist"
         )
-        for ppath in cache.ppaths.values()
+        for ppath in ctx.cache.ppaths.values()
     }
 
     for tower in ctx.game.towers:
-        if isinstance(tower, BasicTower):
+        if isinstance(tower, BasicTowerModel):
             tower.attack_speed_guage += tower.attack_speed
             rem, attacks = math.modf(tower.attack_speed_guage)
             tower.attack_speed_guage = rem
 
             if attacks > 0:
-                targets = find_tower_targets(tower, units, cache.ranges)
+                targets = find_tower_targets(tower, units, ctx.cache.ranges)
                 targets = flatten_targets(targets)
                 targets = [tgt.unit for tgt in targets]
 
@@ -34,14 +31,10 @@ def apply_damage(ctx: PlayContext, cache: PlayCache):
                     if not tgt:
                         break
 
-                    tgt.health -= tower.damage
+                    tgt.take_damage(tower.damage, tower)
                     # print(f"Enemy {tgt.id} HP: {tgt.health}")
-
-                    tgt.render_queue.append(RenderTowerAttack())
-                    tgt.render_queue.append(RenderUnitDamage())
 
                     if tgt.health <= 0:
                         ctx.game.unit_mgr.set_status(tgt, UnitStatus.DEAD)
-                        tgt.render_queue.append(RenderUnitDeath())
         else:
             raise Exception(f"Unknown tower type: {tower.__class__.__name__}", tower)

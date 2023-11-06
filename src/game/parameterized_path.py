@@ -18,17 +18,17 @@ class ParameterizedPath:
     length: int
 
     def __init__(self, path: Path):
-        self.id = path.id
+        self.id = path["id"]
 
-        start = path.start
-        dir = _dir_to_pt(path.segments[0].dir)
-        self.points = [PointWithDirection(pos=start, dir=dir)]
+        pos = path["start"]
+        dir = _dir_to_pt(path["segments"][0]["dir"])
+        self.points = [PointWithDirection(pos=pos, dir=dir)]
 
-        for segment in path.segments:
-            (step_x, step_y) = _dir_to_pt(segment.dir)
+        for segment in path["segments"]:
+            (step_x, step_y) = _dir_to_pt(segment["dir"])
 
-            for _ in range(1, segment.dist):
-                pos = (start[0] + step_x, start[1] + step_y)
+            for _ in range(1, segment["dist"]):
+                pos = (pos[0] + step_x, pos[1] + step_y)
                 dir = (step_x, step_y)
                 self.points.append(PointWithDirection(pos=pos, dir=dir))
 

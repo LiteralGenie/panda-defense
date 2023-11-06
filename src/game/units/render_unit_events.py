@@ -2,25 +2,25 @@ from dataclasses import dataclass
 
 
 @dataclass
-class RenderUnitPosition:
-    pass
+class RenderUnitSpawn:
+    ids: list[int]
 
 
 @dataclass
 class RenderUnitMovement:
-    pass
+    ids: list[int]
 
 
 @dataclass
 class RenderUnitDamage:
-    pass
+    ids: list[int]
 
 
 @dataclass
 class RenderUnitDeath:
-    pass
+    ids: list[int]
 
 
 RenderUnitEvents = (
-    RenderUnitPosition | RenderUnitMovement | RenderUnitDamage | RenderUnitDeath
+    RenderUnitSpawn | RenderUnitMovement | RenderUnitDamage | RenderUnitDeath
 )

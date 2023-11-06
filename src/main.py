@@ -1,11 +1,11 @@
-import simplepbr
-from direct.showbase.ShowBase import ShowBase
-from direct.task.Task import Task
-from panda3d.core import WindowProperties
+from multiprocessing import Pipe, Process
+from multiprocessing.connection import Connection
 
-from game.map import Map
-from game.play.play import play_game
+from game.controller.controller import play_game
+from game.event_manager import TickEvents
 from game.scenario import Path, Round, Scenario, Segment, Wave
+
+# from faster_fifo import Queue
 
 
 def build_test_scenario():
@@ -22,8 +22,8 @@ def build_test_scenario():
             waves=[
                 Wave(
                     id=1,
-                    enemies=5,
-                    id_path=path.id,
+                    enemies=15,
+                    id_path=path["id"],
                     spawn_delay_ticks=4,
                 )
             ]
@@ -33,7 +33,7 @@ def build_test_scenario():
                 Wave(
                     id=2,
                     enemies=15,
-                    id_path=path.id,
+                    id_path=path["id"],
                     spawn_delay_ticks=2,
                 )
             ]
@@ -42,29 +42,68 @@ def build_test_scenario():
 
     return Scenario(
         rounds=rounds,
-        paths={path.id: path},
+        paths={path["id"]: path},
     )
 
 
-class App(ShowBase):
-    map: Map | None
+def run_renderer(scenario: Scenario, pipe: Connection):
+    import simplepbr
+    from direct.showbase.ShowBase import ShowBase
+    from direct.task.Task import Task
+    from panda3d.core import WindowProperties
 
-    def __init__(self):
-        super().__init__()
-        simplepbr.init()
+    class Renderer(ShowBase):
+        def __init__(self):
+            super().__init__()
+            simplepbr.init()
 
-        self.camera.setPos(0, 0, 40)
-        self.camera.setP(-90)
-        self.disable_mouse()
+            self.camera.setPos(0, 0, 40)
+            self.camera.setP(-90)
+            self.disable_mouse()
 
-        properties = WindowProperties()
-        properties.set_origin(7680, 0)
-        properties.set_size(3840, 2160)
+            properties = WindowProperties()
+            properties.set_origin(7680, 0)
+            properties.set_size(3840, 2160)
 
-        self.win.request_properties(properties)
+            self.win.request_properties(properties)  # type: ignore
 
-        self.task_mgr.add(play_game(build_test_scenario(), Task.pause))
+            self.view = None
+            self.task_mgr.add(self._check_render_queue)
+
+        def _check_render_queue(self, task: Task):
+            if pipe.poll():
+                tick: TickEvents = pipe.recv()
+
+                if not self.view:
+                    from game.view.game_view import GameView
+
+                    self.view = GameView(tick.state)
+
+                self.view.render(tick)
+
+            return task.cont
+
+    r = Renderer()
+    r.run()
 
 
-app = App()
-app.run()
+def run_game(scenario: Scenario, pipe: Connection):
+    import asyncio
+
+    coro = play_game(scenario, pipe)
+    asyncio.run(coro)
+
+
+if __name__ == "__main__":
+    scenario = build_test_scenario()
+    parent_conn, child_conn = Pipe()
+
+    game = Process(target=run_game, args=(scenario, parent_conn))
+    game.start()
+
+    renderer = Process(target=run_renderer, args=(scenario, child_conn))
+    renderer.start()
+
+    game.join()
+    renderer.join()
+    # renderer.kill()
