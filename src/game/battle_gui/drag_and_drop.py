@@ -11,15 +11,15 @@ from panda3d.core import MouseWatcherParameter
 
 import g
 from utils.gui_utils import get_mouse_pos
+from utils.types import Point2f
 
-_Point2d = tuple[float, float]
 _StartData = TypeVar("_StartData")
 _MoveData = TypeVar("_MoveData")
 
 
 @dataclass
 class DragStartState(Generic[_StartData]):
-    start_pos: _Point2d
+    start_pos: Point2f
     end_pos: None
 
     start_time: float
@@ -31,8 +31,8 @@ class DragStartState(Generic[_StartData]):
 
 @dataclass
 class DragMoveState(Generic[_MoveData]):
-    start_pos: _Point2d
-    end_pos: _Point2d
+    start_pos: Point2f
+    end_pos: Point2f
 
     start_time: float
     end_time: float
@@ -41,15 +41,15 @@ class DragMoveState(Generic[_MoveData]):
     _poller: Task
 
 
-_DragState = DragStartState[_StartData] | DragMoveState[_MoveData]
+DragState = DragStartState[_StartData] | DragMoveState[_MoveData]
 
 
 class DragListeners(Generic[_StartData, _MoveData], TypedDict):
     # (start pos / time) -> (start data)
-    on_drag_start: Callable[[_Point2d, float], _StartData]
+    on_drag_start: Callable[[Point2f, float], _StartData]
     # (current pos / time, previous start or move data) -> (move data)
     on_drag_move: Callable[
-        [_Point2d, float, _DragState[_StartData, _MoveData]], _MoveData
+        [Point2f, float, DragState[_StartData, _MoveData]], _MoveData
     ]
     # (move data) -> (None)
     on_drag_end: Callable[[DragMoveState[_MoveData]], None]
@@ -74,7 +74,7 @@ class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
     POLL_FREQ_S: ClassVar[float] = 0.1
 
     listeners: DragListeners[_StartData, _MoveData]
-    state: _DragState[_StartData, _MoveData] | None
+    state: DragState[_StartData, _MoveData] | None
     target: DirectGuiWidget
 
     def __init__(

@@ -5,10 +5,12 @@ from direct.showbase.DirectObject import DirectObject
 
 import g
 from game.battle_gui.tower_grid import TowerGrid
+from game.game import Game
 from utils.gui_utils import get_w, set_relative_frame_size
 
 
 class BattleGui(DirectObject):
+    game: Game
     sidebar: DirectFrame
     sidebar: DirectFrame
     tower_grid: TowerGrid
@@ -19,7 +21,9 @@ class BattleGui(DirectObject):
     # Relative to side length of each tile
     TILE_GAP_PERCENT: ClassVar[float] = 0.05
 
-    def __init__(self):
+    def __init__(self, game: Game):
+        self.game = game
+
         self._init_nodes()
         self._recalculate_layout()
 
@@ -33,6 +37,7 @@ class BattleGui(DirectObject):
         )
 
         self.tower_grid = TowerGrid(
+            game=self.game,
             parent=self.sidebar,
             num_cols=self.TILE_COLS,
             gap_percent=self.TILE_GAP_PERCENT,
@@ -43,7 +48,7 @@ class BattleGui(DirectObject):
             )
 
     def delete(self):
-        pass
+        self.tower_grid.delete()
 
     def _recalculate_layout(self):
         # Constants
@@ -57,10 +62,7 @@ class BattleGui(DirectObject):
 
         vp_wh = (vp_width, vp_height)
 
-        # Create invisible global layer for capturing events
-        self.sidebar["frameSize"] = (min_x, max_x, min_y, max_y)
-
-        # Create pane pinned to right, with origin at top-left
+        # Create rectangular pane on right, with origin at top-left
         set_relative_frame_size(self.sidebar, vp_wh, (0.1, -1))
         self.sidebar.set_pos((max_x - get_w(self.sidebar), 0, max_y))
 

@@ -29,6 +29,7 @@ async def play_game(scenario: Scenario, sleep_fn: SleepFunction):
 
     ctx = PlayContext(
         game=game,
+        gui=None,
         render=True,
         sleep_fn=sleep_fn,
     )
@@ -40,6 +41,11 @@ async def play_game(scenario: Scenario, sleep_fn: SleepFunction):
         ranges=RangeCache(list(ppaths.values())),
         start_ticks={0: 0},
     )
+
+    if True:
+        from game.battle_gui.battle_gui import BattleGui
+
+        gui = BattleGui(game)
 
     tower = BasicTower(pos=(1, 1))
     game.towers.append(tower)

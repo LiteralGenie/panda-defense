@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Literal
 
-Point = tuple[int, int]
+from utils.types import Point2
+
 Direction = Literal["x", "-x", "y", "-y"]
 
 
@@ -14,7 +15,7 @@ class Segment:
 @dataclass
 class Path:
     id: int
-    start: Point
+    start: Point2
     segments: list[Segment]
 
 

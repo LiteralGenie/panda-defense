@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 from game.parameterized_path import ParameterizedPath
 from game.range import Range
-from game.scenario import Point
 from game.unit.unit import Unit
 from utils.misc_utils import find_insertion_index, split_with_lookback
+from utils.types import Point2
 
 
 class PathInterval:
@@ -48,14 +48,14 @@ class RangeCache:
     (so we don't have to search the whole range for targets)
     """
 
-    _data: dict[Point, _CacheEntry]
+    _data: dict[Point2, _CacheEntry]
     paths: list[ParameterizedPath]
 
     def __init__(self, paths: list[ParameterizedPath]):
         self._data = dict()
         self.paths = paths
 
-    def get(self, pos: Point, range: Range) -> PathIntervalMap:
+    def get(self, pos: Point2, range: Range) -> PathIntervalMap:
         entry = self._data.get(pos)
         if not entry:
             self._data[pos] = self._create_entry(pos, range)
@@ -67,10 +67,10 @@ class RangeCache:
 
         return entry.intervals
 
-    def remove(self, pos: Point):
+    def remove(self, pos: Point2):
         del self._data[pos]
 
-    def _create_entry(self, pos: Point, range: Range) -> _CacheEntry:
+    def _create_entry(self, pos: Point2, range: Range) -> _CacheEntry:
         intervals: PathIntervalMap = dict()
 
         for path in self.paths:

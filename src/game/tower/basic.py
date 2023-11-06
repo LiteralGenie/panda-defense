@@ -1,6 +1,6 @@
 from game.range import PyramidalRange
-from game.scenario import Point
 from game.tower.tower import Tower
+from utils.types import Point2
 
 
 class BasicTower(Tower):
@@ -8,7 +8,7 @@ class BasicTower(Tower):
     attack_speed_guage: float
     damage: int
 
-    def __init__(self, pos: Point):
+    def __init__(self, pos: Point2):
         super().__init__(
             pos,
             range=PyramidalRange(2),

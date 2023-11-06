@@ -1,14 +1,15 @@
 from dataclasses import dataclass
 from functools import lru_cache
 
-from game.scenario import Direction, Path, Point
+from game.scenario import Direction, Path
 from utils.misc_utils import find_index
+from utils.types import Point2
 
 
 @dataclass
 class PointWithDirection:
-    pos: Point
-    dir: Point
+    pos: Point2
+    dir: Point2
 
 
 class ParameterizedPath:
@@ -19,26 +20,26 @@ class ParameterizedPath:
     def __init__(self, path: Path):
         self.id = path.id
 
-        pos = path.start
+        start = path.start
         dir = _dir_to_pt(path.segments[0].dir)
-        self.points = [PointWithDirection(pos=pos, dir=dir)]
+        self.points = [PointWithDirection(pos=start, dir=dir)]
 
         for segment in path.segments:
             (step_x, step_y) = _dir_to_pt(segment.dir)
 
             for _ in range(1, segment.dist):
-                pos = (pos[0] + step_x, pos[1] + step_y)
+                pos = (start[0] + step_x, start[1] + step_y)
                 dir = (step_x, step_y)
                 self.points.append(PointWithDirection(pos=pos, dir=dir))
 
         self.length = len(self.points)
 
     @lru_cache(maxsize=None)
-    def point_to_param(self, point: Point) -> int | None:
+    def point_to_param(self, point: Point2) -> int | None:
         return find_index(self.points, lambda pt: pt.pos == point)
 
 
-def _dir_to_pt(dir: Direction) -> Point:
+def _dir_to_pt(dir: Direction) -> Point2:
     step_x = 0
     if dir == "x":
         step_x = 1

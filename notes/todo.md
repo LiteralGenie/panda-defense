@@ -1,17 +1,23 @@
-# now
+# PoC
 tower placement
-
-# later
 gold / health
-ingame gui
+gold / health gui
+tower description on hover
+tower description on click
+tower stats on instance click
+sell tower
+unit stats on instance click
 main menu
-campaign levels
-replayable levels
 settings menu
 logging
+campaign levels
+throwaway art
+
+# later
 progression
 db schema
 art
+replayable levels
 camera controls
         pan / zoom
         orthogonal view

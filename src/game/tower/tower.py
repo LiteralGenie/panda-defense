@@ -3,18 +3,22 @@ from typing import TYPE_CHECKING
 
 from game.range import Range
 from game.renderable import Renderable
-from game.scenario import Point
-from game.tower.render_tower_events import RenderTowerAttack, RenderTowerEvents, RenderTowerPosition
+from game.tower.render_tower_events import (
+    RenderTowerAttack,
+    RenderTowerEvents,
+    RenderTowerPosition,
+)
+from utils.types import Point2
 
 if TYPE_CHECKING:
     from panda3d.core import NodePath
 
 
 class Tower(Renderable[RenderTowerEvents, "NodePath"], ABC):
-    pos: Point
+    pos: Point2
     range: Range
 
-    def __init__(self, pos: Point, range: Range):
+    def __init__(self, pos: Point2, range: Range):
         super().__init__()
         self.pnode = None
 
@@ -42,6 +46,6 @@ class Tower(Renderable[RenderTowerEvents, "NodePath"], ABC):
 
         if self.get_latest_event(RenderTowerPosition):
             self.pnode.setPos(self.pos[0], self.pos[1], 0)
-        
+
         if self.get_latest_event(RenderTowerAttack):
             pass

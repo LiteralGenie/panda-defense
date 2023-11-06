@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from functools import lru_cache
 
-from game.scenario import Point
+from utils.types import Point2
 
 
 class Range(ABC):
-    points: set[Point]
+    points: set[Point2]
 
     @abstractmethod
     def id(self) -> str:
@@ -32,8 +32,8 @@ class PyramidalRange(Range):
 
     @classmethod
     @lru_cache
-    def _generate_points(cls, radius: int) -> set[Point]:
-        pts: set[Point] = set()
+    def _generate_points(cls, radius: int) -> set[Point2]:
+        pts: set[Point2] = set()
 
         # Build the upper quarter
         #       x
