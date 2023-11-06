@@ -1,10 +1,11 @@
+from multiprocessing.connection import Connection
 from typing import Any
 
 from game.event_manager import TickEvents
 from game.game_gui.game_gui import GameGui
+from game.game_state import GameState
 from game.maps.map_view import MapView
 from game.parameterized_path import ParameterizedPath
-from game.state import GameState
 from game.towers.render_tower_events import RenderTowerSpawn
 from game.towers.tower_view import TowerView
 from game.units.render_unit_events import RenderUnitSpawn
@@ -20,7 +21,7 @@ class GameView:
     entities: dict[int, Any]
     map: MapView
 
-    def __init__(self, state: GameState):
+    def __init__(self, state: GameState, event_pipe: Connection):
         ppaths = {
             id: ParameterizedPath(p) for id, p in state["scenario"]["paths"].items()
         }
@@ -29,6 +30,7 @@ class GameView:
         )
         self.globals = GameViewGlobals(
             cache=cache,
+            event_pipe=event_pipe,
             state=state,
         )
 

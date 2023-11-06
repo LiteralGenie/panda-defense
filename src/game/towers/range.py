@@ -51,7 +51,7 @@ class PyramidalRange(Range):
                 pts.add((-j, i))
                 pts.add((j, i))
 
-        # Flip vertically and union
+        # Flip vertically
         #       x
         #      xxx
         #

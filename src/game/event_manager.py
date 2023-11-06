@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 if TYPE_CHECKING:
     from game.game_model import GameModel
-    from game.state import GameState
+    from game.game_state import GameState
 
 T = TypeVar("T")
 

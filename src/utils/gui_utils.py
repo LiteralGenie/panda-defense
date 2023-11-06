@@ -63,5 +63,5 @@ def mpos_to_real_pos(mpos: Point2f) -> Point2f:
     ):
         raise Exception("No intersection")
 
-    xz = pos.get_xz()
-    return (xz[0], xz[1])
+    xy = pos.get_xy()
+    return (xy[0], xy[1])

@@ -1,6 +1,9 @@
+from typing import Any
+
 from game.controller.controller_globals import ControllerGlobals
+from game.game_actions import BuyTowerAction, GameActions
+from game.game_state import GameState
 from game.scenario import Round, Scenario
-from game.state import GameState
 from game.towers.render_tower_events import RenderTowerSpawn
 from game.towers.tower_model import TowerModel
 from game.units.unit_manager import UnitManager
@@ -8,7 +11,7 @@ from game.units.unit_model import UnitModel
 
 
 class GameModel:
-    action_queue: list[None]
+    action_queue: list[GameActions]
     scenario: Scenario
 
     first_tick: float
@@ -57,6 +60,17 @@ class GameModel:
 
     def add_unit(self, unit: UnitModel):
         self.unit_mgr.add(unit)
+
+    def add_action(self, action: Any):
+        self.action_queue.append(action)
+        # todo: validate
+
+    def apply_actions(self):
+        for action in self.action_queue:
+            match action:
+                case BuyTowerAction(cls, kwargs):
+                    tower: Any = cls(globals=self.globals, **kwargs)
+                    self.add_tower(tower)
 
     # def delete(self):
     #     actors = [UnitView]

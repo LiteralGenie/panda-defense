@@ -25,23 +25,25 @@ class DragStartState(Generic[_StartData]):
     start_time: float
     end_time: None
 
-    data: _StartData
+    start_data: _StartData
+    move_data: None
     _poller: Any
 
 
 @dataclass
-class DragMoveState(Generic[_MoveData]):
+class DragMoveState(Generic[_StartData, _MoveData]):
     start_pos: Point2f
     end_pos: Point2f
 
     start_time: float
     end_time: float
 
-    data: _MoveData
+    start_data: _StartData
+    move_data: _MoveData
     _poller: Task
 
 
-DragState = DragStartState[_StartData] | DragMoveState[_MoveData]
+DragState = DragStartState[_StartData] | DragMoveState[_StartData, _MoveData]
 
 
 class DragListeners(Generic[_StartData, _MoveData], TypedDict):
@@ -52,10 +54,12 @@ class DragListeners(Generic[_StartData, _MoveData], TypedDict):
         [Point2f, float, DragState[_StartData, _MoveData]], _MoveData
     ]
     # (move data) -> (None)
-    on_drag_end: Callable[[DragMoveState[_MoveData]], None]
-    # (start data) -> (None)
-    # called if there was a drag_start but never a drag_move (ie a click)
-    on_drag_cancel: Callable[[DragStartState[_StartData]], None]
+    on_drag_end: Callable[[DragMoveState[_StartData, _MoveData]], None]
+    # called if...
+    #    there was a drag_start but never a drag_move (ie a click)
+    #    multiple drag_starts (probably mobile)
+    #    cancel() was invoked
+    on_drag_cancel: Callable[[], None]
 
 
 class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
@@ -94,7 +98,7 @@ class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
 
     def drag_start(self, param: MouseWatcherParameter):
         if self.state is not None:
-            return
+            return self.drag_cancel()
 
         start_pos = get_mouse_pos()
         if not start_pos:
@@ -103,7 +107,7 @@ class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
 
         start_time = time.time()
 
-        data = self.listeners["on_drag_start"](start_pos, start_time)
+        start_data = self.listeners["on_drag_start"](start_pos, start_time)
 
         _poller = g.base.task_mgr.doMethodLater(
             self.POLL_FREQ_S, self.drag_move, f"drag_and_drop_{uuid4()}"
@@ -114,7 +118,8 @@ class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
             end_pos=None,
             start_time=time.time(),
             end_time=None,
-            data=data,
+            start_data=start_data,
+            move_data=None,
             _poller=_poller,
         )
 
@@ -130,13 +135,14 @@ class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
 
         end_time = time.time()
 
-        data = self.listeners["on_drag_move"](end_pos, end_time, self.state)
+        move_data = self.listeners["on_drag_move"](end_pos, end_time, self.state)
         self.state = DragMoveState(
             end_pos=end_pos,
             end_time=end_time,
-            data=data,
+            move_data=move_data,
             start_pos=self.state.start_pos,
             start_time=self.state.start_time,
+            start_data=self.state.start_data,
             _poller=self.state._poller,  # type: ignore
         )
 
@@ -153,15 +159,16 @@ class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
         self._deleteState()
 
     def drag_cancel(self):
-        if not isinstance(self.state, (DragStartState)):
-            return
-
-        self.listeners["on_drag_cancel"](self.state)
+        self.listeners["on_drag_cancel"]()
         self._deleteState()
 
     def delete(self):
         self.ignore_all()
         self._deleteState()
+
+    def cancel(self):
+        if self.state:
+            self.drag_cancel()
 
     def _deleteState(self):
         if self.state:

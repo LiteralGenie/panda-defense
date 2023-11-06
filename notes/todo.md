@@ -1,7 +1,7 @@
 # PoC
-tower placement
 gold / health
 gold / health gui
+validate tower placement
 tower description on hover
 tower description on click
 tower stats on instance click
@@ -42,6 +42,7 @@ push rendering into its own thread / process
 
 
 # done
+[x] tower placement
 [x] tower shop
 [x] get rid of vdom tree, everything should be child of render
 [x] replace render-via-state-tracking with render-via-message-queue

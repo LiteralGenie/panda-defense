@@ -74,9 +74,9 @@ async def _play_round(ctx: ControllerContext):
         start = time.time()
 
         # Validate and apply actions
-        for action in game.action_queue:
-            pass
-        game.action_queue = []
+        while ctx.render_pipe.poll():
+            game.action_queue.append(ctx.render_pipe.recv())
+        game.apply_actions()
 
         # Update game state
         is_round_end = _update_game_state(ctx)

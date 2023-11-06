@@ -3,8 +3,10 @@ from typing import Any
 
 from direct.gui.DirectGui import DirectFrame
 
+from game.game_actions import BuyTowerAction
 from game.game_gui.better_direct_frame import BetterDirectFrame
-from game.game_gui.drag_and_drop import DragAndDrop, DragState
+from game.game_gui.drag_and_drop import DragAndDrop, DragMoveState, DragState
+from game.towers.basic.basic_tower_model import BasicTowerModel
 from game.view.game_view_globals import GameViewGlobals
 from utils.gui_utils import mpos_to_real_pos
 from utils.types import Point2, Point2f
@@ -17,11 +19,7 @@ class _StartData:
 
 @dataclass
 class _MoveData:
-    invalid_tiles: set[Point2]
-    active_tile: Point2
-
-
-_DndState = DragState[_StartData, _MoveData]
+    active_tile: Point2 | None
 
 
 class TowerTile(BetterDirectFrame):
@@ -44,8 +42,6 @@ class TowerTile(BetterDirectFrame):
         self.dnd.delete()
 
     def _on_drag_start(self, pos: Point2f, time: float):
-        print("on_drag_start cb")
-
         invalid_tiles: set[Point2] = set()
         for tower in self.globals.state["towers"].values():
             invalid_tiles.add(tower["pos"])
@@ -54,14 +50,34 @@ class TowerTile(BetterDirectFrame):
             for point in path.points:
                 invalid_tiles.add(point.pos)
 
-    def _on_drag_move(self, pos: Point2f, time: float, prev: _DndState):
-        print("on_drag_move cb")
+        return _StartData(invalid_tiles=invalid_tiles)
 
+    def _on_drag_move(
+        self,
+        pos: Point2f,
+        time: float,
+        prev: DragState[_StartData, _MoveData],
+    ):
         # coordinates of map tile being hovered
         real_pos = mpos_to_real_pos(pos)
+        active_tile = (int(real_pos[0]), int(real_pos[1]))
 
-    def _on_drag_end(self, *args: Any):
-        print("on_drag_end cb", args)
+        if active_tile not in prev.start_data.invalid_tiles:
+            return _MoveData(active_tile=active_tile)
+        else:
+            return _MoveData(active_tile=None)
 
-    def _on_drag_cancel(self, *args: Any):
-        print("on_drag_cancel cb", args)
+    def _on_drag_end(
+        self,
+        state: DragMoveState[_StartData, _MoveData],
+    ):
+        if pos := state.move_data.active_tile:
+            self.globals.event_pipe.send(
+                BuyTowerAction(
+                    BasicTowerModel,
+                    kwargs=dict(pos=pos),
+                )
+            )
+
+    def _on_drag_cancel(self):
+        return

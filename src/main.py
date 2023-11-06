@@ -77,7 +77,7 @@ def run_renderer(scenario: Scenario, pipe: Connection):
                 if not self.view:
                     from game.view.game_view import GameView
 
-                    self.view = GameView(tick.state)
+                    self.view = GameView(tick.state, pipe)
 
                 self.view.render(tick)
 
