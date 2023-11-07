@@ -13,7 +13,7 @@ from game.game_model import GameModel
 from game.parameterized_path import ParameterizedPath
 from game.scenario import Scenario
 from game.shared_globals import SG
-from game.state import State
+from game.state.state import State
 from game.towers.basic.basic_tower_model import BasicTowerModel
 from game.units.unit_manager import UnitManager
 from game.units.unit_model import UnitModel, UnitStatus

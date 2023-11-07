@@ -1,10 +1,10 @@
 # pyright: reportPrivateUsage=false
 
 from abc import ABC
-from typing import Any, ClassVar, Self
+from typing import Any, ClassVar, Self, Type
 
 from game.shared_globals import SG
-from game.state import StateCategory
+from game.state.state import StateCategory
 
 
 class StatefulClass(ABC):
@@ -37,9 +37,11 @@ class StatefulProp:
     key: str
     read_only: bool
 
-    def __init__(self, key: str, read_only: bool = False):
-        self.key = key
+    def __init__(self, read_only: bool = False):
         self.read_only = read_only
+
+    def __set_name__(self, cls: Type[Any], key: str):
+        self.key = key
 
     def __get__(self, obj: StatefulClass | None, objtype: Any = None):
         if obj is None:

@@ -4,7 +4,7 @@ from typing import Any, TypeVar
 
 from game.events.render_event import RenderEvent
 from game.game_model import GameModel
-from game.state import StateEvent
+from game.state.state import StateEvent
 
 T = TypeVar("T")
 

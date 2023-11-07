@@ -1,4 +1,4 @@
-from game.state import State
+from game.state.state import State
 
 
 class SharedGlobals:

@@ -3,8 +3,8 @@ from typing import Any, ClassVar, Self
 
 from game.id_manager import IdManager
 from game.parameterized_path import ParameterizedPath
-from game.state import StateCategory
-from game.stateful_class import StatefulClass, StatefulProp
+from game.state.state import StateCategory
+from game.state.stateful_class import StatefulClass, StatefulProp
 
 
 class UnitStatus(Enum):
@@ -16,13 +16,13 @@ class UnitStatus(Enum):
 class UnitModel(StatefulClass):
     _state_category: ClassVar[StateCategory] = "UNIT"
 
-    id: int = StatefulProp("id", read_only=True)  # type: ignore
-    id_wave: int = StatefulProp("id_wave", read_only=True)  # type: ignore
+    id: int = StatefulProp(read_only=True)  # type: ignore
+    id_wave: int = StatefulProp(read_only=True)  # type: ignore
 
-    dist: float = StatefulProp("dist")  # type: ignore
-    health: int = StatefulProp("health")  # type: ignore
-    speed: float = StatefulProp("speed", read_only=True)  # type: ignore
-    status: UnitStatus = StatefulProp("status")  # type: ignore
+    dist: float = StatefulProp()  # type: ignore
+    health: int = StatefulProp()  # type: ignore
+    speed: float = StatefulProp(read_only=True)  # type: ignore
+    status: UnitStatus = StatefulProp()  # type: ignore
 
     ppath: ParameterizedPath
 

@@ -12,7 +12,7 @@ import g
 from game.events.event_manager import GameEvent
 from game.events.render_event import RenderTowerAttack
 from game.shared_globals import SG
-from game.state import StateUpdated
+from game.state.state import StateUpdated
 from game.units.unit_model import UnitModel, UnitStatus
 from game.view.game_view_globals import GVG
 

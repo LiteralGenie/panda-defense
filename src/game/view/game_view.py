@@ -10,7 +10,7 @@ from game.maps.map_view import MapView
 from game.parameterized_path import ParameterizedPath
 from game.scenario import Scenario
 from game.shared_globals import SG
-from game.state import State, StateCreated, StateDeleted, StateUpdated
+from game.state.state import State, StateCreated, StateDeleted, StateUpdated
 from game.towers.tower_view import TowerView
 from game.units.unit_view import UnitView
 from game.view.game_view_cache import GameViewCache
