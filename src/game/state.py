@@ -53,7 +53,7 @@ class State:
     on_event: _OnEvent
 
     def __init__(self, on_event: _OnEvent):
-        self.data = dict()
+        self.data = dict(TOWER=dict(), UNIT=dict())
         self.on_event = on_event
 
     def create(self, category: StateCategory, data: _Entry):
@@ -70,9 +70,10 @@ class State:
         self._log_event(ev)
 
     def delete(self, category: StateCategory, id: int):
+        data = self.data[category][id]
         del self.data[category][id]
 
-        ev = StateDeleted(category=category, id=id)
+        ev = StateDeleted(category=category, data=data)
         self._log_event(ev)
 
     def _log_event(self, event: "StateEvent"):
@@ -100,7 +101,11 @@ class StateUpdated:
 @dataclass
 class StateDeleted:
     category: StateCategory
-    id: int
+    data: Any
+
+    @property
+    def id(self):
+        return self.data["id"]
 
 
 StateEvent = StateCreated | StateUpdated | StateDeleted

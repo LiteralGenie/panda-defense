@@ -36,13 +36,13 @@ e2e tests
 more nuanced spawn times in scenario
 organize render_queue into queue-per-event-type
         (can handling for a certain event type be independent of all possible other types?)
-rxpy for gui to respond to changes since it doesnt receive render events
 
 # dream
 push rendering into its own thread / process
 
 
 # done
+[x] rxpy for gui to respond to changes since it doesnt receive render events
 [x] tower placement
 [x] tower shop
 [x] get rid of vdom tree, everything should be child of render
