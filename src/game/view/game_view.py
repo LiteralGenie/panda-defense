@@ -75,10 +75,8 @@ class GameView:
                     GVG.event_subj.on_next(ev)
 
     def _init_view(self, ev: StateCreated):
-        id = ev.data["id"]
-
         match ev.category:
             case "TOWER":
-                self.views[id] = TowerView(id)
+                self.views[ev.id] = TowerView(ev.id)
             case "UNIT":
-                self.views[id] = UnitView(id)
+                self.views[ev.id] = UnitView(ev.id)

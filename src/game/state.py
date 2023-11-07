@@ -1,9 +1,15 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Literal, TypeAlias
+from typing import Any, Callable, Literal, Type, TypeAlias, TypedDict
 
 StateCategory = Literal["TOWER", "UNIT"]
+_STATE_CATEGORIES: list[StateCategory] = ["TOWER", "UNIT"]
 
-_Entry = dict[str, Any]
+
+class _Entry(TypedDict):
+    cls: Type[Any]
+    data: dict[str, Any]
+
+
 _EntriesById = dict[int, _Entry]
 _DataByCategory = dict[StateCategory, _EntriesById]
 
@@ -15,14 +21,8 @@ class State:
     Basically a 2-layer dict with this shape
     {
         category_1: {
-            id_1: {
-                prop_1: ...,
-                prop_2: ...
-            },
-
-            id_2: {
-                ...
-            }
+            id_1: entry_1,
+            id_2: entry_2,
         },
 
         category_2: {
@@ -31,8 +31,7 @@ class State:
     }
 
     all entries should have an id
-    all entries for a category may not have the same shape (keys / value types),
-        the consumer should know how to determine the data shape
+    all entries for a category may not have the same type
 
     operations on this data are classified as one of...
         creation - new entry with unique id is added under a category
@@ -53,18 +52,25 @@ class State:
     on_event: _OnEvent
 
     def __init__(self, on_event: _OnEvent):
-        self.data = dict(TOWER=dict(), UNIT=dict())
+        self.data = {cat: dict() for cat in _STATE_CATEGORIES}
         self.on_event = on_event
 
-    def create(self, category: StateCategory, data: _Entry):
-        self.data.setdefault(category, dict())
-        self.data[category][data["id"]] = data
+    def create(
+        self,
+        category: StateCategory,
+        cls: Type[Any],
+        data: dict[str, Any],
+    ):
+        self.data[category][data["id"]] = _Entry(
+            cls=cls,
+            data=data,
+        )
 
-        ev = StateCreated(category=category, data=data)
+        ev = StateCreated(category=category, cls=cls, data=data)
         self._log_event(ev)
 
     def update(self, category: StateCategory, id: int, key: str, value: Any):
-        self.data[category][id][key] = value
+        self.data[category][id]["data"][key] = value
 
         ev = StateUpdated(category=category, id=id, key=key, value=value)
         self._log_event(ev)
@@ -83,7 +89,8 @@ class State:
 @dataclass
 class StateCreated:
     category: StateCategory
-    data: Any
+    cls: Type[Any]
+    data: dict[str, Any]
 
     @property
     def id(self):

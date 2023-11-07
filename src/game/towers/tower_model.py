@@ -1,37 +1,37 @@
 from abc import ABC
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Self
 
 from game.id_manager import IdManager
+from game.state import StateCategory
 from game.stateful_class import StatefulClass, StatefulProp
 from game.towers.tower_range import TowerRange
 from utils.types import Point2
 
 
 class TowerModel(StatefulClass, ABC):
-    type: ClassVar[str]
+    _state_category: ClassVar[StateCategory] = "TOWER"
 
-    id: int
+    id: int = StatefulProp("id")  # type: ignore
     pos: Point2 = StatefulProp("pos")  # type: ignore
     range: TowerRange = StatefulProp("range", read_only=True)  # type: ignore
 
-    def __init__(
-        self,
+    @classmethod
+    def create(
+        cls,
         pos: Point2,
         range: TowerRange,
-        register: bool = True,
         **kwargs: Any,
-    ):
-        StatefulClass.__init__(self, "TOWER")
+    ) -> Self:
+        id = IdManager.create()
 
-        if register:
-            self.id = IdManager.create()
-
-            self.create(
-                type=self.__class__.type,
-                id=self.id,
+        instance = cls(id)
+        instance._register(
+            init_state=dict(
+                id=id,
                 pos=pos,
                 range=range,
                 **kwargs,
             )
-        else:
-            self.id = kwargs["id"]
+        )
+
+        return instance

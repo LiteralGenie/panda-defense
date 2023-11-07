@@ -1,30 +1,36 @@
+# pyright: reportPrivateUsage=false
+
 from abc import ABC
-from typing import Any
+from typing import Any, ClassVar, Self
 
 from game.shared_globals import SG
-from game.state import State, StateCategory
+from game.state import StateCategory
 
 
 class StatefulClass(ABC):
-    id: int
-    _category: StateCategory
-    _state: State
+    _state_category: ClassVar[StateCategory]
 
-    def __init__(self, category: StateCategory):
-        self._category = category
+    _id: int
+
+    def __init__(self, id: int):
+        self._id = id
+
+    @classmethod
+    def load(cls, id: int) -> Self:
+        return cls(id)
+
+    def _register(self, init_state: Any):
+        SG.entities.create(self._state_category, self.__class__, init_state)
+
+    def _update(self, key: str, val: Any):
+        SG.entities.update(self._state_category, self._id, key, val)
+
+    def _delete(self):
+        SG.entities.delete(self._state_category, self._id)
 
     @property
     def _state_data(self):
-        return SG.entities.data[self._category][self.id]
-
-    def create(self, id: int, **data: Any):
-        SG.entities.create(self._category, dict(id=id, **data))
-
-    def update(self, key: str, val: Any):
-        SG.entities.update(self._category, self.id, key, val)
-
-    def delete(self):
-        SG.entities.delete(self._category, self.id)
+        return SG.entities.data[self._state_category][self._id]["data"]
 
 
 class StatefulProp:
@@ -41,9 +47,9 @@ class StatefulProp:
             # so they must want the descriptor itself
             return self
 
-        return obj._state_data[self.key]  # type: ignore
+        return obj._state_data[self.key]
 
     def __set__(self, obj: StatefulClass, value: Any):
         if self.read_only:
             raise Exception(f"Cannot set readonly attribute {self.key} to {value}")
-        obj.update(self.key, value)
+        obj._update(self.key, value)

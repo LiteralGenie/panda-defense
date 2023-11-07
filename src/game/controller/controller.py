@@ -52,7 +52,7 @@ async def play_game(
     )
 
     # ...
-    tower = BasicTowerModel(pos=(1, 1))
+    tower = BasicTowerModel.create(pos=(1, 1))
     game.add_tower(tower)
 
     # start game
@@ -117,7 +117,7 @@ async def _play_round(ctx: ControllerContext):
 def _init_units_for_round(ctx: ControllerContext):
     for wave in ctx.game.current_round["waves"]:
         for _ in range(wave["enemies"]):
-            unit = UnitModel(
+            unit = UnitModel.create(
                 id_wave=wave["id"],
                 ppath=ctx.cache.ppaths[wave["id_path"]],
                 speed=0.25,

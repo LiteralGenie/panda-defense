@@ -5,7 +5,6 @@ from direct.actor.Actor import Actor
 from panda3d.core import NodePath
 
 import g
-from game.shared_globals import SG
 from game.towers.tower_model import TowerModel
 
 
@@ -24,8 +23,7 @@ class TowerView(ABC):
         self.pnode = self._init_pnode()
 
     def _init_model(self):
-        data = SG.entities.data["TOWER"][self.id]
-        return TowerModel(register=False, **data)
+        return TowerModel.load(self.id)
 
     def _init_pnode(self) -> Actor:
         pnode = NodePath("")

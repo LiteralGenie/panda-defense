@@ -1,8 +1,9 @@
 from enum import Enum
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Self
 
 from game.id_manager import IdManager
 from game.parameterized_path import ParameterizedPath
+from game.state import StateCategory
 from game.stateful_class import StatefulClass, StatefulProp
 
 
@@ -13,9 +14,9 @@ class UnitStatus(Enum):
 
 
 class UnitModel(StatefulClass):
-    type: ClassVar[str] = ""
+    _state_category: ClassVar[StateCategory] = "UNIT"
 
-    id: int
+    id: int = StatefulProp("id", read_only=True)  # type: ignore
     id_wave: int = StatefulProp("id_wave", read_only=True)  # type: ignore
 
     dist: float = StatefulProp("dist")  # type: ignore
@@ -25,23 +26,21 @@ class UnitModel(StatefulClass):
 
     ppath: ParameterizedPath
 
-    def __init__(
-        self,
+    @classmethod
+    def create(
+        cls,
         id_wave: int,
         ppath: ParameterizedPath,
         speed: float,
-        register: bool = True,
         **kwargs: Any,
-    ):
-        StatefulClass.__init__(self, "UNIT")
+    ) -> Self:
+        id = IdManager.create()
 
-        self.ppath = ppath
-
-        if register:
-            self.id = IdManager.create()
-            self.create(
-                type=self.__class__.type,
-                id=self.id,
+        instance = cls(id)
+        instance.ppath = ppath
+        instance._register(
+            init_state=dict(
+                id=id,
                 id_path=ppath.id,
                 id_wave=id_wave,
                 dist=0,
@@ -50,5 +49,12 @@ class UnitModel(StatefulClass):
                 status=UnitStatus.PRESPAWN,
                 **kwargs,
             )
-        else:
-            self.id = kwargs["id"]
+        )
+
+        return instance
+
+    @classmethod
+    def load(cls, id: int, ppath: ParameterizedPath) -> Self:  # type: ignore
+        instance = super().load(id)
+        instance.ppath = ppath
+        return instance

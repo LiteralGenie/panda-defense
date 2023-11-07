@@ -11,8 +11,9 @@ class BasicTowerModel(TowerModel):
     attack_speed_guage: float = StatefulProp("attack_speed_guage")  # type: ignore
     damage: int = StatefulProp("damage", read_only=True)  # type: ignore
 
-    def __init__(self, pos: Point2):
-        super().__init__(
+    @classmethod
+    def create(cls, pos: Point2):  # type: ignore
+        return super().create(
             pos,
             range=PyramidalRange(2),
             attack_speed=0.25,

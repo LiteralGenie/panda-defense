@@ -53,7 +53,7 @@ class TowerTile(BetterDirectFrame):
             tiles: set[Point2] = set()
 
             for tower in SG.entities.data["TOWER"].values():
-                tiles.add(tower["pos"])
+                tiles.add(tower["data"]["pos"])
 
             for path in GVG.cache.ppaths.values():
                 for point in path.points:
