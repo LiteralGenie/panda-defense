@@ -5,12 +5,10 @@ from direct.showbase.DirectObject import DirectObject
 
 import g
 from game.game_gui.tower_grid import TowerGrid
-from game.view.game_view_globals import GameViewGlobals
 from utils.gui_utils import get_w, set_relative_frame_size
 
 
 class GameGui(DirectObject):
-    globals: GameViewGlobals
     sidebar: DirectFrame
     sidebar: DirectFrame
     tower_grid: TowerGrid
@@ -21,9 +19,7 @@ class GameGui(DirectObject):
     # Relative to side length of each tile
     TILE_GAP_PERCENT: ClassVar[float] = 0.05
 
-    def __init__(self, globals: GameViewGlobals):
-        self.globals = globals
-
+    def __init__(self):
         self._init_nodes()
         self._recalculate_layout()
 
@@ -37,7 +33,6 @@ class GameGui(DirectObject):
         )
 
         self.tower_grid = TowerGrid(
-            globals=self.globals,
             parent=self.sidebar,
             num_cols=self.TILE_COLS,
             gap_percent=self.TILE_GAP_PERCENT,

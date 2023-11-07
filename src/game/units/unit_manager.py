@@ -33,11 +33,11 @@ class UnitManager:
         self._insert(unit)
 
     def set_dist(self, unit: UnitModel, dist: float):
-        unit.set_dist(dist)
+        unit.dist = dist
         self._insert(unit)
 
     def set_status(self, unit: UnitModel, status: UnitStatus):
-        unit.set_status(status)
+        unit.status = status
         self._insert(unit)
 
     def select(

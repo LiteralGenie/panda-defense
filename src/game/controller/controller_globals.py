@@ -1,8 +1,11 @@
-from dataclasses import dataclass
+from typing import TYPE_CHECKING, ClassVar
 
-from game.event_manager import EventManager
+if TYPE_CHECKING:
+    from game.events.event_manager import EventManager
 
 
-@dataclass
 class ControllerGlobals:
-    ev_mgr: EventManager
+    ev_mgr: "ClassVar[EventManager]"
+
+
+CG = ControllerGlobals

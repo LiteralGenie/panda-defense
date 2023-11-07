@@ -55,24 +55,19 @@ class DragListeners(Generic[_StartData, _MoveData], TypedDict):
     ]
     # (move data) -> (None)
     on_drag_end: Callable[[DragMoveState[_StartData, _MoveData]], None]
-    # called if...
-    #    there was a drag_start but never a drag_move (ie a click)
+    # (last state or None) -> (None)
+    # this is called called if...
     #    multiple drag_starts (probably mobile)
     #    cancel() was invoked
+    #    the mousedown to mouseup period was too short for the poller to invoke mousemove
     on_drag_cancel: Callable[[DragState[_StartData, _MoveData] | None], None]
 
 
 class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
     """
-    When the target element receives a mousedown event, the on_drag_start() callback will be invoked.
-
-    After that callback finishes, the on_drag_move() callback will be invoked periodically
-        (via a mouse location poller, no such thing as mousemove events in panda3d)
-
-    And finally on mouseup, the on_drag_end() callback will be invoked
-        (or alternatively the on_drag_cancel() if it was a really fast click.
-         but the on_drag_end() callback should still check the distance / duration
-         if it's important to avoid click events)
+    Caller should supply callbacks for drag start / move / end / cancel
+    The on-move callback will be invoked periodically
+    The on-cancel callback will generally only be invoked if cancel() is called
     """
 
     POLL_FREQ_S: ClassVar[float] = 0.05

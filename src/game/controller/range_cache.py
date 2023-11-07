@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from game.parameterized_path import ParameterizedPath
-from game.towers.range import Range
+from game.towers.tower_range import TowerRange
 from game.units.unit_model import UnitModel
 from utils.misc_utils import find_insertion_index, split_with_lookback
 from utils.types import Point2
@@ -55,7 +55,7 @@ class RangeCache:
         self._data = dict()
         self.paths = paths
 
-    def get(self, pos: Point2, range: Range) -> PathIntervalMap:
+    def get(self, pos: Point2, range: TowerRange) -> PathIntervalMap:
         entry = self._data.get(pos)
         if not entry:
             self._data[pos] = self._create_entry(pos, range)
@@ -70,7 +70,7 @@ class RangeCache:
     def remove(self, pos: Point2):
         del self._data[pos]
 
-    def _create_entry(self, pos: Point2, range: Range) -> _CacheEntry:
+    def _create_entry(self, pos: Point2, range: TowerRange) -> _CacheEntry:
         intervals: PathIntervalMap = dict()
 
         for path in self.paths:

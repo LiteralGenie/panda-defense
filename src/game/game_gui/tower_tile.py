@@ -8,9 +8,10 @@ import g
 from game.game_actions import BuyTowerAction
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.drag_and_drop import DragAndDrop, DragMoveState, DragState
+from game.shared_globals import SG
 from game.towers.basic.basic_tower_model import BasicTowerModel
 from game.towers.tower_view import TowerView
-from game.view.game_view_globals import GameViewGlobals
+from game.view.game_view_globals import GVG
 from utils.gui_utils import mpos_to_real_pos
 from utils.types import Point2, Point2f
 
@@ -28,9 +29,8 @@ class _MoveData:
 
 class TowerTile(BetterDirectFrame):
     dnd: DragAndDrop[_StartData, _MoveData]
-    globals: GameViewGlobals
 
-    def __init__(self, parent: DirectFrame, globals: GameViewGlobals, **kwargs: Any):
+    def __init__(self, parent: DirectFrame, **kwargs: Any):
         super().__init__(parent, **kwargs)
 
         self.dnd = DragAndDrop(
@@ -40,22 +40,22 @@ class TowerTile(BetterDirectFrame):
             on_drag_end=self._on_drag_end,
             on_drag_cancel=self._on_drag_cancel,
         )
-        self.globals = globals
 
     def delete(self):
         self.dnd.delete()
 
     def _on_drag_start(self, pos: Point2f, time: float):
         invalid_tiles: set[Point2] = set()
-        for tower in self.globals.state["towers"].values():
+        for tower in SG.entities.data["TOWER"].values():
             invalid_tiles.add(tower["pos"])
 
-        for path in self.globals.cache.ppaths.values():
+        for path in GVG.cache.ppaths.values():
             for point in path.points:
                 invalid_tiles.add(point.pos)
 
         placeholder = NodePath("")
-        TowerView.model.instance_to(placeholder)
+        TowerView.actor.instance_to(placeholder)
+        placeholder.set_pos((0, 0, -10))
         placeholder.reparent_to(g.render)
 
         return _StartData(invalid_tiles=invalid_tiles, placeholder=placeholder)
@@ -82,7 +82,7 @@ class TowerTile(BetterDirectFrame):
         state: DragMoveState[_StartData, _MoveData],
     ):
         if pos := state.move_data.active_tile:
-            self.globals.event_pipe.send(
+            GVG.event_pipe.send(
                 BuyTowerAction(
                     BasicTowerModel,
                     kwargs=dict(pos=pos),

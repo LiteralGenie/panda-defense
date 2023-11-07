@@ -1,11 +1,10 @@
+import time
 from multiprocessing import Pipe, Process
 from multiprocessing.connection import Connection
 
 from game.controller.controller import play_game
-from game.event_manager import TickEvents
+from game.events.event_manager import TickEvents
 from game.scenario import Path, Round, Scenario, Segment, Wave
-
-# from faster_fifo import Queue
 
 
 def build_test_scenario():
@@ -46,7 +45,7 @@ def build_test_scenario():
     )
 
 
-def run_renderer(scenario: Scenario, pipe: Connection):
+def run_renderer(first_tick: float, scenario: Scenario, pipe: Connection):
     import simplepbr
     from direct.showbase.ShowBase import ShowBase
     from direct.task.Task import Task
@@ -67,19 +66,15 @@ def run_renderer(scenario: Scenario, pipe: Connection):
 
             self.win.request_properties(properties)  # type: ignore
 
-            self.view = None
+            from game.view.game_view import GameView
+
+            self.view = GameView(first_tick, scenario, pipe)
             self.task_mgr.add(self._check_render_queue)
 
         def _check_render_queue(self, task: Task):
             if pipe.poll():
-                tick: TickEvents = pipe.recv()
-
-                if not self.view:
-                    from game.view.game_view import GameView
-
-                    self.view = GameView(tick.state, pipe)
-
-                self.view.render(tick)
+                update: TickEvents = pipe.recv()
+                self.view.render(update)
 
             return task.cont
 
@@ -87,21 +82,22 @@ def run_renderer(scenario: Scenario, pipe: Connection):
     r.run()
 
 
-def run_game(scenario: Scenario, pipe: Connection):
+def run_game(first_tick: float, scenario: Scenario, pipe: Connection):
     import asyncio
 
-    coro = play_game(scenario, pipe)
+    coro = play_game(first_tick, scenario, pipe)
     asyncio.run(coro)
 
 
 if __name__ == "__main__":
+    first_tick = time.time() + 3
     scenario = build_test_scenario()
     parent_conn, child_conn = Pipe()
 
-    game = Process(target=run_game, args=(scenario, parent_conn))
+    game = Process(target=run_game, args=(first_tick, scenario, parent_conn))
     game.start()
 
-    renderer = Process(target=run_renderer, args=(scenario, child_conn))
+    renderer = Process(target=run_renderer, args=(first_tick, scenario, child_conn))
     renderer.start()
 
     game.join()

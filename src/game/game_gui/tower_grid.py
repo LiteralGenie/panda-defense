@@ -3,14 +3,12 @@ from panda3d.core import TextNode
 
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.tower_tile import TowerTile
-from game.view.game_view_globals import GameViewGlobals
 from utils.gui_utils import get_w
 
 
 class TowerGrid:
     """Grid of square tiles, filling top rows first"""
 
-    globals: GameViewGlobals
     parent: DirectFrame
     grid_container: BetterDirectFrame
     children: list[TowerTile]
@@ -20,12 +18,10 @@ class TowerGrid:
 
     def __init__(
         self,
-        globals: GameViewGlobals,
         parent: DirectFrame,
         num_cols: int,
         gap_percent: float,
     ):
-        self.globals = globals
         self.parent = parent
         self.grid_container = BetterDirectFrame(parent)
         self.children = []
@@ -41,7 +37,6 @@ class TowerGrid:
         idx = len(self.children)
         self.children.append(
             TowerTile(
-                globals=self.globals,
                 parent=self.grid_container,
                 text=f"T{idx}",
                 text_scale=0.05,

@@ -1,21 +1,21 @@
-from game.controller.controller_globals import ControllerGlobals
-from game.towers.range import PyramidalRange
+from game.stateful_class import StatefulProp
 from game.towers.tower_model import TowerModel
+from game.towers.tower_range import PyramidalRange
 from utils.types import Point2
 
 
 class BasicTowerModel(TowerModel):
-    attack_speed: float
-    attack_speed_guage: float
-    damage: int
+    type = "basic"
 
-    def __init__(self, pos: Point2, globals: ControllerGlobals):
+    attack_speed: float = StatefulProp("attack_speed", read_only=True)  # type: ignore
+    attack_speed_guage: float = StatefulProp("attack_speed_guage")  # type: ignore
+    damage: int = StatefulProp("damage", read_only=True)  # type: ignore
+
+    def __init__(self, pos: Point2):
         super().__init__(
             pos,
             range=PyramidalRange(2),
-            globals=globals,
+            attack_speed=0.25,
+            attack_speed_guage=0,
+            damage=30,
         )
-
-        self.attack_speed = 0.25
-        self.attack_speed_guage = 0
-        self.damage = 30

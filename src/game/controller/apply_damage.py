@@ -1,7 +1,9 @@
 import math
 
 from game.controller.controller_context import ControllerContext
+from game.controller.controller_globals import CG
 from game.controller.target import find_tower_targets, flatten_targets
+from game.events.render_event import RenderTowerAttack
 from game.towers.basic.basic_tower_model import BasicTowerModel
 from game.units.unit_model import UnitStatus
 from utils.misc_utils import find
@@ -17,8 +19,8 @@ def apply_damage(ctx: ControllerContext):
 
     for tower in ctx.game.towers:
         if isinstance(tower, BasicTowerModel):
-            tower.attack_speed_guage += tower.attack_speed
-            rem, attacks = math.modf(tower.attack_speed_guage)
+            new_guage = tower.attack_speed_guage + tower.attack_speed
+            rem, attacks = math.modf(new_guage)
             tower.attack_speed_guage = rem
 
             if attacks > 0:
@@ -31,7 +33,8 @@ def apply_damage(ctx: ControllerContext):
                     if not tgt:
                         break
 
-                    tgt.take_damage(tower.damage, tower)
+                    tgt.health -= tower.damage
+                    CG.ev_mgr.add(RenderTowerAttack(tower.id, [tgt.id]))
                     # print(f"Enemy {tgt.id} HP: {tgt.health}")
 
                     if tgt.health <= 0:

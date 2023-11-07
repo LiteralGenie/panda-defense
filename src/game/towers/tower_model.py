@@ -1,29 +1,37 @@
 from abc import ABC
+from typing import Any, ClassVar
 
-from game.controller.controller_globals import ControllerGlobals
 from game.id_manager import IdManager
-from game.towers.range import Range
+from game.stateful_class import StatefulClass, StatefulProp
+from game.towers.tower_range import TowerRange
 from utils.types import Point2
 
 
-class TowerModel(ABC):
+class TowerModel(StatefulClass, ABC):
+    type: ClassVar[str]
+
     id: int
-    pos: Point2
-    range: Range
+    pos: Point2 = StatefulProp("pos")  # type: ignore
+    range: TowerRange = StatefulProp("range", read_only=True)  # type: ignore
 
-    globals: ControllerGlobals
+    def __init__(
+        self,
+        pos: Point2,
+        range: TowerRange,
+        register: bool = True,
+        **kwargs: Any,
+    ):
+        StatefulClass.__init__(self, "TOWER")
 
-    def __init__(self, pos: Point2, range: Range, globals: ControllerGlobals):
-        self.id = IdManager.create()
+        if register:
+            self.id = IdManager.create()
 
-        self.pos = pos
-        self.range = range
-
-        self.globals = globals
-
-    def serialize(self):
-        return dict(
-            id=self.id,
-            pos=self.pos,
-            range=self.range.serialize(),
-        )
+            self.create(
+                type=self.__class__.type,
+                id=self.id,
+                pos=pos,
+                range=range,
+                **kwargs,
+            )
+        else:
+            self.id = kwargs["id"]

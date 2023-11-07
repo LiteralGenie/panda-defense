@@ -2,8 +2,8 @@
 gold / health
 gold / health gui
 validate tower placement
+prevent tower placement under gui
 tower description on hover
-tower description on click
 tower stats on instance click
 sell tower
 unit stats on instance click
@@ -36,6 +36,7 @@ e2e tests
 more nuanced spawn times in scenario
 organize render_queue into queue-per-event-type
         (can handling for a certain event type be independent of all possible other types?)
+rxpy for gui to respond to changes since it doesnt receive render events
 
 # dream
 push rendering into its own thread / process

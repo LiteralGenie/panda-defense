@@ -24,3 +24,27 @@
 
 ### decoupling via message queue
     more direct approach than listening for state changes is having a message queue that's updated on every state change. It's almost the same as just rendering directly but like the state change approach still allows intercepting the render call (to either drop it because server build or it was for an old frame that was superceded)
+
+
+### globals
+    global state... isnt inherently evil
+    
+    in web apps the backend / db typically acts as global state and is frequently queried
+    by deeply nested components like dialogs, not just the root component
+        but as an optimization, data that's needed by multiple linked components is typically queried once and shared via props
+    
+    notifying distant components of updates eventually means some kind of pub-sub / observer like design
+    
+### current arch
+    Still MVC, where the models are stored in a giant dict
+    through python magic, the controller / view interact with class instances rather than this global state
+    through further magic, the controller and view run in separate processes, with each having a copy of the state
+        at the beginning of each tick the controller mutates its copy of the state
+        and once finalized, the view's copy is updated with these changes
+
+    more specifically, each change to the state made by the controller generates a StateEvent
+    at the end of each tick, a list of all the StateEvents are submitted to the process the view is running in
+    the view iterates over these events and runs whatever necessary animations
+
+    in the case where an animation involves multiple models (eg tower attacking a unit)
+    an additional event (in addition to the StateEvent) may be emitted to the renderer

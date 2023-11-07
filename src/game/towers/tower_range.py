@@ -5,7 +5,7 @@ from typing import Any
 from utils.types import Point2
 
 
-class Range(ABC):
+class TowerRange(ABC):
     points: set[Point2]
 
     @abstractmethod
@@ -16,7 +16,7 @@ class Range(ABC):
         return dict(points=self.points)
 
 
-class PyramidalRange(Range):
+class PyramidalRange(TowerRange):
     """
     example:
         x

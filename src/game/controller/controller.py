@@ -6,24 +6,36 @@ from multiprocessing.connection import Connection
 from game.controller.apply_damage import apply_damage
 from game.controller.controller_cache import ControllerCache
 from game.controller.controller_context import ControllerContext
-from game.controller.controller_globals import ControllerGlobals
+from game.controller.controller_globals import CG
 from game.controller.range_cache import RangeCache
-from game.event_manager import EventManager
+from game.events.event_manager import EventManager
 from game.game_model import GameModel
 from game.parameterized_path import ParameterizedPath
 from game.scenario import Scenario
+from game.shared_globals import SG
+from game.state import State
 from game.towers.basic.basic_tower_model import BasicTowerModel
 from game.units.unit_manager import UnitManager
 from game.units.unit_model import UnitModel, UnitStatus
 
-TICK_FREQ_S = 4
+TICK_FREQ_S = 24
 TICK_PERIOD_S = 1 / TICK_FREQ_S
 BUILD_TIME_S = 3
 
 
-async def play_game(scenario: Scenario, render_pipe: Connection):
-    globals = ControllerGlobals(ev_mgr=EventManager())
+async def play_game(
+    first_tick: float,
+    scenario: Scenario,
+    render_pipe: Connection,
+):
+    game = GameModel(scenario, first_tick)
 
+    # init globals
+    # (things that most models need access to and would be painful to supply via contructor)
+    CG.ev_mgr = EventManager(game, render_pipe)
+    SG.entities = State(on_event=CG.ev_mgr.add)
+
+    # init cache
     ppaths = {id: ParameterizedPath(p) for id, p in scenario["paths"].items()}
     cache = ControllerCache(
         ppaths=ppaths,
@@ -31,18 +43,19 @@ async def play_game(scenario: Scenario, render_pipe: Connection):
         start_ticks={0: 0},
     )
 
-    game = GameModel(scenario, time.time(), globals=globals)
-
+    # init context
+    # (god object passed to all controller functions)
     ctx = ControllerContext(
         game=game,
         cache=cache,
-        globals=globals,
         render_pipe=render_pipe,
     )
 
-    tower = BasicTowerModel(pos=(1, 1), globals=ctx.globals)
+    # ...
+    tower = BasicTowerModel(pos=(1, 1))
     game.add_tower(tower)
 
+    # start game
     for i in range(len(game.scenario["rounds"])):
         game.round_idx = i
         cache.start_ticks[game.round_idx] = game.tick + 1
@@ -61,8 +74,7 @@ async def _play_round(ctx: ControllerContext):
 
     while True:
         # Update view
-        evs = ctx.globals.ev_mgr.dump(ctx.game)
-        ctx.render_pipe.send(evs)
+        CG.ev_mgr.flush()
 
         # Wait for tick start
         delay = game.next_tick - time.time()
@@ -99,8 +111,7 @@ async def _play_round(ctx: ControllerContext):
             continue
 
     # Update view
-    evs = ctx.globals.ev_mgr.dump(ctx.game)
-    ctx.render_pipe.send(evs)
+    CG.ev_mgr.flush()
 
 
 def _init_units_for_round(ctx: ControllerContext):
@@ -110,7 +121,6 @@ def _init_units_for_round(ctx: ControllerContext):
                 id_wave=wave["id"],
                 ppath=ctx.cache.ppaths[wave["id_path"]],
                 speed=0.25,
-                globals=ctx.globals,
             )
             ctx.game.add_unit(unit)
 
