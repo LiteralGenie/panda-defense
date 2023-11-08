@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from game.parameterized_path import ParameterizedPath
     from game.view.game_view_globals import GameViewMetaInfo
     from game.view.view_manager import GameViewManager
+    from model_manager import ModelManager
 
 _PathId = int
 
@@ -12,5 +13,6 @@ _PathId = int
 @dataclass
 class GameViewData:
     meta: "GameViewMetaInfo"
+    models: "ModelManager"
     ppaths: "dict[_PathId, ParameterizedPath]"
     views: "GameViewManager"

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Literal, Type, TypeAlias, TypedDict
 
-StateCategory = Literal["TOWER", "UNIT"]
-_STATE_CATEGORIES: list[StateCategory] = ["TOWER", "UNIT"]
+StateCategory = Literal["PLAYER", "TOWER", "UNIT"]
+_STATE_CATEGORIES: list[StateCategory] = ["PLAYER", "TOWER", "UNIT"]
 
 
 class _Entry(TypedDict):

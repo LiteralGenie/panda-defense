@@ -11,6 +11,7 @@ from game.controller.range_cache import RangeCache
 from game.events.event_manager import EventManager
 from game.game_model import GameModel
 from game.parameterized_path import ParameterizedPath
+from game.player.player_model import PlayerModel
 from game.scenario import Scenario
 from game.shared_globals import SG
 from game.state.state import State
@@ -52,6 +53,9 @@ async def play_game(
     )
 
     # ...
+    player = PlayerModel.create(gold=10, health=30)
+    game.add_player(player)
+
     tower = BasicTowerModel.create(pos=(1, 1))
     game.add_tower(tower)
 

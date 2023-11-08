@@ -5,12 +5,12 @@ from game.units.unit_view import UnitView
 
 T = TypeVar("T")
 
-_ModelsById = dict[int, T]
+_ById = dict[int, T]
 
 
 class GameViewManager:
-    towers: _ModelsById[TowerView]
-    units: _ModelsById[UnitView]
+    towers: _ById[TowerView]
+    units: _ById[UnitView]
 
     def __init__(self):
         self.towers = dict()

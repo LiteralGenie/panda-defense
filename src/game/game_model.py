@@ -1,6 +1,7 @@
 from typing import Any
 
 from game.events.game_actions import BuyTowerAction, GameActions
+from game.player.player_model import PlayerModel
 from game.scenario import Round, Scenario
 from game.towers.tower_model import TowerModel
 from game.units.unit_manager import UnitManager
@@ -16,6 +17,7 @@ class GameModel:
     round_idx: int
     tick: int
 
+    players: list[PlayerModel]
     towers: list[TowerModel]
     unit_mgr: UnitManager
 
@@ -32,12 +34,16 @@ class GameModel:
         self.round_idx = -1
         self.tick = -1
 
+        self.players = []
         self.towers = []
         self.unit_mgr = UnitManager()
 
     @property
     def current_round(self) -> Round:
         return self.scenario["rounds"][self.round_idx]
+
+    def add_player(self, player: PlayerModel):
+        self.players.append(player)
 
     def add_tower(self, tower: TowerModel):
         self.towers.append(tower)

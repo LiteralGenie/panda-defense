@@ -7,6 +7,7 @@ from game.events.event_manager import TickEvents
 from game.game_gui.game_gui import GameGui
 from game.maps.map_view import MapView
 from game.parameterized_path import ParameterizedPath
+from game.player.player_model import PlayerModel
 from game.scenario import Scenario
 from game.shared_globals import SG
 from game.state.state import State, StateCreated, StateDeleted, StateUpdated
@@ -15,6 +16,7 @@ from game.units.unit_view import UnitView
 from game.view.game_view_cache import GameViewData
 from game.view.game_view_globals import GVG, GameViewGlobals, GameViewMetaInfo
 from game.view.view_manager import GameViewManager
+from model_manager import ModelManager
 
 
 class GameView:
@@ -40,6 +42,7 @@ class GameView:
                 tick=-1,
                 tick_end=first_tick,
             ),
+            models=ModelManager(),
             ppaths={id: ParameterizedPath(p) for id, p in scenario["paths"].items()},
             views=GameViewManager(),
         )
@@ -74,7 +77,14 @@ class GameView:
 
     def _init_view(self, ev: StateCreated):
         match ev.category:
+            case "PLAYER":
+                model = PlayerModel(ev.id)
+                GVG.data.models.players[model.id] = model
             case "TOWER":
-                GVG.data.views.towers[ev.id] = TowerView(ev.id)
+                view = TowerView(ev.id)
+                GVG.data.views.towers[view.id] = view
+                GVG.data.models.towers[view.id] = view.model
             case "UNIT":
-                GVG.data.views.units[ev.id] = UnitView(ev.id)
+                view = UnitView(ev.id)
+                GVG.data.views.units[view.id] = view
+                GVG.data.models.units[view.id] = view.model

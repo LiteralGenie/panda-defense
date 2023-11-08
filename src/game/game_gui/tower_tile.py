@@ -51,8 +51,8 @@ class TowerTile(BetterDirectFrame):
         if not self.__class__._tile_sub:
             tiles: set[Point2] = set()
 
-            for tower_view in GVG.data.views.towers.values():
-                tiles.add(tower_view.model.pos)
+            for tower in GVG.data.models.towers.values():
+                tiles.add(tower.pos)
 
             for path in GVG.data.ppaths.values():
                 for point in path.points:
