@@ -94,7 +94,7 @@ async def _play_round(ctx: ControllerContext):
         is_round_end = _update_game_state(ctx)
 
         # Calculations should never (consistently) run over than tick period
-        # (assuming the tick times are constant and reproducible
+        # (because assuming the tick times are constant and reproducible
         #  simplifies a lot of the client-server and multiplayer syncing)
         tick_end = time.time()
         elapsed = tick_end - start

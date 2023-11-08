@@ -34,6 +34,16 @@
         but as an optimization, data that's needed by multiple linked components is typically queried once and shared via props
     
     notifying distant components of updates eventually means some kind of pub-sub / observer like design
+
+    evil part is *mutable* global state
+    because when doing calculations to update a value,
+    you'd have to check that any utility functions dont also mutate that value
+
+    in this case, only the controller mutates globals, the view accesses a read-only copy.
+        more specifically, the controller mutates invidiual entries in the global KV store
+        (GameState) via a proxy object (StatefulClass). Each proxy points to unique key
+        (determined at init), and the proxies themselves are not globally accessible.
+        So in practice, the places a value is being mutated is limited and easily debugged
     
 ### current arch
     Still MVC, where the models are stored in a giant dict

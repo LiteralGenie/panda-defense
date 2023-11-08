@@ -65,9 +65,12 @@ class DragListeners(Generic[_StartData, _MoveData], TypedDict):
 
 class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
     """
-    Caller should supply callbacks for drag start / move / end / cancel
-    The on-move callback will be invoked periodically
-    The on-cancel callback will generally only be invoked if cancel() is called
+    Attaches drag start / move / end / cancel callbacks to a GUI widget
+
+    On mousedown, the start cb will be invoked
+    Afterwards, the move cb will be invoked at regular intervals until mouseup
+    On mouseup, the end cb will be invoked
+    If cancel() is called (or another mousedown somehow occurs) before mouseup, the cancel cb will be invoked instead
     """
 
     POLL_FREQ_S: ClassVar[float] = 0.05

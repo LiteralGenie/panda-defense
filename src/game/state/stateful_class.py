@@ -45,8 +45,8 @@ class StatefulProp:
 
     def __get__(self, obj: StatefulClass | None, objtype: Any = None):
         if obj is None:
-            # Caller referenced the class object, not the instance
-            # so they must want the descriptor itself
+            # Caller accessed this descriptor via a class object, not an instance
+            # so they must want the descriptor, not the proxied value
             return self
 
         return obj._state_data[self.key]
