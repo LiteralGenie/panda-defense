@@ -20,17 +20,17 @@ class StatefulClass(ABC):
         return cls(id)
 
     def _register(self, init_state: Any):
-        SG.entities.create(self._state_category, self.__class__, init_state)
+        SG.state.create(self._state_category, self.__class__, init_state)
 
     def _update(self, key: str, val: Any):
-        SG.entities.update(self._state_category, self._id, key, val)
+        SG.state.update(self._state_category, self._id, key, val)
 
     def _delete(self):
-        SG.entities.delete(self._state_category, self._id)
+        SG.state.delete(self._state_category, self._id)
 
     @property
     def _state_data(self):
-        return SG.entities.data[self._state_category][self._id]["data"]
+        return SG.state.data[self._state_category][self._id]["data"]
 
 
 class StatefulProp:

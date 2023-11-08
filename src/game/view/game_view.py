@@ -1,6 +1,5 @@
 from dataclasses import asdict
 from multiprocessing.connection import Connection
-from typing import Any
 
 from reactivex import Subject
 
@@ -15,6 +14,7 @@ from game.towers.tower_view import TowerView
 from game.units.unit_view import UnitView
 from game.view.game_view_cache import GameViewCache
 from game.view.game_view_globals import GVG, GameViewGlobals, GameViewMetaInfo
+from game.view.view_manager import GameViewManager
 
 
 class GameView:
@@ -22,7 +22,6 @@ class GameView:
 
     gui: GameGui
     map: MapView
-    views: dict[int, Any]
 
     def __init__(
         self,
@@ -39,6 +38,7 @@ class GameView:
             tick=-1,
             tick_end=first_tick,
         )
+        GVG.views = GameViewManager()
 
         ppaths = {id: ParameterizedPath(p) for id, p in scenario["paths"].items()}
         cache = GameViewCache(
@@ -46,11 +46,10 @@ class GameView:
         )
         GVG.cache = cache
 
-        SG.entities = State(on_event=GVG.event_subj.on_next)
+        SG.state = State(on_event=GVG.event_subj.on_next)
 
         self.gui = GameGui()
         self.map = MapView()
-        self.views = dict()
 
     def render(self, update: TickEvents):
         # print(
@@ -65,18 +64,18 @@ class GameView:
         for ev in update.events:
             match ev:
                 case StateCreated():
-                    SG.entities.create(**asdict(ev))
+                    SG.state.create(**asdict(ev))
                     self._init_view(ev)
                 case StateUpdated():
-                    SG.entities.update(**asdict(ev))
+                    SG.state.update(**asdict(ev))
                 case StateDeleted():
-                    SG.entities.delete(**asdict(ev))
+                    SG.state.delete(**asdict(ev))
                 case _:
                     GVG.event_subj.on_next(ev)
 
     def _init_view(self, ev: StateCreated):
         match ev.category:
             case "TOWER":
-                self.views[ev.id] = TowerView(ev.id)
+                GVG.views.towers[ev.id] = TowerView(ev.id)
             case "UNIT":
-                self.views[ev.id] = UnitView(ev.id)
+                GVG.views.units[ev.id] = UnitView(ev.id)

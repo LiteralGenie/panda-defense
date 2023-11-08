@@ -1,12 +1,10 @@
 from dataclasses import dataclass
 from multiprocessing.connection import Connection
-from typing import Any, TypeVar
+from typing import Any
 
 from game.events.render_event import RenderEvent
 from game.game_model import GameModel
 from game.state.state import StateEvent
-
-T = TypeVar("T")
 
 GameEvent = RenderEvent | StateEvent
 

@@ -33,7 +33,7 @@ async def play_game(
     # init globals
     # (things that most models need access to and would be painful to supply via contructor)
     CG.ev_mgr = EventManager(game, render_pipe)
-    SG.entities = State(on_event=CG.ev_mgr.add)
+    SG.state = State(on_event=CG.ev_mgr.add)
 
     # init cache
     ppaths = {id: ParameterizedPath(p) for id, p in scenario["paths"].items()}

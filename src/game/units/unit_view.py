@@ -38,7 +38,7 @@ class UnitView:
         self._event_sub = self._subscribe_events()
 
     def _init_model(self):
-        data = SG.entities.data["UNIT"][self.id]["data"]
+        data = SG.state.data["UNIT"][self.id]["data"]
         ppath = GVG.cache.ppaths[data["id_path"]]
         return UnitModel.load(self.id, ppath=ppath)
 
