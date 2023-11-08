@@ -15,7 +15,6 @@ from game.player.player_model import PlayerModel
 from game.scenario import Scenario
 from game.shared_globals import SG
 from game.state.state import State
-from game.towers.basic.basic_tower_model import BasicTowerModel
 from game.units.unit_manager import UnitManager
 from game.units.unit_model import UnitModel, UnitStatus
 
@@ -52,12 +51,9 @@ async def play_game(
         render_pipe=render_pipe,
     )
 
-    # ...
+    # init players
     player = PlayerModel.create(gold=10, health=30)
     game.add_player(player)
-
-    tower = BasicTowerModel.create(pos=(1, 1))
-    game.add_tower(tower)
 
     # start game
     for i in range(len(game.scenario["rounds"])):

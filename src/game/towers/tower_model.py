@@ -9,9 +9,11 @@ from utils.types import Point2
 
 
 class TowerModel(StatefulClass, ABC):
+    cost: ClassVar[int]
     _state_category: ClassVar[StateCategory] = "TOWER"
 
     id: int = StatefulProp()  # type: ignore
+    cost: int = StatefulProp(read_only=True)  # type: ignore
     pos: Point2 = StatefulProp()  # type: ignore
     range: TowerRange = StatefulProp(read_only=True)  # type: ignore
 

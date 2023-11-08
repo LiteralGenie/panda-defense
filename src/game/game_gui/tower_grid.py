@@ -3,6 +3,8 @@ from panda3d.core import TextNode
 
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.tower_tile import TowerTile
+from game.towers.basic.basic_tower_model import BasicTowerModel
+from game.towers.basic.basic_tower_view import BasicTowerView
 from utils.gui_utils import get_w
 
 
@@ -37,7 +39,9 @@ class TowerGrid:
         idx = len(self.children)
         self.children.append(
             TowerTile(
-                parent=self.grid_container,
+                self.grid_container,
+                BasicTowerModel,
+                BasicTowerView,
                 text=f"T{idx}",
                 text_scale=0.05,
                 text_align=TextNode.ACenter,

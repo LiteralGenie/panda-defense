@@ -140,3 +140,8 @@ def split_with_lookback(
         result.append(buffer)
 
     return result
+
+
+def first_in_dict(data: dict[Any, T]) -> T:
+    first_key = next(iter(data))
+    return data[first_key]

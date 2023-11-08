@@ -17,8 +17,8 @@ class GameModel:
     round_idx: int
     tick: int
 
-    players: list[PlayerModel]
-    towers: list[TowerModel]
+    players: dict[int, PlayerModel]
+    towers: dict[int, TowerModel]
     unit_mgr: UnitManager
 
     def __init__(
@@ -34,8 +34,8 @@ class GameModel:
         self.round_idx = -1
         self.tick = -1
 
-        self.players = []
-        self.towers = []
+        self.players = dict()
+        self.towers = dict()
         self.unit_mgr = UnitManager()
 
     @property
@@ -43,10 +43,10 @@ class GameModel:
         return self.scenario["rounds"][self.round_idx]
 
     def add_player(self, player: PlayerModel):
-        self.players.append(player)
+        self.players[player.id] = player
 
     def add_tower(self, tower: TowerModel):
-        self.towers.append(tower)
+        self.towers[tower.id] = tower
 
     def add_unit(self, unit: UnitModel):
         self.unit_mgr.add(unit)
@@ -58,9 +58,16 @@ class GameModel:
     def apply_actions(self):
         for action in self.action_queue:
             match action:
-                case BuyTowerAction(cls, kwargs):
-                    tower: TowerModel = cls(**kwargs)
-                    self.add_tower(tower)
+                case BuyTowerAction(id_player, TowerCls, kwargs):
+                    player = self.players[id_player]
+
+                    if player.gold >= TowerCls.cost:
+                        player.gold -= TowerCls.cost
+                        tower = TowerCls.create(**kwargs)
+                        self.add_tower(tower)
+                    else:
+                        print("Not enough gold to buy tower")
+        self.action_queue = []
 
     # def delete(self):
     #     actors = [UnitView]

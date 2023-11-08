@@ -5,7 +5,7 @@ from utils.types import Point2
 
 
 class BasicTowerModel(TowerModel):
-    type = "basic"
+    cost = 5
 
     attack_speed: float = StatefulProp(read_only=True)  # type: ignore
     attack_speed_guage: float = StatefulProp()  # type: ignore
@@ -14,9 +14,9 @@ class BasicTowerModel(TowerModel):
     @classmethod
     def create(cls, pos: Point2):  # type: ignore
         return super().create(
-            pos,
-            range=PyramidalRange(2),
             attack_speed=0.25,
             attack_speed_guage=0,
             damage=30,
+            pos=pos,
+            range=PyramidalRange(2),
         )

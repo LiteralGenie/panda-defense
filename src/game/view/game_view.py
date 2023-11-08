@@ -11,10 +11,11 @@ from game.player.player_model import PlayerModel
 from game.scenario import Scenario
 from game.shared_globals import SG
 from game.state.state import State, StateCreated, StateDeleted, StateUpdated
-from game.towers.tower_view import TowerView
+from game.towers.basic.basic_tower_view import BasicTowerView
 from game.units.unit_view import UnitView
 from game.view.game_view_cache import GameViewData
 from game.view.game_view_globals import GVG, GameViewGlobals, GameViewMetaInfo
+from game.view.resource_manager import ResourceManager
 from game.view.view_manager import GameViewManager
 from model_manager import ModelManager
 
@@ -34,6 +35,7 @@ class GameView:
         # init globals
         GVG.event_pipe = event_pipe
         GVG.event_subj = Subject()
+        GVG.resource_mgr = ResourceManager()
 
         cache = GameViewData(
             meta=GameViewMetaInfo(
@@ -81,7 +83,7 @@ class GameView:
                 model = PlayerModel(ev.id)
                 GVG.data.models.players[model.id] = model
             case "TOWER":
-                view = TowerView(ev.id)
+                view = BasicTowerView(ev.id)
                 GVG.data.views.towers[view.id] = view
                 GVG.data.models.towers[view.id] = view.model
             case "UNIT":

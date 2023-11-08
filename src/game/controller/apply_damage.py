@@ -17,7 +17,7 @@ def apply_damage(ctx: ControllerContext):
         for ppath in ctx.cache.ppaths.values()
     }
 
-    for tower in ctx.game.towers:
+    for tower in ctx.game.towers.values():
         if isinstance(tower, BasicTowerModel):
             new_guage = tower.attack_speed_guage + tower.attack_speed
             rem, attacks = math.modf(new_guage)

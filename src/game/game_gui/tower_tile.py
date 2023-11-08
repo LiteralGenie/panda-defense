@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Type
 
 from direct.gui.DirectGui import DirectFrame
 from panda3d.core import NodePath
@@ -11,10 +11,11 @@ from game.events.game_actions import BuyTowerAction
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.drag_and_drop import DragAndDrop, DragMoveState, DragState
 from game.state.state import StateCreated, StateDeleted
-from game.towers.basic.basic_tower_model import BasicTowerModel
+from game.towers.tower_model import TowerModel
 from game.towers.tower_view import TowerView
 from game.view.game_view_globals import GVG
 from utils.gui_utils import mpos_to_real_pos
+from utils.misc_utils import first_in_dict
 from utils.types import Point2, Point2f
 
 
@@ -33,8 +34,16 @@ class TowerTile(BetterDirectFrame):
     _tile_sub: ClassVar[DisposableBase | None] = None
 
     dnd: DragAndDrop[_StartData, _MoveData]
+    TowerModelCls: Type[TowerModel]
+    TowerViewCls: Type[TowerView]
 
-    def __init__(self, parent: DirectFrame, **kwargs: Any):
+    def __init__(
+        self,
+        parent: DirectFrame,
+        TowerModelCls: Type[TowerModel],
+        TowerViewCls: Type[TowerView],
+        **kwargs: Any,
+    ):
         super().__init__(parent, **kwargs)
 
         self.dnd = DragAndDrop(
@@ -44,6 +53,8 @@ class TowerTile(BetterDirectFrame):
             on_drag_end=self._on_drag_end,
             on_drag_cancel=self._on_drag_cancel,
         )
+        self.TowerModelCls = TowerModelCls
+        self.TowerViewCls = TowerViewCls
 
         self._sub_invalid_tiles()
 
@@ -76,7 +87,7 @@ class TowerTile(BetterDirectFrame):
 
     def _on_drag_start(self, pos: Point2f, time: float):
         placeholder = NodePath("")
-        TowerView.actor.instance_to(placeholder)
+        self.TowerViewCls.placeholder.instance_to(placeholder)
         placeholder.set_pos((0, 0, -10))
         placeholder.reparent_to(g.render)
 
@@ -104,9 +115,11 @@ class TowerTile(BetterDirectFrame):
         state: DragMoveState[_StartData, _MoveData],
     ):
         if pos := state.move_data.active_tile:
+            player = first_in_dict(GVG.data.models.players)
             GVG.event_pipe.send(
                 BuyTowerAction(
-                    BasicTowerModel,
+                    id_player=player.id,
+                    TowerCls=self.TowerModelCls,
                     kwargs=dict(pos=pos),
                 )
             )
