@@ -30,6 +30,7 @@ class GameView:
         self,
         first_tick: float,
         scenario: Scenario,
+        id_player: int,
         event_pipe: Connection,
     ):
         # init globals
@@ -52,7 +53,6 @@ class GameView:
 
         SG.state = GameState(on_event=GVG.event_subj.on_next)
 
-        self.gui = GameGui()
         self.map = MapView()
 
     def render(self, update: TickEvents):
@@ -77,8 +77,14 @@ class GameView:
                 case _:
                     GVG.event_subj.on_next(ev)
 
+        # Wait for state to init
+        if SG.state.data["GAME"] and not getattr(self, "gui", None):
+            self.gui = GameGui()
+
     def _init_view(self, ev: StateCreated):
         match ev.category:
+            case "GAME":
+                pass
             case "PLAYER":
                 model = PlayerModel(ev.id)
                 GVG.data.models.players[model.id] = model

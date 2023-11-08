@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Literal, Type, TypeAlias, TypedDict
 
-StateCategory = Literal["PLAYER", "TOWER", "UNIT"]
-_STATE_CATEGORIES: list[StateCategory] = ["PLAYER", "TOWER", "UNIT"]
+StateCategory = Literal["GAME", "PLAYER", "TOWER", "UNIT"]
+_STATE_CATEGORIES: list[StateCategory] = ["GAME", "PLAYER", "TOWER", "UNIT"]
 
 
 class _Entry(TypedDict):
@@ -18,11 +18,16 @@ _OnEvent: TypeAlias = "Callable[[StateEvent], None]"
 
 class GameState:
     """
-    Basically a 2-layer dict with this shape
+    Basically a 3-layer dict with this shape
     {
         category_1: {
-            id_1: entry_1,
-            id_2: entry_2,
+            id_1: {
+                attr_1: ...,
+                attr2_: ...,
+            },
+            id_2: {
+                ...
+            },
         },
 
         category_2: {

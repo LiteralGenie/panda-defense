@@ -12,7 +12,9 @@ from utils.misc_utils import find
 def apply_damage(ctx: ControllerContext):
     units = {
         ppath.id: ctx.game.unit_mgr.select(
-            id_path=ppath.id, status=UnitStatus.ALIVE, order_by="dist"
+            id_path=ppath.id,
+            status=UnitStatus.ALIVE,
+            order_by="dist",
         )
         for ppath in ctx.cache.ppaths.values()
     }

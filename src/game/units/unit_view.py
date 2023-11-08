@@ -1,6 +1,6 @@
 import time
 from math import modf
-from typing import Any, ClassVar
+from typing import Any
 
 from direct.actor.Actor import Actor
 from direct.interval.Interval import Interval
@@ -18,10 +18,6 @@ from game.view.game_view_globals import GVG
 
 
 class UnitView:
-    actor: ClassVar[Actor] = Actor(
-        "data/assets/glTF-Sample-Models/2.0/BoomBox/glTF/BoomBox.gltf"
-    )
-
     id: int
     model: UnitModel
     pnode: Actor | None
@@ -49,8 +45,6 @@ class UnitView:
         dist = int(self.model.dist)
         pos = self.model.ppath.points[dist].pos
         pnode.set_pos(pos + (0,))
-
-        pnode.get_child(0).set_scale(20)
 
         pnode.reparent_to(g.render)
 
@@ -111,3 +105,13 @@ class UnitView:
 
         if self.pnode:
             self.pnode.removeNode()
+
+    @classmethod
+    @property
+    def actor(cls):
+        pnode = GVG.resource_mgr.load_actor(
+            "glTF-Sample-Models/2.0/BoomBox/glTF/BoomBox.gltf"
+        )
+
+        pnode.getChild(0).setScale(20)
+        return pnode

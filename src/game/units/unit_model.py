@@ -21,7 +21,7 @@ class UnitModel(StatefulClass):
 
     dist: float = StatefulProp()  # type: ignore
     health: int = StatefulProp()  # type: ignore
-    speed: float = StatefulProp(read_only=True)  # type: ignore
+    speed: float = StatefulProp()  # type: ignore
     status: UnitStatus = StatefulProp()  # type: ignore
 
     ppath: ParameterizedPath

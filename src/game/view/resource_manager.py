@@ -17,9 +17,14 @@ class ResourceManager:
         self.assets = dict()
 
     def load_actor(self, name: str):
-        fp = self._asset_dir + name
-        return Actor(fp)
+        if name not in self.actors:
+            fp = self._asset_dir + name
+            self.actors[name] = Actor(fp)
+        return self.actors[name]
 
     def load_asset(self, name: str):
         fp = self._asset_dir + name
-        return g.loader.laodModel(fp)
+        if name not in self.actors:
+            fp = self._asset_dir + name
+            self.assets[name] = g.loader.load_model(fp)
+        return self.assets[name]

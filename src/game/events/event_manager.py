@@ -24,8 +24,7 @@ class EventManager:
 
     pending: list[Any]
 
-    def __init__(self, game: GameModel, pipe: Connection):
-        self.game = game
+    def __init__(self, pipe: Connection):
         self.pipe = pipe
 
         self.pending = []

@@ -45,7 +45,12 @@ def build_test_scenario():
     )
 
 
-def run_renderer(first_tick: float, scenario: Scenario, pipe: Connection):
+def run_renderer(
+    first_tick: float,
+    scenario: Scenario,
+    id_player: int,
+    pipe: Connection,
+):
     import simplepbr
     from direct.showbase.ShowBase import ShowBase
     from direct.task.Task import Task
@@ -68,7 +73,7 @@ def run_renderer(first_tick: float, scenario: Scenario, pipe: Connection):
 
             from game.view.game_view import GameView
 
-            self.view = GameView(first_tick, scenario, pipe)
+            self.view = GameView(first_tick, scenario, id_player, pipe)
             self.task_mgr.add(self._check_render_queue)
 
         def _check_render_queue(self, task: Task):
@@ -82,10 +87,15 @@ def run_renderer(first_tick: float, scenario: Scenario, pipe: Connection):
     r.run()
 
 
-def run_game(first_tick: float, scenario: Scenario, pipe: Connection):
+def run_game(
+    first_tick: float,
+    scenario: Scenario,
+    id_player: int,
+    pipe: Connection,
+):
     import asyncio
 
-    coro = play_game(first_tick, scenario, pipe)
+    coro = play_game(first_tick, scenario, id_player, pipe)
     asyncio.run(coro)
 
 
@@ -94,10 +104,26 @@ if __name__ == "__main__":
     scenario = build_test_scenario()
     parent_conn, child_conn = Pipe()
 
-    game = Process(target=run_game, args=(first_tick, scenario, parent_conn))
-    game.start()
+    game = Process(
+        target=run_game,
+        args=(
+            first_tick,
+            scenario,
+            3232,
+            parent_conn,
+        ),
+    )
+    renderer = Process(
+        target=run_renderer,
+        args=(
+            first_tick,
+            scenario,
+            3232,
+            child_conn,
+        ),
+    )
 
-    renderer = Process(target=run_renderer, args=(first_tick, scenario, child_conn))
+    game.start()
     renderer.start()
 
     game.join()

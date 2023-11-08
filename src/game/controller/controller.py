@@ -18,7 +18,7 @@ from game.state.game_state import GameState
 from game.units.unit_manager import UnitManager
 from game.units.unit_model import UnitModel, UnitStatus
 
-TICK_FREQ_S = 24
+TICK_FREQ_S = 10
 TICK_PERIOD_S = 1 / TICK_FREQ_S
 BUILD_TIME_S = 3
 
@@ -26,14 +26,18 @@ BUILD_TIME_S = 3
 async def play_game(
     first_tick: float,
     scenario: Scenario,
+    id_player: int,
     render_pipe: Connection,
 ):
-    game = GameModel(scenario, first_tick)
-
     # init globals
     # (things that most models need access to and would be painful to supply via contructor)
-    CG.ev_mgr = EventManager(game, render_pipe)
+    CG.ev_mgr = EventManager(render_pipe)
     SG.state = GameState(on_event=CG.ev_mgr.add)
+
+    # init game model
+    players = [PlayerModel.create(id=id_player, gold=10)]
+    game = GameModel.create(scenario, first_tick, players[0].id, players)
+    CG.ev_mgr.game = game
 
     # init cache
     ppaths = {id: ParameterizedPath(p) for id, p in scenario["paths"].items()}
@@ -50,10 +54,6 @@ async def play_game(
         cache=cache,
         render_pipe=render_pipe,
     )
-
-    # init players
-    player = PlayerModel.create(gold=10, health=30)
-    game.add_player(player)
 
     # start game
     for i in range(len(game.scenario["rounds"])):

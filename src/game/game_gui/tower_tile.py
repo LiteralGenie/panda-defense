@@ -15,7 +15,6 @@ from game.towers.tower_model import TowerModel
 from game.towers.tower_view import TowerView
 from game.view.game_view_globals import GVG
 from utils.gui_utils import mpos_to_real_pos
-from utils.misc_utils import first_in_dict
 from utils.types import Point2, Point2f
 
 
@@ -115,10 +114,8 @@ class TowerTile(BetterDirectFrame):
         state: DragMoveState[_StartData, _MoveData],
     ):
         if pos := state.move_data.active_tile:
-            player = first_in_dict(GVG.data.models.players)
             GVG.event_pipe.send(
                 BuyTowerAction(
-                    id_player=player.id,
                     TowerCls=self.TowerModelCls,
                     kwargs=dict(pos=pos),
                 )

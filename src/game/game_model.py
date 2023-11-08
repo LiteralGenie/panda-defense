@@ -1,49 +1,71 @@
-from typing import Any
+from typing import Any, ClassVar, Self
 
 from game.events.game_actions import BuyTowerAction, GameActions
+from game.id_manager import IdManager
 from game.player.player_model import PlayerModel
 from game.scenario import Round, Scenario
+from game.state.game_state import StateCategory
+from game.state.stateful_class import StatefulClass, StatefulProp
 from game.towers.tower_model import TowerModel
 from game.units.unit_manager import UnitManager
 from game.units.unit_model import UnitModel
 
 
-class GameModel:
-    action_queue: list[GameActions]
-    scenario: Scenario
+class GameModel(StatefulClass):
+    _state_category: ClassVar[StateCategory] = "GAME"
 
-    first_tick: float
-    next_tick: float
-    round_idx: int
-    tick: int
+    action_queue: list[GameActions]
+    scenario: Scenario = StatefulProp(read_only=True)  # type: ignore
+
+    first_tick: float = StatefulProp(read_only=True)  # type: ignore
+    next_tick: float = StatefulProp()  # type: ignore
+    round_idx: int = StatefulProp()  # type: ignore
+    tick: int = StatefulProp()  # type: ignore
 
     players: dict[int, PlayerModel]
     towers: dict[int, TowerModel]
     unit_mgr: UnitManager
 
-    def __init__(
-        self,
+    id: int = StatefulProp(read_only=True)  # type: ignore
+    id_player: int = StatefulProp(read_only=True)  # type: ignore
+    health: int = StatefulProp()  # type: ignore
+
+    @classmethod
+    def create(
+        cls,
         scenario: Scenario,
         first_tick: float,
-    ):
-        self.action_queue = []
-        self.scenario = scenario
+        id_player: int,
+        players: list[PlayerModel],
+    ) -> Self:
+        id = IdManager.create()
+        instance = cls(id)
 
-        self.first_tick = first_tick
-        self.next_tick = first_tick
-        self.round_idx = -1
-        self.tick = -1
+        instance.action_queue = []
+        instance.players = {pl.id: pl for pl in players}
+        instance.towers = dict()
+        instance.unit_mgr = UnitManager()
 
-        self.players = dict()
-        self.towers = dict()
-        self.unit_mgr = UnitManager()
+        # Unlike other models, we don't intend to have multiple instances of GameModel
+        # nor re-instantiate it in the View process
+        # this is mostly so the View is notified of health / gold changes
+        instance._register(
+            dict(
+                id=id,
+                id_player=id_player,
+                scenario=scenario,
+                first_tick=first_tick,
+                next_tick=first_tick,
+                round_idx=-1,
+                tick=-1,
+            )
+        )
+
+        return instance
 
     @property
     def current_round(self) -> Round:
         return self.scenario["rounds"][self.round_idx]
-
-    def add_player(self, player: PlayerModel):
-        self.players[player.id] = player
 
     def add_tower(self, tower: TowerModel):
         self.towers[tower.id] = tower
@@ -58,16 +80,18 @@ class GameModel:
     def apply_actions(self):
         for action in self.action_queue:
             match action:
-                case BuyTowerAction(id_player, TowerCls, kwargs):
-                    player = self.players[id_player]
-
-                    if player.gold >= TowerCls.cost:
-                        player.gold -= TowerCls.cost
+                case BuyTowerAction(TowerCls, kwargs):
+                    if self.player.gold >= TowerCls.cost:
+                        self.player.gold -= TowerCls.cost
                         tower = TowerCls.create(**kwargs)
                         self.add_tower(tower)
                     else:
                         print("Not enough gold to buy tower")
         self.action_queue = []
+
+    @property
+    def player(self):
+        return self.players[self.id_player]
 
     # def delete(self):
     #     actors = [UnitView]
