@@ -160,3 +160,4 @@ def _move_units(ctx: ControllerContext):
         # Remove unit if it completed path
         if unit.dist >= unit.ppath.length - 1:
             ctx.game.unit_mgr.set_status(unit, UnitStatus.DEAD)
+            ctx.game.health -= 1
