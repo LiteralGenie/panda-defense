@@ -7,7 +7,7 @@ from reactivex.abc import DisposableBase
 
 import g
 from game.events.event_manager import GameEvent
-from game.game_actions import BuyTowerAction
+from game.events.game_actions import BuyTowerAction
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.drag_and_drop import DragAndDrop, DragMoveState, DragState
 from game.state.state import StateCreated, StateDeleted
@@ -51,10 +51,10 @@ class TowerTile(BetterDirectFrame):
         if not self.__class__._tile_sub:
             tiles: set[Point2] = set()
 
-            for tower_view in GVG.views.towers.values():
+            for tower_view in GVG.data.views.towers.values():
                 tiles.add(tower_view.model.pos)
 
-            for path in GVG.cache.ppaths.values():
+            for path in GVG.data.ppaths.values():
                 for point in path.points:
                     tiles.add(point.pos)
 

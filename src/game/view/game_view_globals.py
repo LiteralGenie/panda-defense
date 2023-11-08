@@ -6,8 +6,7 @@ from reactivex import Subject
 
 from game.events.event_manager import GameEvent
 from game.scenario import Scenario
-from game.view.game_view_cache import GameViewCache
-from game.view.view_manager import GameViewManager
+from game.view.game_view_cache import GameViewData
 
 
 @dataclass
@@ -19,11 +18,9 @@ class GameViewMetaInfo:
 
 
 class GameViewGlobals:
-    cache: ClassVar[GameViewCache]
+    data: ClassVar[GameViewData]
     event_pipe: ClassVar[Connection]
     event_subj: ClassVar[Subject[GameEvent]]
-    meta: GameViewMetaInfo
-    views: GameViewManager
 
 
 GVG = GameViewGlobals

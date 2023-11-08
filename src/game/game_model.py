@@ -1,6 +1,6 @@
 from typing import Any
 
-from game.game_actions import BuyTowerAction, GameActions
+from game.events.game_actions import BuyTowerAction, GameActions
 from game.scenario import Round, Scenario
 from game.towers.tower_model import TowerModel
 from game.units.unit_manager import UnitManager

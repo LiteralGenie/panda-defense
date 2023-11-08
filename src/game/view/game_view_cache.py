@@ -1,10 +1,16 @@
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from game.parameterized_path import ParameterizedPath
+if TYPE_CHECKING:
+    from game.parameterized_path import ParameterizedPath
+    from game.view.game_view_globals import GameViewMetaInfo
+    from game.view.view_manager import GameViewManager
 
 _PathId = int
 
 
 @dataclass
-class GameViewCache:
-    ppaths: dict[_PathId, ParameterizedPath]
+class GameViewData:
+    meta: "GameViewMetaInfo"
+    ppaths: "dict[_PathId, ParameterizedPath]"
+    views: "GameViewManager"

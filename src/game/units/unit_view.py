@@ -39,7 +39,7 @@ class UnitView:
 
     def _init_model(self):
         data = SG.state.data["UNIT"][self.id]["data"]
-        ppath = GVG.cache.ppaths[data["id_path"]]
+        ppath = GVG.data.ppaths[data["id_path"]]
         return UnitModel.load(self.id, ppath=ppath)
 
     def _init_pnode(self) -> Actor:
@@ -101,7 +101,7 @@ class UnitView:
         )
 
         self._intervals["pos"] = self.pnode.posInterval(  # type: ignore
-            (GVG.meta.tick_end - time.time()),
+            (GVG.data.meta.tick_end - time.time()),
             new_pos + (0,),
         )
         self._intervals["pos"].start()  # type: ignore
