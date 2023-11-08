@@ -16,7 +16,7 @@ _DataByCategory = dict[StateCategory, _EntriesById]
 _OnEvent: TypeAlias = "Callable[[StateEvent], None]"
 
 
-class State:
+class GameState:
     """
     Basically a 2-layer dict with this shape
     {

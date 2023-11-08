@@ -3,7 +3,7 @@ from typing import Any, ClassVar, Self
 
 from game.id_manager import IdManager
 from game.parameterized_path import ParameterizedPath
-from game.state.state import StateCategory
+from game.state.game_state import StateCategory
 from game.state.stateful_class import StatefulClass, StatefulProp
 
 

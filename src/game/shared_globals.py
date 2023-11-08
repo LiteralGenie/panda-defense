@@ -1,8 +1,8 @@
-from game.state.state import State
+from game.state.game_state import GameState
 
 
 class SharedGlobals:
-    state: State
+    state: GameState
 
 
 SG = SharedGlobals

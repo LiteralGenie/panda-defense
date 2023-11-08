@@ -4,7 +4,7 @@ from typing import Any
 
 from game.events.render_event import RenderEvent
 from game.game_model import GameModel
-from game.state.state import StateEvent
+from game.state.game_state import StateEvent
 
 GameEvent = RenderEvent | StateEvent
 

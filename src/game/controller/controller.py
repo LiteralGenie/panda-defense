@@ -14,7 +14,7 @@ from game.parameterized_path import ParameterizedPath
 from game.player.player_model import PlayerModel
 from game.scenario import Scenario
 from game.shared_globals import SG
-from game.state.state import State
+from game.state.game_state import GameState
 from game.units.unit_manager import UnitManager
 from game.units.unit_model import UnitModel, UnitStatus
 
@@ -33,7 +33,7 @@ async def play_game(
     # init globals
     # (things that most models need access to and would be painful to supply via contructor)
     CG.ev_mgr = EventManager(game, render_pipe)
-    SG.state = State(on_event=CG.ev_mgr.add)
+    SG.state = GameState(on_event=CG.ev_mgr.add)
 
     # init cache
     ppaths = {id: ParameterizedPath(p) for id, p in scenario["paths"].items()}

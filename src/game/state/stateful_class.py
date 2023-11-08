@@ -4,7 +4,7 @@ from abc import ABC
 from typing import Any, ClassVar, Self, Type
 
 from game.shared_globals import SG
-from game.state.state import StateCategory
+from game.state.game_state import StateCategory
 
 
 class StatefulClass(ABC):

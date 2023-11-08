@@ -10,7 +10,7 @@ from game.events.event_manager import GameEvent
 from game.events.game_actions import BuyTowerAction
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.drag_and_drop import DragAndDrop, DragMoveState, DragState
-from game.state.state import StateCreated, StateDeleted
+from game.state.game_state import StateCreated, StateDeleted
 from game.towers.tower_model import TowerModel
 from game.towers.tower_view import TowerView
 from game.view.game_view_globals import GVG

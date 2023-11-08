@@ -10,7 +10,7 @@ from game.parameterized_path import ParameterizedPath
 from game.player.player_model import PlayerModel
 from game.scenario import Scenario
 from game.shared_globals import SG
-from game.state.state import State, StateCreated, StateDeleted, StateUpdated
+from game.state.game_state import GameState, StateCreated, StateDeleted, StateUpdated
 from game.towers.basic.basic_tower_view import BasicTowerView
 from game.units.unit_view import UnitView
 from game.view.game_view_cache import GameViewData
@@ -50,7 +50,7 @@ class GameView:
         )
         GVG.data = cache
 
-        SG.state = State(on_event=GVG.event_subj.on_next)
+        SG.state = GameState(on_event=GVG.event_subj.on_next)
 
         self.gui = GameGui()
         self.map = MapView()
