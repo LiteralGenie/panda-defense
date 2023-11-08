@@ -1,5 +1,4 @@
 # PoC
-gold / health
 gold / health gui
 validate tower placement
 prevent tower placement under gui
@@ -12,6 +11,7 @@ settings menu
 logging
 campaign levels
 throwaway art
+game start / end
 
 # later
 progression
@@ -38,10 +38,11 @@ organize render_queue into queue-per-event-type
         (can handling for a certain event type be independent of all possible other types?)
 
 # dream
-push rendering into its own thread / process
 
 
 # done
+[x] push rendering into its own thread / process
+[x] gold / health
 [x] rxpy for gui to respond to changes since it doesnt receive render events
 [x] tower placement
 [x] tower shop

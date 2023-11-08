@@ -51,13 +51,14 @@ class GameModel(StatefulClass):
         # this is mostly so the View is notified of health / gold changes
         instance._register(
             dict(
-                id=id,
-                id_player=id_player,
                 scenario=scenario,
                 first_tick=first_tick,
                 next_tick=first_tick,
                 round_idx=-1,
                 tick=-1,
+                id=id,
+                id_player=id_player,
+                health=30,
             )
         )
 

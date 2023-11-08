@@ -6,9 +6,17 @@ from utils.gui_utils import get_h, get_w
 
 
 class BetterDirectFrame(DirectFrame):
+    parent_frame: DirectFrame
+
     def __init__(self, parent: DirectFrame, **kwargs: Any):
         super().__init__(parent, **kwargs)
         super().initialiseoptions(self.__class__)
+
+        # Because self.parent is the parent arg wrapped into a NodePath
+        self.parent_frame = parent
+
+        # So that self['frameSize'] always exists
+        self.set_frame_size((0, 0))
 
     def set_xy(self, xy: tuple[float, float]):
         x, y = xy
