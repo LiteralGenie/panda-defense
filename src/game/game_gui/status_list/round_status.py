@@ -14,7 +14,7 @@ class RoundStatus(StatusLabel):
     def __init__(self, parent: BetterDirectFrame):
         super().__init__(
             parent,
-            text_fg=(0.56, 0.56, 0.56, 1),
+            text_fg=(0.85, 0.85, 0.85, 1),
         )
 
         self._status_sub = self._subscribe_status()

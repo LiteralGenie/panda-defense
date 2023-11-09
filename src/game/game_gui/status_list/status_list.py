@@ -16,10 +16,7 @@ class StatusList(BetterDirectFrame):
     health_status: HealthStatus
 
     def __init__(self, parent: BetterDirectFrame, labels: list[StatusLabel]):
-        super().__init__(
-            parent,
-            frameColor=(0, 0, 0, 0),
-        )
+        super().__init__(parent)
 
         self.labels = labels
         for lbl in self.labels:

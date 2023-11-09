@@ -11,9 +11,10 @@ class BetterDirectFrame(DirectFrame):
     def __init__(
         self,
         parent: "BetterDirectFrame",
+        frameColor: tuple[float, float, float, float] = (0, 0, 0, 0),
         **kwargs: Any,
     ):
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, frameColor=frameColor, **kwargs)
         super().initialiseoptions(self.__class__)
 
         # Because self.parent is the parent arg wrapped into a NodePath

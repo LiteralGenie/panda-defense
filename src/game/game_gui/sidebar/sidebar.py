@@ -10,10 +10,7 @@ class Sidebar(BetterDirectFrame):
     tower_grid: TowerGrid
 
     def __init__(self, parent: BetterDirectFrame):
-        super().__init__(
-            parent,
-            frameColor=(0, 0, 0, 0),
-        )
+        super().__init__(parent)
 
         self.tower_grid = TowerGrid(
             self,

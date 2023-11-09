@@ -28,10 +28,7 @@ class GameGui(BetterDirectFrame):
     basic_status: StatusList
 
     def __init__(self):
-        super().__init__(
-            g.aspect2d,
-            frameColor=(0, 0, 0, 0),
-        )
+        super().__init__(g.aspect2d)
 
         self.sidebar = Sidebar(self)
         self.basic_status = StatusList(

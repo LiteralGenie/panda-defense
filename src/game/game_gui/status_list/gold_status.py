@@ -15,7 +15,7 @@ class GoldStatus(StatusLabel):
     def __init__(self, parent: BetterDirectFrame):
         super().__init__(
             parent,
-            text_fg=(0.72, 0.52, 0.22, 1),
+            text_fg=(0.69, 0.64, 0.26, 1),
         )
 
         self._status_sub = self._subscribe_status()
