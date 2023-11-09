@@ -11,4 +11,16 @@
   "python.analysis.typeCheckingMode": "strict",
   "python.analysis.autoImportCompletions": true,
   "python.analysis.fixAll": ["source.convertImportFormat", "source.unusedImports"],
+  "python.analysis.packageIndexDepths": [
+    {
+      "name": "direct",
+      "depth": 3,
+      "includeAllSymbols": false
+    },
+    {
+      "name": "panda3d",
+      "depth": 3,
+      "includeAllSymbols": false
+    }
+  ]
 }
