@@ -31,6 +31,14 @@ class BetterDirectFrame(DirectFrame):
         self["frameSize"] = (0, w, 0, h)
 
     @property
+    def x(self) -> float:
+        return self.get_pos()[0]
+
+    @property
+    def y(self) -> float:
+        return self.get_pos()[2]
+
+    @property
     def width(self) -> float:
         return get_w(self)
 

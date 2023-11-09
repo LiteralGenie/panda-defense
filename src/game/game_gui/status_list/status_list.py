@@ -1,10 +1,8 @@
 from typing import ClassVar
 
 from game.game_gui.better_direct_frame import BetterDirectFrame
-from game.game_gui.status_box.gold_status import GoldStatus
-from game.game_gui.status_box.health_status import HealthStatus
-from game.game_gui.status_box.status_label import StatusLabel
-from game.game_gui.status_box.wave_status import RoundStatus
+from game.game_gui.status_list.health_status import HealthStatus
+from game.game_gui.status_list.status_label import StatusLabel
 from utils.gui_utils import get_h, get_w
 
 
@@ -17,20 +15,15 @@ class StatusList(BetterDirectFrame):
     labels: list[StatusLabel]
     health_status: HealthStatus
 
-    def __init__(
-        self,
-        parent: BetterDirectFrame,
-    ):
+    def __init__(self, parent: BetterDirectFrame, labels: list[StatusLabel]):
         super().__init__(
             parent,
             frameColor=(0, 0, 0, 0),
         )
 
-        self.labels = [
-            HealthStatus(self),
-            GoldStatus(self),
-            RoundStatus(self),
-        ]
+        self.labels = labels
+        for lbl in self.labels:
+            lbl.reparent_to(self)
 
     def recalculate_layout(self):
         for i, label in enumerate(self.labels):

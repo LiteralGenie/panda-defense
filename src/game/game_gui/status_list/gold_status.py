@@ -2,39 +2,43 @@ from reactivex.abc import DisposableBase
 
 from game.events.event_manager import GameEvent
 from game.game_gui.better_direct_frame import BetterDirectFrame
-from game.game_gui.status_box.status_label import StatusLabel
-from game.game_model import GameModel
+from game.game_gui.status_list.status_label import StatusLabel
+from game.player.player_model import PlayerModel
+from game.shared_globals import SG
 from game.state.game_state import StateUpdated
 from game.view.game_view_globals import GVG
 
 
-class RoundStatus(StatusLabel):
+class GoldStatus(StatusLabel):
     _status_sub: DisposableBase
 
     def __init__(self, parent: BetterDirectFrame):
         super().__init__(
             parent,
-            text_fg=(0.56, 0.56, 0.56, 1),
+            text_fg=(0.72, 0.52, 0.22, 1),
         )
 
         self._status_sub = self._subscribe_status()
 
     def _subscribe_status(self):
-        status_key: str = GameModel.round_idx.key  # type: ignore
-        num_rounds = len(GVG.data.meta.scenario["rounds"])
+        status_key: str = PlayerModel.gold.key  # type: ignore
+        id_player = GVG.data.meta.id_player
 
         # Init text
-        round = GVG.data.meta.round
-        self["text"] = f"Round {round + 1} / {num_rounds}"
+        player = SG.state.data["PLAYER"][id_player]["data"]
+        self["text"] = f"Gold: {player['gold']}"
 
         # Listen for changes
         def on_next(ev: GameEvent):
             match ev:
-                case StateUpdated("GAME", _, key, value):
+                case StateUpdated("PLAYER", id, key, value):
+                    if id != id_player:
+                        return
+
                     if key != status_key:
                         return
 
-                    self["text"] = f"Round {value + 1} / {num_rounds}"
+                    self["text"] = f"Gold: {value}"
                 case _:
                     pass
 
