@@ -12,6 +12,7 @@ from game.view.resource_manager import ResourceManager
 
 @dataclass
 class GameViewMetaInfo:
+    id_player: int
     scenario: Scenario
     tick: int
     tick_end: float

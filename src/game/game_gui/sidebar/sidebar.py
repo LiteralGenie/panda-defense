@@ -1,9 +1,7 @@
 from typing import ClassVar
 
-from direct.gui.DirectGui import DGG
-
 from game.game_gui.better_direct_frame import BetterDirectFrame
-from game.game_gui.tower_grid import TowerGrid
+from game.game_gui.sidebar.tower_grid import TowerGrid
 
 
 class Sidebar(BetterDirectFrame):
@@ -14,8 +12,7 @@ class Sidebar(BetterDirectFrame):
     def __init__(self, parent: BetterDirectFrame):
         super().__init__(
             parent,
-            frameColor=(0, 1, 0, 0.5),
-            state=DGG.NORMAL,
+            frameColor=(0, 0, 0, 0),
         )
 
         self.tower_grid = TowerGrid(

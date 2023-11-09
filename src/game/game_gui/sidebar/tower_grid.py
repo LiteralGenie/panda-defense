@@ -25,7 +25,7 @@ class TowerGrid(BetterDirectFrame):
     ):
         super().__init__(
             parent,
-            frameColor=(0, 1, 0, 0.5),
+            frameColor=(0, 0, 0, 0.95),
         )
 
         self.cells = []
@@ -76,10 +76,10 @@ class TowerGrid(BetterDirectFrame):
         half_sl = (self._side_length) / 2
         cell["text_pos"] = (half_sl, -(half_sl + self._gap_length))
         cell["frameColor"] = (
-            idx / (len(self.cells) - 1),
-            0,
-            0,
-            0.5,
+            (idx + 3) / (len(self.cells) - 1 + 5),
+            (idx + 3) / (len(self.cells) - 1 + 5),
+            (idx + 3) / (len(self.cells) - 1 + 5),
+            0.8,
         )
 
     @property

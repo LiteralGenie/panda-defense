@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Literal, Type, TypeAlias, TypedDict
 
+from utils.misc_utils import first_in_dict
+
 StateCategory = Literal["GAME", "PLAYER", "TOWER", "UNIT"]
 _STATE_CATEGORIES: list[StateCategory] = ["GAME", "PLAYER", "TOWER", "UNIT"]
 
@@ -86,6 +88,10 @@ class GameState:
 
         ev = StateDeleted(category=category, data=data)
         self._log_event(ev)
+
+    @property
+    def game(self):
+        return first_in_dict(self.data["GAME"])
 
     def _log_event(self, event: "StateEvent"):
         self.on_event(event)

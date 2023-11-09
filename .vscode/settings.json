@@ -19,6 +19,11 @@
     {
       "name": "panda3d",
       "depth": 3,
+      "includeAllSymbols": true
+    },
+    {
+      "name": "reactivex",
+      "depth": 3
     },
   ]
 }

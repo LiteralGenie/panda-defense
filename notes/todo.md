@@ -1,5 +1,4 @@
 # PoC
-gold / health gui
 validate tower placement
 prevent tower placement under gui
 tower description on hover
@@ -41,6 +40,7 @@ organize render_queue into queue-per-event-type
 
 
 # done
+[x] gold / health gui
 [x] push rendering into its own thread / process
 [x] gold / health
 [x] rxpy for gui to respond to changes since it doesnt receive render events

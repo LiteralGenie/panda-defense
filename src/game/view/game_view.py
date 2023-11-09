@@ -40,6 +40,7 @@ class GameView:
 
         cache = GameViewData(
             meta=GameViewMetaInfo(
+                id_player=id_player,
                 round=-1,
                 scenario=scenario,
                 tick=-1,
