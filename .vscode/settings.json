@@ -15,12 +15,10 @@
     {
       "name": "direct",
       "depth": 3,
-      "includeAllSymbols": false
     },
     {
       "name": "panda3d",
       "depth": 3,
-      "includeAllSymbols": false
-    }
+    },
   ]
 }

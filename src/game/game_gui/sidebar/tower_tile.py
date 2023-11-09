@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Any, ClassVar, Type
 
-from direct.gui.DirectGui import DirectFrame
 from panda3d.core import NodePath
 from reactivex.abc import DisposableBase
 
@@ -38,7 +37,7 @@ class TowerTile(BetterDirectFrame):
 
     def __init__(
         self,
-        parent: DirectFrame,
+        parent: BetterDirectFrame,
         TowerModelCls: Type[TowerModel],
         TowerViewCls: Type[TowerView],
         **kwargs: Any,

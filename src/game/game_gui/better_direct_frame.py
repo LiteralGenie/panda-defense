@@ -8,7 +8,11 @@ from utils.gui_utils import get_h, get_w
 class BetterDirectFrame(DirectFrame):
     parent_frame: DirectFrame
 
-    def __init__(self, parent: DirectFrame, **kwargs: Any):
+    def __init__(
+        self,
+        parent: "BetterDirectFrame",
+        **kwargs: Any,
+    ):
         super().__init__(parent, **kwargs)
         super().initialiseoptions(self.__class__)
 

@@ -1,8 +1,9 @@
-from direct.gui.DirectGui import DirectFrame
+from typing import ClassVar
+
 from panda3d.core import TextNode
 
 from game.game_gui.better_direct_frame import BetterDirectFrame
-from game.game_gui.tower_tile import TowerTile
+from game.game_gui.sidebar.tower_tile import TowerTile
 from game.towers.basic.basic_tower_model import BasicTowerModel
 from game.towers.basic.basic_tower_view import BasicTowerView
 from utils.gui_utils import get_w
@@ -11,20 +12,23 @@ from utils.gui_utils import get_w
 class TowerGrid(BetterDirectFrame):
     """Grid of square tiles, filling top rows first"""
 
+    # Relative to side length of each tile
+    GAP_PERCENT: ClassVar[float] = 0.05
+
     cells: list[TowerTile]
-    gap_percent: float
     num_cols: int
 
     def __init__(
         self,
-        parent: DirectFrame,
+        parent: BetterDirectFrame,
         num_cols: int,
-        gap_percent: float,
     ):
-        super().__init__(parent)
+        super().__init__(
+            parent,
+            frameColor=(0, 1, 0, 0.5),
+        )
 
         self.cells = []
-        self.gap_percent = gap_percent
         self.num_cols = num_cols
 
     def recalculate_layout(self):
@@ -80,10 +84,10 @@ class TowerGrid(BetterDirectFrame):
 
     @property
     def _side_length(self) -> float:
-        cw = get_w(self.parent_frame)
+        cw = get_w(self)
 
         # Treat each gap as a partial tile
-        gap_width_tiles = self.gap_percent * (self.num_cols + 1)
+        gap_width_tiles = self.GAP_PERCENT * (self.num_cols + 1)
         total_width_tiles = self.num_cols + gap_width_tiles
 
         length = cw / total_width_tiles
@@ -91,5 +95,5 @@ class TowerGrid(BetterDirectFrame):
 
     @property
     def _gap_length(self) -> float:
-        result = self._side_length * self.gap_percent
+        result = self._side_length * self.GAP_PERCENT
         return result
