@@ -63,8 +63,9 @@ class BasicTowerView(TowerView):
                             ivl_move, ivl_delete
                         )
                         self._intervals["bullet_sequence"].start()
-
+                        self._active_bullet = bullet
                 case StateUpdated("GAME", _, key, _):
+                    # On round change, remove bullets
                     if key != GameModel.round_idx.key:  # type: ignore
                         return
 

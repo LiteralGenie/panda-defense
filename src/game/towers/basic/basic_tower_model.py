@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from game.state.stateful_class import StatefulProp
 from game.towers.tower_model import TowerModel
 from game.towers.tower_range import PyramidalRange
@@ -6,6 +8,7 @@ from utils.types import Point2
 
 class BasicTowerModel(TowerModel):
     cost = 5
+    default_range = PyramidalRange(4)
 
     attack_speed: float = StatefulProp(read_only=True)  # type: ignore
     attack_speed_guage: float = StatefulProp()  # type: ignore
@@ -18,5 +21,5 @@ class BasicTowerModel(TowerModel):
             attack_speed_guage=0,
             damage=30,
             pos=pos,
-            range=PyramidalRange(4),
+            range=deepcopy(cls.default_range),
         )

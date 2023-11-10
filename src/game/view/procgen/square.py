@@ -7,6 +7,7 @@ from panda3d.core import (
     GeomVertexWriter,
     Material,
     NodePath,
+    TransparencyAttrib,
 )
 
 
@@ -40,6 +41,8 @@ def build_square(color: tuple[float, float, float, float]):
     node.addGeom(geom)
 
     path = NodePath(node)
+    if color[3] < 1:
+        path.set_transparency(TransparencyAttrib.M_alpha)
 
     # simplepbr requires material and use_normal_maps flag
     # otherwise black blob gets rendered

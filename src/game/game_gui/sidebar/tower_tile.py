@@ -13,6 +13,7 @@ from game.state.game_state import StateCreated, StateDeleted
 from game.towers.tower_model import TowerModel
 from game.towers.tower_view import TowerView
 from game.view.game_view_globals import GVG
+from game.view.procgen.square import build_square
 from utils.gui_utils import mpos_to_real_pos
 from utils.types import Point2, Point2f
 
@@ -88,12 +89,7 @@ class TowerTile(BetterDirectFrame):
         self.dnd.delete()
 
     def _on_drag_start(self, pos: Point2f, time: float):
-        placeholder = NodePath("")
-        self.TowerViewCls.placeholder.instance_to(placeholder)
-        placeholder.set_pos((0, 0, -10))
-        placeholder.reparent_to(g.render)
-
-        return _StartData(placeholder=placeholder)
+        return _StartData(placeholder=self._load_placeholder())
 
     def _on_drag_move(
         self,
@@ -116,6 +112,8 @@ class TowerTile(BetterDirectFrame):
         self,
         state: DragMoveState[_StartData, _MoveData],
     ):
+        state.start_data.placeholder.removeNode()
+
         if pos := state.move_data.active_tile:
             GVG.event_pipe.send(
                 BuyTowerAction(
@@ -127,3 +125,18 @@ class TowerTile(BetterDirectFrame):
     def _on_drag_cancel(self, state: None | DragState[_StartData, _MoveData]):
         if state:
             state.start_data.placeholder.removeNode()
+
+    def _load_placeholder(self):
+        placeholder = NodePath("")
+        self.TowerViewCls.placeholder.instance_to(placeholder)
+        placeholder.reparent_to(g.render)
+        placeholder.set_pos((0, 0, -10))
+
+        tile = build_square((0, 0, 0.2, 0.9))
+        for pos in self.TowerModelCls.default_range.points:
+            t = NodePath("")
+            tile.instance_to(t)
+            t.reparent_to(placeholder)
+            t.set_pos(pos + (0.001,))
+
+        return placeholder
