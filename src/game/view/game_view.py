@@ -52,7 +52,7 @@ class GameView:
         )
         GVG.data = cache
 
-        SG.state = GameState(on_event=GVG.event_subj.on_next)
+        SG.state = GameState(on_event=lambda _: None)
 
         self.map = MapView()
 
@@ -77,6 +77,7 @@ class GameView:
                     SG.state.delete(**asdict(ev))
                 case _:
                     pass
+            GVG.event_subj.on_next(ev)
 
         # Wait for state to init
         if SG.state.data["GAME"] and not getattr(self, "gui", None):

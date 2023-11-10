@@ -6,6 +6,7 @@ tower description on hover
 tower stats on instance click
 sell tower
 unit stats on instance click
+apply actions during build phase
 main menu
 settings menu
 logging
@@ -37,6 +38,7 @@ more nuanced spawn times in scenario
 unit tests
 e2e tests
 co-op
+async view
 
 # dream
 

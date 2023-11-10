@@ -20,7 +20,7 @@ from game.units.unit_model import UnitModel, UnitStatus
 
 TICK_FREQ_S = 4
 TICK_PERIOD_S = 1 / TICK_FREQ_S
-BUILD_TIME_S = 30
+BUILD_TIME_S = 2
 
 
 async def play_game(

@@ -1,23 +1,33 @@
 import time
 
 from direct.interval.FunctionInterval import Func
+from direct.interval.Interval import Interval
 from direct.interval.LerpInterval import LerpPosInterval
 from direct.interval.MetaInterval import Sequence
 from panda3d.core import NodePath
+from reactivex.abc import DisposableBase
 
 import g
 from game.events.event_manager import GameEvent
 from game.events.render_event import RenderTowerAttack
+from game.game_model import GameModel
+from game.state.game_state import StateUpdated
 from game.towers.tower_view import TowerView
 from game.view.game_view_globals import GVG
 from game.view.procgen.pyramid import build_pyramid
 
 
 class BasicTowerView(TowerView):
+    _active_bullet: NodePath | None
+    _event_sub: DisposableBase
+    _intervals: "dict[str, Interval | Sequence]"
+
     def __init__(self, id: int):
         super().__init__(id)
 
+        self._active_bullet = None
         self._event_sub = self._subscribe_events()
+        self._intervals = dict()
 
     def _init_assets(self):
         super()._init_assets()
@@ -46,10 +56,22 @@ class BasicTowerView(TowerView):
                             startPos=self.model.pos + (0,),
                         )
 
-                        # delet
+                        # delete
                         ivl_delete = Func(lambda: bullet.hide())
 
-                        Sequence(ivl_move, ivl_delete).start()
+                        self._intervals["bullet_sequence"] = Sequence(
+                            ivl_move, ivl_delete
+                        )
+                        self._intervals["bullet_sequence"].start()
+
+                case StateUpdated("GAME", _, key, _):
+                    if key != GameModel.round_idx.key:  # type: ignore
+                        return
+
+                    if self._active_bullet:
+                        self._intervals["bullet_sequence"].pause()
+                        self._active_bullet.remove_node()
+                        self._active_bullet = None
                 case _:
                     pass
 

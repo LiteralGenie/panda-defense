@@ -10,43 +10,28 @@ from panda3d.core import (
 )
 
 
-def build_pyramid():
+def build_square(color: tuple[float, float, float, float]):
     vdata = GeomVertexData("", GeomVertexFormat.getV3c4(), Geom.UH_dynamic)
-    vdata.set_num_rows(5)
+    vdata.set_num_rows(4)
 
     vertex = GeomVertexWriter(vdata, "vertex")
-    color = GeomVertexWriter(vdata, "color")
-
-    # square base centered at origin
-    # 0 --- 1
-    # |  4  |
-    # 3 --- 2
+    color_writer = GeomVertexWriter(vdata, "color")
 
     # fmt: off
     vertex.add_data3((-0.5,  0.5, 0))
     vertex.add_data3(( 0.5,  0.5, 0))
     vertex.add_data3(( 0.5, -0.5, 0))
     vertex.add_data3((-0.5, -0.5, 0))
-    vertex.add_data3(( 0.0,  0.0, 1))
 
-    color.add_data4(255, 000, 000, 255)
-    color.add_data4(000, 255, 000, 255)
-    color.add_data4(000, 000, 255, 255)
-    color.add_data4(000, 000, 255, 255)
-    color.add_data4(255, 255, 000, 255)
+    color_writer.add_data4(color)
+    color_writer.add_data4(color)
+    color_writer.add_data4(color)
+    color_writer.add_data4(color)
     # fmt: on
 
     prim = GeomTriangles(Geom.UH_static)
-
-    # base
     prim.addVertices(3, 1, 0)
     prim.addVertices(3, 2, 1)
-
-    # left / back / right / front
-    prim.addVertices(3, 4, 0)
-    prim.addVertices(0, 4, 1)
-    prim.addVertices(1, 4, 2)
-    prim.addVertices(2, 4, 3)
 
     geom = Geom(vdata)
     geom.addPrimitive(prim)
