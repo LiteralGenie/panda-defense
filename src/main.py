@@ -2,7 +2,7 @@ import time
 from multiprocessing import Pipe, Process
 from multiprocessing.connection import Connection
 
-from game.controller.controller import play_game
+from game.controller.controller import BUILD_TIME_S, play_game
 from game.events.event_manager import TickEvents
 from game.scenario import Path, Round, Scenario, Segment, Wave
 
@@ -37,6 +37,16 @@ def build_test_scenario():
                 )
             ]
         ),
+        Round(
+            waves=[
+                Wave(
+                    id=3,
+                    enemies=105,
+                    id_path=path["id"],
+                    spawn_delay_ticks=1,
+                )
+            ]
+        ),
     ]
 
     return Scenario(
@@ -59,7 +69,7 @@ def run_renderer(
     class Renderer(ShowBase):
         def __init__(self):
             super().__init__()
-            simplepbr.init()
+            simplepbr.init(use_normal_maps=True)
 
             self.camera.setPos(0, 0, 40)
             self.camera.setP(-90)
@@ -100,7 +110,7 @@ def run_game(
 
 
 if __name__ == "__main__":
-    first_tick = time.time() + 3
+    first_tick = time.time() + BUILD_TIME_S
     scenario = build_test_scenario()
     parent_conn, child_conn = Pipe()
 

@@ -1,6 +1,5 @@
 import time
 from math import modf
-from typing import Any
 
 from direct.actor.Actor import Actor
 from direct.interval.Interval import Interval
@@ -15,6 +14,7 @@ from game.shared_globals import SG
 from game.state.game_state import StateUpdated
 from game.units.unit_model import UnitModel, UnitStatus
 from game.view.game_view_globals import GVG
+from utils.types import Point2f
 
 
 class UnitView:
@@ -60,7 +60,7 @@ class UnitView:
                 case _:
                     return False
 
-        def on_next(ev: Any):
+        def on_next(ev: GameEvent):
             match ev:
                 case StateUpdated(_, _, key, value):
                     match key:
@@ -81,22 +81,9 @@ class UnitView:
         ).subscribe(on_next=on_next)
 
     def _render_pos(self):
-        if ivl := self._intervals.get("pos"):
-            ivl.pause()
-
-        frac, idx = modf(self.model.dist)
-        idx = int(idx)
-
-        pt = self.model.ppath.points[idx]
-
-        new_pos = (
-            pt.pos[0] + frac * pt.dir[0],
-            pt.pos[1] + frac * pt.dir[1],
-        )
-
         self._intervals["pos"] = self.pnode.posInterval(  # type: ignore
             (GVG.data.meta.tick_end - time.time()),
-            new_pos + (0,),
+            self.interpolated_pos + (0,),
         )
         self._intervals["pos"].start()  # type: ignore
 
@@ -115,3 +102,19 @@ class UnitView:
 
         pnode.getChild(0).setScale(20)
         return pnode
+
+    @property
+    def interpolated_pos(self) -> Point2f:
+        if ivl := self._intervals.get("pos"):
+            ivl.pause()
+
+        frac, idx = modf(self.model.dist)
+        idx = int(idx)
+
+        pt = self.model.ppath.points[idx]
+
+        new_pos = (
+            pt.pos[0] + frac * pt.dir[0],
+            pt.pos[1] + frac * pt.dir[1],
+        )
+        return new_pos

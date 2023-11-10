@@ -18,9 +18,9 @@ from game.state.game_state import GameState
 from game.units.unit_manager import UnitManager
 from game.units.unit_model import UnitModel, UnitStatus
 
-TICK_FREQ_S = 10
+TICK_FREQ_S = 4
 TICK_PERIOD_S = 1 / TICK_FREQ_S
-BUILD_TIME_S = 30
+BUILD_TIME_S = 1
 
 
 async def play_game(
@@ -37,7 +37,6 @@ async def play_game(
     # init game model
     players = [PlayerModel.create(id=id_player, gold=10)]
     game = GameModel.create(scenario, first_tick, players[0].id, players)
-    CG.ev_mgr.game = game
 
     # init cache
     ppaths = {id: ParameterizedPath(p) for id, p in scenario["paths"].items()}
@@ -74,7 +73,7 @@ async def _play_round(ctx: ControllerContext):
 
     while True:
         # Update view
-        CG.ev_mgr.flush()
+        CG.ev_mgr.flush(game)
 
         # Wait for tick start
         delay = game.next_tick - time.time()
@@ -111,7 +110,7 @@ async def _play_round(ctx: ControllerContext):
             continue
 
     # Update view
-    CG.ev_mgr.flush()
+    CG.ev_mgr.flush(game)
 
 
 def _init_units_for_round(ctx: ControllerContext):

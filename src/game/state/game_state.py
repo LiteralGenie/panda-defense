@@ -91,7 +91,7 @@ class GameState:
 
     @property
     def game(self):
-        return first_in_dict(self.data["GAME"])
+        return first_in_dict(self.data["GAME"])["data"]
 
     def _log_event(self, event: "StateEvent"):
         self.on_event(event)

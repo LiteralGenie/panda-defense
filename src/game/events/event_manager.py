@@ -19,27 +19,24 @@ class TickEvents:
 
 
 class EventManager:
-    game: GameModel
-    pipe: Connection
-
     pending: list[Any]
+    pipe: Connection
 
     def __init__(self, pipe: Connection):
         self.pipe = pipe
-
         self.pending = []
 
     def add(self, ev: Any):
         self.pending.append(ev)
 
-    def flush(self) -> None:
+    def flush(self, game: GameModel) -> None:
         events = self.pending
         self.pending = []
 
         result = TickEvents(
-            round=self.game.round_idx,
-            tick=self.game.tick,
-            tick_end=self.game.next_tick,
+            round=game.round_idx,
+            tick=game.tick,
+            tick_end=game.next_tick,
             events=events,
         )
 

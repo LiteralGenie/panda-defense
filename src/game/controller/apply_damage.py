@@ -41,5 +41,6 @@ def apply_damage(ctx: ControllerContext):
 
                     if tgt.health <= 0:
                         ctx.game.unit_mgr.set_status(tgt, UnitStatus.DEAD)
+                        ctx.game.player.gold += 1
         else:
             raise Exception(f"Unknown tower type: {tower.__class__.__name__}", tower)

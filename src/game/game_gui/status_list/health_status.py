@@ -24,7 +24,7 @@ class HealthStatus(StatusLabel):
         status_key: str = GameModel.health.key  # type: ignore
 
         # Init text
-        game = SG.state.game["data"]
+        game = SG.state.game
         self["text"] = f"Health: {game['health']}"
 
         # Listen for changes

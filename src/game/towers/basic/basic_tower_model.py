@@ -14,9 +14,9 @@ class BasicTowerModel(TowerModel):
     @classmethod
     def create(cls, pos: Point2):  # type: ignore
         return super().create(
-            attack_speed=0.25,
+            attack_speed=0.5,
             attack_speed_guage=0,
             damage=30,
             pos=pos,
-            range=PyramidalRange(2),
+            range=PyramidalRange(4),
         )

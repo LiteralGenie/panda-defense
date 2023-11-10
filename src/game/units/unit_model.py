@@ -44,7 +44,7 @@ class UnitModel(StatefulClass):
                 id_path=ppath.id,
                 id_wave=id_wave,
                 dist=0,
-                health=100,
+                health=150,
                 speed=speed,
                 status=UnitStatus.PRESPAWN,
                 **kwargs,

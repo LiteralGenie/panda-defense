@@ -2,6 +2,7 @@ from abc import ABC, abstractproperty
 
 from direct.actor.Actor import Actor
 from panda3d.core import NodePath
+from reactivex.abc import DisposableBase
 
 import g
 from game.towers.tower_model import TowerModel
@@ -12,22 +13,24 @@ class TowerView(ABC):
     model: TowerModel
     pnode: Actor
 
+    _event_sub: DisposableBase
+
     def __init__(self, id: int):
         self.id = id
         self.model = self._init_model()
-        self.pnode = self._init_pnode()
+        self._init_assets()
 
     def _init_model(self):
         return TowerModel.load(self.id)
 
-    def _init_pnode(self) -> Actor:
+    def _init_assets(self):
         pnode = NodePath("")
         self.__class__.actor.instance_to(pnode)
 
         pnode.setPos(self.model.pos + (0,))
         pnode.reparent_to(g.render)
 
-        return pnode  # type: ignore
+        self.pnode = pnode  # type: ignore
 
     @classmethod
     @abstractproperty

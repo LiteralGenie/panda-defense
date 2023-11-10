@@ -29,26 +29,27 @@ class BuildTimerStatus(StatusLabel):
     def _subscribe_status(self):
         status_key: str = GameModel.round_idx.key  # type: ignore
 
+        self._start_countdown()
+
         def on_next(ev: GameEvent):
             match ev:
                 case StateUpdated("GAME", _, key, _):
                     if key != status_key:
                         return
 
-                    tick_end = GVG.data.meta.tick_end
-                    cb = self._create_countdown_cb(tick_end)
-                    g.base.task_mgr.do_method_later(0.25, cb, f"build_timer_{uuid4()}")
+                    self._start_countdown()
                 case _:
                     pass
 
         return GVG.event_subj.subscribe(on_next=on_next)
 
-    def _create_countdown_cb(self, t_end_s: float):
-        self["text"] = f"{t_end_s - time.time():.0f}s"
+    def _start_countdown(self):
+        tick_end = GVG.data.meta.tick_end
+        self["text"] = f"{tick_end - time.time():.0f}s"
         self.show()
 
         def task_fn(task: Task):
-            rem = t_end_s - time.time()
+            rem = tick_end - time.time()
 
             if rem > 0:
                 self["text"] = f"{rem:.0f}s"
@@ -57,7 +58,7 @@ class BuildTimerStatus(StatusLabel):
                 self.hide()
                 return task.done
 
-        return task_fn
+        g.base.task_mgr.do_method_later(0.25, task_fn, f"build_timer_{uuid4()}")
 
     def delete(self):
         self._status_sub.dispose()

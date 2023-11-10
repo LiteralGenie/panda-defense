@@ -1,4 +1,5 @@
 # PoC
+health bars
 validate tower placement
 prevent tower placement under gui
 tower description on hover
@@ -8,9 +9,9 @@ unit stats on instance click
 main menu
 settings menu
 logging
+game start / end
 campaign levels
 throwaway art
-game start / end
 
 # later
 progression
@@ -29,17 +30,19 @@ units should not move diagonally
 
 
 # backlog
-co-op
+preload models
+        units on PRESPAWN
+        towers on hover (or purchase-able?)
+more nuanced spawn times in scenario
 unit tests
 e2e tests
-more nuanced spawn times in scenario
-organize render_queue into queue-per-event-type
-        (can handling for a certain event type be independent of all possible other types?)
+co-op
 
 # dream
 
 
 # done
+[x] projectiles
 [x] gold / health gui
 [x] push rendering into its own thread / process
 [x] gold / health
