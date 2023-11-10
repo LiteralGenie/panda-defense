@@ -33,6 +33,8 @@ class UnitView:
         self._intervals = dict()
         self._event_sub = self._subscribe_events()
 
+        self.preload_actor()
+
     def _init_model(self):
         data = SG.state.data["UNIT"][self.id]["data"]
         ppath = GVG.data.ppaths[data["id_path"]]
@@ -102,6 +104,12 @@ class UnitView:
 
         pnode.getChild(0).setScale(20)
         return pnode
+
+    @classmethod
+    def preload_actor(cls):
+        GVG.resource_mgr.preload_actor(
+            "glTF-Sample-Models/2.0/BoomBox/glTF/BoomBox.gltf"
+        )
 
     @property
     def interpolated_pos(self) -> Point2f:

@@ -1,4 +1,4 @@
-from abc import ABC, abstractproperty
+from abc import ABC, abstractmethod, abstractproperty
 
 from direct.actor.Actor import Actor
 from panda3d.core import NodePath
@@ -38,6 +38,16 @@ class TowerView(ABC):
         ...
 
     @classmethod
+    @abstractmethod
+    def preload_actor(cls) -> None:
+        ...
+
+    @classmethod
     @abstractproperty
     def placeholder(cls) -> Actor:
+        ...
+
+    @classmethod
+    @abstractmethod
+    def preload_placeholder(cls) -> None:
         ...

@@ -54,6 +54,10 @@ class TowerTile(BetterDirectFrame):
         self.TowerModelCls = TowerModelCls
         self.TowerViewCls = TowerViewCls
 
+        # todo: conditionally preload on hover or availability
+        TowerViewCls.preload_actor()
+        TowerViewCls.preload_placeholder()
+
         self._sub_invalid_tiles()
 
     def _sub_invalid_tiles(self):

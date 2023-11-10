@@ -14,8 +14,6 @@ from game.view.procgen.pyramid import build_pyramid
 
 
 class BasicTowerView(TowerView):
-    bullet: NodePath
-
     def __init__(self, id: int):
         super().__init__(id)
 
@@ -23,12 +21,6 @@ class BasicTowerView(TowerView):
 
     def _init_assets(self):
         super()._init_assets()
-
-        bullet = build_pyramid()
-        bullet.set_scale(0.25)
-        bullet.set_p(30)
-
-        self.bullet = bullet
 
     def _subscribe_events(self):
         def on_next(ev: GameEvent):
@@ -74,6 +66,12 @@ class BasicTowerView(TowerView):
         return pnode
 
     @classmethod
+    def preload_actor(cls):
+        GVG.resource_mgr.preload_actor(
+            "glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf"
+        )
+
+    @classmethod
     @property
     def placeholder(cls):
         pnode = GVG.resource_mgr.load_actor(
@@ -81,3 +79,20 @@ class BasicTowerView(TowerView):
         )
         pnode.getChild(0).setScale(20)
         return pnode
+
+    @classmethod
+    def preload_placeholder(cls):
+        GVG.resource_mgr.preload_actor(
+            "glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf"
+        )
+
+    @classmethod
+    @property
+    def bullet(cls):
+        def factory():
+            bullet = build_pyramid()
+            bullet.set_scale(0.25)
+            bullet.set_p(30)
+            return bullet
+
+        return GVG.resource_mgr.load_or_register("basic_bullet", factory)

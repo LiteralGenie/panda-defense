@@ -76,7 +76,7 @@ class GameView:
                 case StateDeleted():
                     SG.state.delete(**asdict(ev))
                 case _:
-                    GVG.event_subj.on_next(ev)
+                    pass
 
         # Wait for state to init
         if SG.state.data["GAME"] and not getattr(self, "gui", None):
