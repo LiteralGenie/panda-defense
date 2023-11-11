@@ -23,7 +23,6 @@ from model_manager import ModelManager
 class GameView:
     globals: GameViewGlobals
 
-    gui: GameGui
     map: MapView
 
     def __init__(
@@ -80,8 +79,8 @@ class GameView:
             GVG.event_subj.on_next(ev)
 
         # Wait for state to init
-        if SG.state.data["GAME"] and not getattr(self, "gui", None):
-            self.gui = GameGui()
+        if SG.state.data["GAME"] and not getattr(GVG, "gui", None):
+            GVG.gui = GameGui()
 
     def _init_view(self, ev: StateCreated):
         match ev.category:

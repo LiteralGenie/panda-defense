@@ -41,7 +41,7 @@ class BasicTowerView(TowerView):
                         pos = unit.interpolated_pos
 
                         # create bullet
-                        bullet = NodePath("bullet")  # why does this throw if no name?
+                        bullet = NodePath("bullet")
                         self.bullet.instance_to(bullet)
                         bullet.reparent_to(g.render)
 

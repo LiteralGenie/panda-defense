@@ -93,15 +93,3 @@ class GameModel(StatefulClass):
     @property
     def player(self):
         return self.players[self.id_player]
-
-    # def delete(self):
-    #     actors = [UnitView]
-    #     for a in actors:
-    #         if a.model:
-    #             a.model.cleanup()  # type: ignore
-    #             a.model.removeNode()
-
-    #     renderables = [Map]
-    #     for r in renderables:
-    #         if r.model:
-    #             r.model.removeNode()

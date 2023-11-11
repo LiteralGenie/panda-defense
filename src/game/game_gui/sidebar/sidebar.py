@@ -66,7 +66,7 @@ class Sidebar(BetterDirectFrame):
         ch = get_h(self.parent_frame)
 
         w = self.width * self.GRID_WIDTH
-        h = -ch
+        h = ch
 
         tl_x = self.width - w
         tl_y = 0
