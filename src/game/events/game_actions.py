@@ -7,6 +7,7 @@ from game.towers.tower_model import TowerModel
 @dataclass
 class BuyTowerAction:
     TowerCls: Type[TowerModel]
+    id_player: int
     kwargs: dict[str, Any]
 
 

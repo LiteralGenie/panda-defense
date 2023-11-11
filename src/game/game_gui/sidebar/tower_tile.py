@@ -120,6 +120,7 @@ class TowerTile(BetterDirectFrame):
             GVG.event_pipe.send(
                 BuyTowerAction(
                     TowerCls=self.TowerModelCls,
+                    id_player=GVG.data.meta.id_player,
                     kwargs=dict(pos=pos),
                 )
             )

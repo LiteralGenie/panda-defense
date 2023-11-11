@@ -81,15 +81,12 @@ class GameModel(StatefulClass):
     def apply_actions(self):
         for action in self.action_queue:
             match action:
-                case BuyTowerAction(TowerCls, kwargs):
-                    if self.player.gold >= TowerCls.cost:
-                        self.player.gold -= TowerCls.cost
+                case BuyTowerAction(TowerCls, id_player, kwargs):
+                    player = self.players[id_player]
+                    if player.gold >= TowerCls.cost:
+                        player.gold -= TowerCls.cost
                         tower = TowerCls.create(**kwargs)
                         self.add_tower(tower)
                     else:
                         print("Not enough gold to buy tower")
         self.action_queue = []
-
-    @property
-    def player(self):
-        return self.players[self.id_player]
