@@ -1,5 +1,4 @@
 # PoC
-health bars
 validate tower placement
 prevent tower placement under gui
 tower description on hover
@@ -44,6 +43,7 @@ async view
 
 
 # done
+[x] health bars
 [x] projectiles
 [x] gold / health gui
 [x] push rendering into its own thread / process
