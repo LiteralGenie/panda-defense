@@ -1,8 +1,9 @@
-import time
 from math import modf
 
 from direct.actor.Actor import Actor
+from direct.interval.FunctionInterval import Func, Wait
 from direct.interval.Interval import Interval
+from direct.interval.MetaInterval import Sequence
 from panda3d.core import NodePath
 from reactivex import operators as ops
 from reactivex.abc import DisposableBase
@@ -12,6 +13,7 @@ from game.events.event_manager import GameEvent
 from game.events.render_event import RenderTowerAttack
 from game.shared_globals import SG
 from game.state.game_state import StateUpdated
+from game.units.health_bar.health_bar import HealthBar
 from game.units.unit_model import UnitModel, UnitStatus
 from game.view.game_view_globals import GVG
 from utils.types import Point2f
@@ -22,8 +24,9 @@ class UnitView:
     model: UnitModel
     pnode: Actor | None
 
-    _intervals: "dict[str, Interval]"
     _event_sub: DisposableBase
+    _health_bar: HealthBar
+    _intervals: "dict[str, Interval]"
 
     def __init__(self, id: int):
         self.id = id
@@ -40,17 +43,21 @@ class UnitView:
         ppath = GVG.data.ppaths[data["id_path"]]
         return UnitModel.load(self.id, ppath=ppath)
 
-    def _init_pnode(self) -> Actor:
-        pnode = NodePath("")
-        self.__class__.actor.instance_to(pnode)
+    def _init_assets(self):
+        self.pnode = NodePath("unit_view")  # type: ignore
+        self.__class__.actor.instance_to(self.pnode)
+        self.pnode.reparent_to(g.render)
 
+        # set position
         dist = int(self.model.dist)
         pos = self.model.ppath.points[dist].pos
-        pnode.set_pos(pos + (0,))
+        self.pnode.set_pos(pos + (0,))
 
-        pnode.reparent_to(g.render)
-
-        return pnode  # type: ignore
+        # add health bar
+        self._health_bar = HealthBar((0.6, 0, 0, 1))
+        self._health_bar.pnode.reparent_to(self.pnode)
+        self._health_bar.pnode.set_scale(0.125)
+        self._health_bar.pnode.set_pos((-0.25, 0, 0.25))
 
     def _subscribe_events(self):
         def filter(ev: GameEvent):
@@ -70,9 +77,15 @@ class UnitView:
                             self._render_pos()
                         case UnitModel.status.key:  # type: ignore
                             if value == UnitStatus.ALIVE:
-                                self.pnode = self._init_pnode()
+                                self._init_assets()
                             elif value == UnitStatus.DEAD:
-                                self.delete()
+                                Sequence(
+                                    Wait(SG.state.until_tick),
+                                    Func(lambda: self.delete()),
+                                ).start()
+                        case UnitModel.health.key:  # type: ignore
+                            percent = value / self.model.max_health
+                            self._health_bar.set_percent(percent, SG.state.until_tick)
                         case _:
                             pass
                 case _:
@@ -84,7 +97,7 @@ class UnitView:
 
     def _render_pos(self):
         self._intervals["pos"] = self.pnode.posInterval(  # type: ignore
-            (GVG.data.meta.tick_end - time.time()),
+            SG.state.until_tick,
             self.interpolated_pos + (0,),
         )
         self._intervals["pos"].start()  # type: ignore

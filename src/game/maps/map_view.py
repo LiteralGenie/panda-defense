@@ -4,7 +4,7 @@ from panda3d.core import NodePath
 
 import g
 from game.view.game_view_globals import GVG
-from game.view.procgen.square import build_square
+from game.view.procgen.square import build_rect
 
 
 class MapView:
@@ -49,7 +49,7 @@ class MapView:
     @classmethod
     def load_tile(cls, color: tuple[float, float, float, float]):
         def factory():
-            square = build_square(color)
+            square = build_rect(color)
             return square
 
         return GVG.resource_mgr.load_or_register(f"map_tile_{color}", factory)

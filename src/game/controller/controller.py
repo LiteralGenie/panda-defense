@@ -81,6 +81,7 @@ async def _play_round(ctx: ControllerContext):
             await asyncio.sleep(delay)
 
         game.tick += 1
+        game.next_tick += TICK_PERIOD_S
         # print("Tick", game.tick)
         start = time.time()
 
@@ -103,11 +104,8 @@ async def _play_round(ctx: ControllerContext):
         # Stop loop on round end
         if is_round_end:
             print("Build phase")
-            game.next_tick = game.next_tick + BUILD_TIME_S
+            game.next_tick = game.next_tick - TICK_PERIOD_S + BUILD_TIME_S
             break
-        else:
-            game.next_tick = game.next_tick + TICK_PERIOD_S
-            continue
 
     # Update view
     CG.ev_mgr.flush(game)

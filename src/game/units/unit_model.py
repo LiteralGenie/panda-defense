@@ -14,6 +14,7 @@ class UnitStatus(Enum):
 
 
 class UnitModel(StatefulClass):
+    max_health: ClassVar[int] = 150
     _state_category: ClassVar[StateCategory] = "UNIT"
 
     id: int = StatefulProp(read_only=True)  # type: ignore
@@ -44,7 +45,7 @@ class UnitModel(StatefulClass):
                 id_path=ppath.id,
                 id_wave=id_wave,
                 dist=0,
-                health=150,
+                health=cls.max_health,
                 speed=speed,
                 status=UnitStatus.PRESPAWN,
                 **kwargs,

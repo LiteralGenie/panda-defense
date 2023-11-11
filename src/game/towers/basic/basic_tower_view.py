@@ -1,5 +1,3 @@
-import time
-
 from direct.interval.FunctionInterval import Func
 from direct.interval.Interval import Interval
 from direct.interval.LerpInterval import LerpPosInterval
@@ -10,8 +8,7 @@ from reactivex.abc import DisposableBase
 import g
 from game.events.event_manager import GameEvent
 from game.events.render_event import RenderTowerAttack
-from game.game_model import GameModel
-from game.state.game_state import StateUpdated
+from game.shared_globals import SG
 from game.towers.tower_view import TowerView
 from game.view.game_view_globals import GVG
 from game.view.procgen.pyramid import build_pyramid
@@ -51,7 +48,7 @@ class BasicTowerView(TowerView):
                         # animate it
                         ivl_move = LerpPosInterval(
                             bullet,
-                            duration=GVG.data.meta.tick_end - time.time(),
+                            duration=SG.state.until_tick,
                             pos=pos + (0,),
                             startPos=self.model.pos + (0,),
                         )
@@ -60,19 +57,11 @@ class BasicTowerView(TowerView):
                         ivl_delete = Func(lambda: bullet.hide())
 
                         self._intervals["bullet_sequence"] = Sequence(
-                            ivl_move, ivl_delete
+                            ivl_move,
+                            ivl_delete,
                         )
                         self._intervals["bullet_sequence"].start()
                         self._active_bullet = bullet
-                case StateUpdated("GAME", _, key, _):
-                    # On round change, remove bullets
-                    if key != GameModel.round_idx.key:  # type: ignore
-                        return
-
-                    if self._active_bullet:
-                        self._intervals["bullet_sequence"].pause()
-                        self._active_bullet.remove_node()
-                        self._active_bullet = None
                 case _:
                     pass
 

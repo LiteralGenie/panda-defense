@@ -1,3 +1,4 @@
+import time
 from dataclasses import dataclass
 from typing import Any, Callable, Literal, Type, TypeAlias, TypedDict
 
@@ -92,6 +93,10 @@ class GameState:
     @property
     def game(self):
         return first_in_dict(self.data["GAME"])["data"]
+
+    @property
+    def until_tick(self) -> float:
+        return self.game["next_tick"] - time.time()
 
     def _log_event(self, event: "StateEvent"):
         self.on_event(event)

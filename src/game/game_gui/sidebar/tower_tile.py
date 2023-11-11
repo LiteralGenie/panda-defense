@@ -13,7 +13,7 @@ from game.state.game_state import StateCreated, StateDeleted
 from game.towers.tower_model import TowerModel
 from game.towers.tower_view import TowerView
 from game.view.game_view_globals import GVG
-from game.view.procgen.square import build_square
+from game.view.procgen.square import build_rect
 from utils.gui_utils import mpos_to_real_pos
 from utils.types import Point2, Point2f
 
@@ -102,10 +102,12 @@ class TowerTile(BetterDirectFrame):
         active_tile = (round(real_pos[0] + 0.0), round(real_pos[1] + 0.0))
 
         if active_tile not in self._invalid_tiles:
+            prev.start_data.placeholder.show()
             prev.start_data.placeholder.set_pos((active_tile[0], active_tile[1], 0))
 
             return _MoveData(active_tile=active_tile)
         else:
+            prev.start_data.placeholder.hide()
             return _MoveData(active_tile=None)
 
     def _on_drag_end(
@@ -132,7 +134,7 @@ class TowerTile(BetterDirectFrame):
         placeholder.reparent_to(g.render)
         placeholder.set_pos((0, 0, -10))
 
-        tile = build_square((0, 0, 0.2, 0.9))
+        tile = build_rect((0, 0, 0.2, 0.9))
         for pos in self.TowerModelCls.default_range.points:
             t = NodePath("")
             tile.instance_to(t)
