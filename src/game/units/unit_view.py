@@ -96,6 +96,9 @@ class UnitView:
         ).subscribe(on_next=on_next)
 
     def _render_pos(self):
+        if ivl := self._intervals.get("pos"):
+            ivl.pause()
+
         self._intervals["pos"] = self.pnode.posInterval(  # type: ignore
             SG.state.until_tick,
             self.interpolated_pos + (0,),
@@ -126,9 +129,6 @@ class UnitView:
 
     @property
     def interpolated_pos(self) -> Point2f:
-        if ivl := self._intervals.get("pos"):
-            ivl.pause()
-
         frac, idx = modf(self.model.dist)
         idx = int(idx)
 
