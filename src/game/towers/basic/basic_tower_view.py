@@ -67,6 +67,9 @@ class BasicTowerView(TowerView):
 
         return GVG.event_subj.subscribe(on_next=on_next)
 
+    def _on_click(self):
+        g.messenger.send("showTowerDetails", [self])
+
     @classmethod
     @property
     def actor(cls):

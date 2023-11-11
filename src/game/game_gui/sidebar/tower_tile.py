@@ -99,7 +99,7 @@ class TowerTile(BetterDirectFrame):
     ):
         # coordinates of map tile being hovered
         real_pos = mpos_to_real_pos(pos)
-        active_tile = (round(real_pos[0] + 0.0), round(real_pos[1] + 0.0))
+        active_tile = (round(real_pos[0]), round(real_pos[1]))
 
         if active_tile not in self._invalid_tiles:
             prev.start_data.placeholder.show()
