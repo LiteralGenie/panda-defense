@@ -2,7 +2,7 @@ import time
 from multiprocessing import Pipe, Process
 from multiprocessing.connection import Connection
 
-from game.controller.controller import BUILD_TIME_S, play_game
+from game.controller.controller import play_game
 from game.events.event_manager import TickEvents
 from game.scenario import Path, Round, Scenario, Segment, Wave
 
@@ -110,7 +110,7 @@ def run_game(
 
 
 if __name__ == "__main__":
-    first_tick = time.time() + BUILD_TIME_S
+    first_tick = time.time()
     scenario = build_test_scenario()
     parent_conn, child_conn = Pipe()
 

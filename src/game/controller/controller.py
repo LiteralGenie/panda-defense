@@ -20,7 +20,7 @@ from game.units.unit_model import UnitModel, UnitStatus
 
 TICK_FREQ_S = 4
 TICK_PERIOD_S = 1 / TICK_FREQ_S
-BUILD_TIME_S = 2
+BUILD_TIME_S = 5
 
 
 async def play_game(
@@ -56,11 +56,27 @@ async def play_game(
 
     # start game
     for i in range(len(game.scenario["rounds"])):
+        print(f"Round {i}")
         game.round_idx = i
         cache.start_ticks[game.round_idx] = game.tick + 1
+        game.next_tick += BUILD_TIME_S
 
-        print(f"Round {game.round_idx}")
+        # Update view
+        CG.ev_mgr.flush(game)
+
+        # Wait for build phase
+        while (delay := game.next_tick - time.time()) > 0:
+            # Apply any actions that occur while waiting
+            while ctx.render_pipe.poll(timeout=delay):
+                game.action_queue.append(ctx.render_pipe.recv())
+                game.apply_actions()
+
+                CG.ev_mgr.flush(game)
+                break
+
         await _play_round(ctx)
+
+    CG.ev_mgr.flush(game)
 
     print(f"Game end")
 
@@ -103,12 +119,7 @@ async def _play_round(ctx: ControllerContext):
 
         # Stop loop on round end
         if is_round_end:
-            print("Build phase")
-            game.next_tick = game.next_tick - TICK_PERIOD_S + BUILD_TIME_S
             break
-
-    # Update view
-    CG.ev_mgr.flush(game)
 
 
 def _init_units_for_round(ctx: ControllerContext):
