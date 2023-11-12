@@ -111,6 +111,7 @@ class Sidebar(BetterDirectFrame):
         self.wave_status.recalculate_layout()
 
     def delete(self):
+        super().delete()
         self.tower_grid.delete()
         self.basic_status.delete()
         self.wave_status.delete()

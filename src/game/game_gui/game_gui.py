@@ -1,18 +1,20 @@
-from typing import ClassVar
+from typing import Callable, ClassVar
 
 from direct.gui.DirectGui import DGG
+from direct.interval.FunctionInterval import Func
 from direct.interval.LerpInterval import LerpFunc
+from direct.interval.MetaInterval import Sequence
 
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.sidebar.sidebar import Sidebar
-from game.game_gui.tower_details_pane import TowerDetailsPane
+from game.game_gui.tower_details.tower_details_pane import TowerDetailsPane
 from utils.gui_utils import get_h, get_w
 from utils.types import IntervalDict
 
 
 class GameGui(BetterDirectFrame):
     # Percentage of viewport width
-    DETAILS_WIDTH: ClassVar[float] = 0.15
+    DETAILS_WIDTH: ClassVar[float] = 0.27
     # Percentage of viewport width
     SIDEBAR_WIDTH: ClassVar[float] = 0.20
 
@@ -119,13 +121,7 @@ class GameGui(BetterDirectFrame):
 
             return inner
 
-        LerpFunc(
-            cb(),
-            duration=0.2 if animate else 0,
-            fromData=0,
-            toData=1,
-            blendType="easeInOut",
-        ).start()
+        self._run_animation(self.sidebar, cb(), animate)
 
     def _hide_sidebar(self, animate: bool = True):
         self._sidebar_visible = False
@@ -142,13 +138,7 @@ class GameGui(BetterDirectFrame):
 
             return inner
 
-        LerpFunc(
-            cb(),
-            duration=0.2 if animate else 0,
-            fromData=0,
-            toData=1,
-            blendType="easeInOut",
-        ).start()
+        self._run_animation(self.sidebar, cb(), animate)
 
     def _show_tower_details(self, animate: bool = True):
         print("_show_tower_details()")
@@ -167,13 +157,7 @@ class GameGui(BetterDirectFrame):
 
             return inner
 
-        LerpFunc(
-            cb(),
-            duration=0.2 if animate else 0,
-            fromData=0,
-            toData=1,
-            blendType="easeInOut",
-        ).start()
+        self._run_animation(self.details_pane, cb(), animate)
 
     def _hide_tower_details(self, animate: bool = True):
         print("_hide_tower_details()")
@@ -190,12 +174,26 @@ class GameGui(BetterDirectFrame):
 
             return inner
 
-        LerpFunc(
-            cb(),
-            duration=0.2 if animate else 0,
-            fromData=0,
-            toData=1,
-            blendType="easeInOut",
+        self._run_animation(self.details_pane, cb(), animate)
+
+    def _run_animation(
+        self,
+        target: Sidebar | TowerDetailsPane,
+        cb: Callable[[float], None],
+        animate: bool,
+    ):
+        Sequence(
+            Func(lambda: target.basic_status.hide()),
+            Func(lambda: target.wave_status.hide()),
+            LerpFunc(
+                cb,
+                duration=0.35 if animate else 0,
+                fromData=0,
+                toData=1,
+                blendType="easeIn",
+            ),
+            Func(lambda: target.basic_status.show()),
+            Func(lambda: target.wave_status.show()),
         ).start()
 
     def delete(self):
