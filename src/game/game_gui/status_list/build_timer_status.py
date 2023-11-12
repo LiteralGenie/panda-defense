@@ -9,6 +9,7 @@ from game.events.event_manager import GameEvent
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.status_list.status_label import StatusLabel
 from game.game_model import GameModel
+from game.shared_globals import SG
 from game.state.game_state import StateUpdated
 from game.view.game_view_globals import GVG
 
@@ -27,14 +28,14 @@ class BuildTimerStatus(StatusLabel):
         self._status_sub = self._subscribe_status()
 
     def _subscribe_status(self):
-        status_key: str = GameModel.round_idx.key  # type: ignore
+        round_idx_key: str = GameModel.round_idx.key  # type: ignore
 
         self._start_countdown()
 
         def on_next(ev: GameEvent):
             match ev:
                 case StateUpdated("GAME", _, key, _):
-                    if key != status_key:
+                    if key != round_idx_key:
                         return
 
                     self._start_countdown()
@@ -44,7 +45,7 @@ class BuildTimerStatus(StatusLabel):
         return GVG.event_subj.subscribe(on_next=on_next)
 
     def _start_countdown(self):
-        tick_end = GVG.data.meta.tick_end
+        tick_end = time.time() + SG.state.until_tick
         self["text"] = f"{tick_end - time.time():.0f}s"
         self.show()
 

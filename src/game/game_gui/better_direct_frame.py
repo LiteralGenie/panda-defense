@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable
 
 from direct.gui.DirectFrame import DirectFrame
 
@@ -7,6 +7,8 @@ from utils.gui_utils import get_h, get_w
 
 class BetterDirectFrame(DirectFrame):
     parent_frame: DirectFrame
+
+    _sub_sink: list[Callable[[], None]]
 
     def __init__(
         self,
@@ -22,6 +24,9 @@ class BetterDirectFrame(DirectFrame):
 
         # So that self['frameSize'] always exists
         self.set_frame_size((0, 0))
+
+        # Unsubscribe from observables / event listeners on destroy
+        self._sub_sink = [lambda: self.ignore_all()]
 
     def set_xy(self, xy: tuple[float, float]):
         x, y = xy
@@ -46,3 +51,7 @@ class BetterDirectFrame(DirectFrame):
     @property
     def height(self) -> float:
         return get_h(self)
+
+    def delete(self):
+        for unsub_fn in self._sub_sink:
+            unsub_fn()
