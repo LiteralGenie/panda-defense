@@ -4,7 +4,6 @@ from direct.actor.Actor import Actor
 from panda3d.core import NodePath
 from reactivex.abc import DisposableBase
 
-import g
 from game.towers.tower_model import TowerModel
 
 
@@ -28,7 +27,7 @@ class TowerView(ABC):
         self.__class__.actor.instance_to(pnode)
 
         pnode.setPos(self.model.pos + (0,))
-        pnode.reparent_to(g.render)
+        pnode.reparent_to(render)
 
         self.pnode = pnode  # type: ignore
 

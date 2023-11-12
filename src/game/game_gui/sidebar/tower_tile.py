@@ -4,7 +4,6 @@ from typing import Any, ClassVar, Type
 from panda3d.core import NodePath
 from reactivex.abc import DisposableBase
 
-import g
 from game.events.event_manager import GameEvent
 from game.events.game_actions import BuyTowerAction
 from game.game_gui.better_direct_frame import BetterDirectFrame
@@ -132,7 +131,7 @@ class TowerTile(BetterDirectFrame):
     def _load_placeholder(self):
         placeholder = NodePath("")
         self.TowerViewCls.placeholder.instance_to(placeholder)
-        placeholder.reparent_to(g.render)
+        placeholder.reparent_to(render)
         placeholder.set_pos((0, 0, -10))
 
         tile = build_rect((0, 0, 0.2, 0.9))

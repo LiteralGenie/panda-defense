@@ -4,6 +4,7 @@ from direct.showbase.ShowBase import ShowBase
 from direct.task.Task import TaskManager
 from panda3d.core import NodePath, VirtualFileSystem
 
+aspect2d: NodePath
 base: ShowBase
 messenger: Messenger
 taskMgr: TaskManager

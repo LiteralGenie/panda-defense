@@ -3,8 +3,6 @@ from typing import Any, Callable, ClassVar
 from direct.actor.Actor import Actor
 from panda3d.core import NodePath
 
-import g
-
 
 class ResourceManager:
     _asset_dir: ClassVar[str] = "data/assets/"
@@ -38,13 +36,13 @@ class ResourceManager:
                 self.actors[name] = Actor(model)  # type: ignore
 
         self._loading.add(name)
-        g.loader.load_model(self._asset_dir + name, callback=cb)
+        loader.load_model(self._asset_dir + name, callback=cb)
 
     def load_asset(self, name: str):
         fp = self._asset_dir + name
         if name not in self.actors:
             fp = self._asset_dir + name
-            self.assets[name] = g.loader.load_model(fp)
+            self.assets[name] = loader.load_model(fp)
         return self.assets[name]
 
     def load_or_register(self, key: str, factory_fn: Callable[[], NodePath]):

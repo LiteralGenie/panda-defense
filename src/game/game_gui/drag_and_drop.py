@@ -9,7 +9,6 @@ from direct.showbase.DirectObject import DirectObject
 from direct.task.Task import Task
 from panda3d.core import MouseWatcherParameter
 
-import g
 from utils.gui_utils import get_mouse_pos
 from utils.types import Point2f
 
@@ -107,7 +106,7 @@ class DragAndDrop(Generic[_StartData, _MoveData], DirectObject):
 
         start_data = self.listeners["on_drag_start"](start_pos, start_time)
 
-        _poller = g.base.task_mgr.doMethodLater(
+        _poller = base.task_mgr.doMethodLater(
             self.POLL_FREQ_S, self.drag_move, f"drag_and_drop_{uuid4()}"
         )
 

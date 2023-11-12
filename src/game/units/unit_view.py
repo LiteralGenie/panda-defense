@@ -8,7 +8,6 @@ from panda3d.core import NodePath
 from reactivex import operators as ops
 from reactivex.abc import DisposableBase
 
-import g
 from game.events.event_manager import GameEvent
 from game.events.render_event import RenderTowerAttack
 from game.shared_globals import SG
@@ -46,7 +45,7 @@ class UnitView:
     def _init_assets(self):
         self.pnode = NodePath("unit_view")  # type: ignore
         self.__class__.actor.instance_to(self.pnode)
-        self.pnode.reparent_to(g.render)
+        self.pnode.reparent_to(render)
 
         # set position
         dist = int(self.model.dist)

@@ -1,7 +1,6 @@
 from direct.gui.DirectGuiBase import DirectGuiWidget
 from panda3d.core import Plane, Point3
 
-import g
 from utils.types import Point2f
 
 
@@ -34,7 +33,7 @@ def get_h(widget: DirectGuiWidget) -> float:
 
 
 def get_mouse_pos() -> Point2f | None:
-    node = g.base.mouseWatcherNode
+    node = base.mouseWatcherNode
     if node.hasMouse():
         return (node.getMouseX(), node.getMouseY())
 
@@ -44,9 +43,6 @@ _ground_plane = Plane((0, 0, 1), (0, 0, 0))
 
 def mpos_to_real_pos(mpos: Point2f) -> Point2f:
     # https://discourse.panda3d.org/t/super-fast-mouse-ray-collisions-with-ground-plane/5022
-
-    render = g.render
-    base = g.base
 
     pos = Point3()
     near_point = Point3()

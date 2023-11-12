@@ -5,7 +5,6 @@ from direct.interval.MetaInterval import Sequence
 from panda3d.core import NodePath
 from reactivex.abc import DisposableBase
 
-import g
 from game.events.event_manager import GameEvent
 from game.events.render_event import RenderTowerAttack
 from game.shared_globals import SG
@@ -43,7 +42,7 @@ class BasicTowerView(TowerView):
                         # create bullet
                         bullet = NodePath("bullet")
                         self.bullet.instance_to(bullet)
-                        bullet.reparent_to(g.render)
+                        bullet.reparent_to(render)
 
                         # animate it
                         ivl_move = LerpPosInterval(
@@ -68,7 +67,7 @@ class BasicTowerView(TowerView):
         return GVG.event_subj.subscribe(on_next=on_next)
 
     def _on_click(self):
-        g.messenger.send("showTowerDetails", [self])
+        messenger.send("showTowerDetails", [self])
 
     @classmethod
     @property

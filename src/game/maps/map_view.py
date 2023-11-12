@@ -2,13 +2,12 @@ from typing import ClassVar
 
 from panda3d.core import NodePath
 
-import g
 from game.view.game_view_globals import GVG
 from game.view.procgen.square import build_rect
 
 
 class MapView:
-    model: ClassVar[NodePath] = g.loader.loadModel("data/assets/board.gltf")
+    model: ClassVar[NodePath] = loader.loadModel("data/assets/board.gltf")
 
     pnode: NodePath
 
@@ -42,7 +41,7 @@ class MapView:
                 t.setPos(idx_col, idx_row, 0)
                 tile.instance_to(t)
 
-        pnode.reparent_to(g.render)
+        pnode.reparent_to(render)
 
         return pnode
 

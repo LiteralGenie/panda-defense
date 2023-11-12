@@ -4,7 +4,6 @@ from uuid import uuid4
 from direct.task.Task import Task
 from reactivex.abc import DisposableBase
 
-import g
 from game.events.event_manager import GameEvent
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.status_list.status_label import StatusLabel
@@ -58,7 +57,7 @@ class BuildTimerStatus(StatusLabel):
                 self.hide()
                 return task.done
 
-        g.base.task_mgr.do_method_later(0.25, task_fn, f"build_timer_{uuid4()}")
+        base.task_mgr.do_method_later(0.25, task_fn, f"build_timer_{uuid4()}")
 
     def delete(self):
         self._status_sub.dispose()

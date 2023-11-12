@@ -3,7 +3,6 @@ from typing import ClassVar
 from direct.gui.DirectGui import DGG
 from direct.interval.LerpInterval import LerpFunc
 
-import g
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.sidebar.sidebar import Sidebar
 from game.game_gui.tower_details_pane import TowerDetailsPane
@@ -25,7 +24,7 @@ class GameGui(BetterDirectFrame):
 
     def __init__(self):
         super().__init__(
-            g.aspect2d,
+            aspect2d,  # type: ignore
             state=DGG.NORMAL,
         )
 
@@ -57,12 +56,12 @@ class GameGui(BetterDirectFrame):
     def recalculate_layout(self):
         """Set origin to top-left and fill screen"""
 
-        min_x = g.base.a2dLeft
-        max_x = g.base.a2dRight
+        min_x = base.a2dLeft
+        max_x = base.a2dRight
         vw = max_x - min_x
 
-        min_y = g.base.a2dBottom
-        max_y = g.base.a2dTop
+        min_y = base.a2dBottom
+        max_y = base.a2dTop
         vh = max_y - min_y
 
         self.set_pos((min_x, 0, max_y))
