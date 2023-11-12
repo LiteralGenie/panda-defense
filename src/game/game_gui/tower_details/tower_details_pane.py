@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING, ClassVar
 
 from direct.gui.DirectGui import DGG
+from direct.interval.FunctionInterval import Func
+from direct.interval.LerpInterval import LerpFunc
+from direct.interval.MetaInterval import Sequence
 from panda3d.core import MouseWatcherParameter
 
 from game.events.event_manager import GameEvent
@@ -14,7 +17,7 @@ from game.game_gui.status_list.status_list import StatusList
 from game.game_gui.tower_details.tower_details import TowerDetails
 from game.state.game_state import StateCreated, StateDeleted
 from game.view.game_view_globals import GVG
-from utils.gui_utils import get_h, get_mouse_pos, mpos_to_real_pos
+from utils.gui_utils import get_mouse_pos, mpos_to_real_pos
 from utils.types import Point2
 
 if TYPE_CHECKING:
@@ -32,9 +35,12 @@ class TowerDetailsPane(BetterDirectFrame):
     INTER_STATUS_GAP: ClassVar[float] = 0.085
 
     active_tower: int | None
+    container: BetterDirectFrame
     details: TowerDetails
     basic_status: StatusList
     wave_status: StatusList
+
+    _is_visible: bool
 
     def __init__(self, parent: "GameGui"):
         super().__init__(
@@ -44,10 +50,12 @@ class TowerDetailsPane(BetterDirectFrame):
 
         self.active_tower = None
 
-        self.details = TowerDetails(self)
+        self.container = BetterDirectFrame(self)
+
+        self.details = TowerDetails(self.container)
 
         self.basic_status = StatusList(
-            self,
+            self.container,
             labels=[
                 HealthStatus(self),
                 GoldStatus(self),
@@ -55,7 +63,7 @@ class TowerDetailsPane(BetterDirectFrame):
         )
 
         self.wave_status = StatusList(
-            self,
+            self.container,
             labels=[
                 RoundStatus(self),
                 EnemyStatus(self),
@@ -63,17 +71,27 @@ class TowerDetailsPane(BetterDirectFrame):
             ],
         )
 
+        self._is_visible = False
+
         self._sub_clicks()
 
     def recalculate_layout(self):
+        self._layout_container()
         self._layout_details()
         self._layout_basic_status()
         self._layout_wave_status(self.basic_status)
 
+    def _layout_container(self):
+        self.container.set_frame_size((self.width, self.height))
+        if self._is_visible:
+            self._show_container(animate=False)
+        else:
+            self._hide_container(animate=False)
+
     def _layout_details(self):
         """Anchor tower description to right edge"""
 
-        ch = get_h(self.parent_frame)
+        ch = self.container.height
 
         w = self.width * self.PANE_WIDTH
         h = ch
@@ -151,21 +169,86 @@ class TowerDetailsPane(BetterDirectFrame):
             if self.active_tower == id_tower:
                 return
             elif id_tower:
-                prev = self.active_tower
                 self.active_tower = id_tower
+                self.details.set_id_tower(id_tower)
 
-                # If this pane is already open, don't re-open it
-                if prev is None:
-                    messenger.send("showTowerDetails")
+                messenger.send("showTowerDetails", [id_tower])
+                self._show_container()
 
-                self.recalculate_layout()
+                self.details.recalculate_layout()
                 return
             else:
                 self.active_tower = None
                 messenger.send("hideTowerDetails")
+                self._hide_container()
                 return
 
         self.parent_frame.bind(DGG.B1RELEASE, on_click)
+
+        # A child component can also generate this event
+        self.accept("hideTowerDetails", lambda: self._hide_container())
+
+    def _show_container(self, animate: bool = True):
+        duration = 0 if not animate or self._is_visible else 0.35
+        self._is_visible = True
+
+        def cb():
+            width = self.container.width
+            y = 0
+
+            def inner(t: float):
+                current_x = width * (1 - t)
+                self.container.set_pos((current_x, 0, y))
+
+            inner(0)
+
+            return inner
+
+        Sequence(
+            Func(lambda: self.show()),
+            Func(lambda: self.basic_status.hide()),
+            Func(lambda: self.wave_status.hide()),
+            LerpFunc(
+                cb(),
+                duration=duration,
+                fromData=0,
+                toData=1,
+                blendType="easeInOut",
+            ),
+            Func(lambda: self.basic_status.show()),
+            Func(lambda: self.wave_status.show()),
+        ).start()
+
+    def _hide_container(self, animate: bool = True):
+        duration = 0 if not animate or not self._is_visible else 0.35
+        self._is_visible = False
+
+        def cb():
+            width = self.container.width
+            y = 0
+
+            def inner(t: float):
+                current_x = width * (t)
+                self.container.set_pos((current_x, 0, y))
+
+            inner(0)
+
+            return inner
+
+        Sequence(
+            Func(lambda: self.basic_status.hide()),
+            Func(lambda: self.wave_status.hide()),
+            LerpFunc(
+                cb(),
+                duration=duration,
+                fromData=0,
+                toData=1,
+                blendType="easeInOut",
+            ),
+            Func(lambda: self.basic_status.show()),
+            Func(lambda: self.wave_status.show()),
+            Func(lambda: self.hide()),
+        ).start()
 
     def delete(self):
         super().delete()

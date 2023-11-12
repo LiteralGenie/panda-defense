@@ -113,7 +113,7 @@ class TowerTile(BetterDirectFrame):
         self,
         state: DragMoveState[_StartData, _MoveData],
     ):
-        state.start_data.placeholder.removeNode()
+        state.start_data.placeholder.remove_node()
 
         if pos := state.move_data.active_tile:
             GVG.event_pipe.send(
@@ -126,7 +126,7 @@ class TowerTile(BetterDirectFrame):
 
     def _on_drag_cancel(self, state: None | DragState[_StartData, _MoveData]):
         if state:
-            state.start_data.placeholder.removeNode()
+            state.start_data.placeholder.remove_node()
 
     def _load_placeholder(self):
         placeholder = NodePath("")

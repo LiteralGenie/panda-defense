@@ -1,6 +1,6 @@
 from typing import Any, ClassVar, Self
 
-from game.events.game_actions import BuyTowerAction, GameActions
+from game.events.game_actions import GameActions
 from game.id_manager import IdManager
 from game.player.player_model import PlayerModel
 from game.scenario import Round, Scenario
@@ -77,16 +77,3 @@ class GameModel(StatefulClass):
     def add_action(self, action: Any):
         self.action_queue.append(action)
         # todo: validate
-
-    def apply_actions(self):
-        for action in self.action_queue:
-            match action:
-                case BuyTowerAction(TowerCls, id_player, kwargs):
-                    player = self.players[id_player]
-                    if player.gold >= TowerCls.cost:
-                        player.gold -= TowerCls.cost
-                        tower = TowerCls.create(**kwargs)
-                        self.add_tower(tower)
-                    else:
-                        print("Not enough gold to buy tower")
-        self.action_queue = []

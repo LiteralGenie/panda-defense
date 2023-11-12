@@ -1,7 +1,7 @@
 from direct.gui.DirectGuiBase import DirectGuiWidget
 from panda3d.core import Plane, Point3
 
-from utils.types import Point2f
+from utils.types import Color, Point2f
 
 
 def set_frame_size(widget: DirectGuiWidget, wh: tuple[float, float]):
@@ -61,3 +61,8 @@ def mpos_to_real_pos(mpos: Point2f) -> Point2f:
 
     xy = pos.get_xy()
     return (xy[0], xy[1])
+
+
+def darken(color: Color, factor: float):
+    rgb = tuple(x * factor for x in color[:3])
+    return rgb + (color[3],)

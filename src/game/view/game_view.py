@@ -6,6 +6,7 @@ from reactivex import Subject
 from game.events.event_manager import TickEvents
 from game.game_gui.game_gui import GameGui
 from game.maps.map_view import MapView
+from game.model_manager import ModelManager
 from game.parameterized_path import ParameterizedPath
 from game.player.player_model import PlayerModel
 from game.scenario import Scenario
@@ -17,7 +18,6 @@ from game.view.game_view_cache import GameViewData
 from game.view.game_view_globals import GVG, GameViewGlobals, GameViewMetaInfo
 from game.view.resource_manager import ResourceManager
 from game.view.view_manager import GameViewManager
-from model_manager import ModelManager
 
 
 class GameView:

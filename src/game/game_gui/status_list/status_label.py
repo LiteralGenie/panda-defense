@@ -1,5 +1,4 @@
 from game.game_gui.better_direct_frame import BetterDirectFrame
-from utils.gui_utils import get_h, get_w
 
 
 class StatusLabel(BetterDirectFrame):
@@ -17,8 +16,8 @@ class StatusLabel(BetterDirectFrame):
         )
 
     def recalculate_layout(self):
-        w = get_w(self)
-        h = get_h(self)
+        w = self.width
+        h = self.height
 
         h *= 1.25  # todo: replace this with height of TextNode / 2
 

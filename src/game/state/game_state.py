@@ -83,11 +83,11 @@ class GameState:
         ev = StateUpdated(category=category, id=id, key=key, value=value)
         self._log_event(ev)
 
-    def delete(self, category: StateCategory, id: int):
-        data = self.data[category][id]
+    def delete(self, category: StateCategory, id: int, **kwargs: Any):
+        data = self.data[category][id]["data"]
         del self.data[category][id]
 
-        ev = StateDeleted(category=category, data=data)
+        ev = StateDeleted(category=category, id=id, data=data)
         self._log_event(ev)
 
     @property
@@ -124,11 +124,8 @@ class StateUpdated:
 @dataclass
 class StateDeleted:
     category: StateCategory
+    id: int
     data: Any
-
-    @property
-    def id(self):
-        return self.data["id"]
 
 
 StateEvent = StateCreated | StateUpdated | StateDeleted

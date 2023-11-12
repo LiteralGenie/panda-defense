@@ -1,6 +1,9 @@
+import pathlib
 import time
 from multiprocessing import Pipe, Process
 from multiprocessing.connection import Connection
+
+from panda3d.core import loadPrcFile
 
 from game.controller.controller import play_game
 from game.events.event_manager import TickEvents
@@ -64,22 +67,17 @@ def run_renderer(
     import simplepbr
     from direct.showbase.ShowBase import ShowBase
     from direct.task.Task import Task
-    from panda3d.core import WindowProperties
 
     class Renderer(ShowBase):
         def __init__(self):
+            loadPrcFile(str(pathlib.Path(__file__).parent / "data" / "Config.prc"))
+
             super().__init__()
             simplepbr.init(use_normal_maps=True)
 
             self.camera.setPos(0, 0, 40)
             self.camera.setP(-90)
             self.disable_mouse()
-
-            properties = WindowProperties()
-            properties.set_origin(7680, 0)
-            properties.set_size(3840, 2160)
-
-            self.win.request_properties(properties)  # type: ignore
 
             from game.view.game_view import GameView
 

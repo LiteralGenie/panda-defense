@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod, abstractproperty
+from typing import ClassVar
 
 from direct.actor.Actor import Actor
 from panda3d.core import NodePath
@@ -8,6 +9,8 @@ from game.towers.tower_model import TowerModel
 
 
 class TowerView(ABC):
+    display_name: ClassVar[str] = "???"
+
     id: int
     model: TowerModel
     pnode: Actor
@@ -50,3 +53,6 @@ class TowerView(ABC):
     @abstractmethod
     def preload_placeholder(cls) -> None:
         ...
+
+    def delete(self):
+        self.pnode.remove_node()

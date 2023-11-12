@@ -2,10 +2,7 @@
 validate tower placement
 prevent tower placement under gui
 tower description on hover
-tower stats on instance click
-sell tower
 unit stats on instance click
-apply actions during build phase
 main menu
 settings menu
 logging
@@ -30,9 +27,7 @@ units should not move diagonally
 
 
 # backlog
-preload models
-        units on PRESPAWN
-        towers on hover (or purchase-able?)
+how to display / upgrade tower-specific properties in details pane?
 more nuanced spawn times in scenario
 unit tests
 e2e tests
@@ -43,6 +38,12 @@ async view
 
 
 # done
+[x] preload models
+        units on PRESPAWN
+        towers on hover (or purchase-able?)
+[x] apply actions during build phase
+[x] tower stats on instance click
+[x] sell tower
 [x] health bars
 [x] projectiles
 [x] gold / health gui

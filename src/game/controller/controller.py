@@ -9,12 +9,19 @@ from game.controller.controller_context import ControllerContext
 from game.controller.controller_globals import CG
 from game.controller.range_cache import RangeCache
 from game.events.event_manager import EventManager
+from game.events.game_actions import (
+    BuyTowerAction,
+    GameActions,
+    SellTowerAction,
+    UpgradeTowerAction,
+)
 from game.game_model import GameModel
 from game.parameterized_path import ParameterizedPath
 from game.player.player_model import PlayerModel
 from game.scenario import Scenario
 from game.shared_globals import SG
 from game.state.game_state import GameState
+from game.towers.tower_range import PyramidalRange
 from game.units.unit_manager import UnitManager
 from game.units.unit_model import UnitModel, UnitStatus
 
@@ -35,7 +42,7 @@ async def play_game(
     SG.state = GameState(on_event=CG.ev_mgr.add)
 
     # init game model
-    players = [PlayerModel.create(id=id_player, gold=10)]
+    players = [PlayerModel.create(id=id_player, gold=50)]
     game = GameModel.create(scenario, first_tick, players[0].id, players)
 
     # init cache
@@ -68,8 +75,8 @@ async def play_game(
         while (delay := game.next_tick - time.time()) > 0:
             # Apply any actions that occur while waiting
             while ctx.render_pipe.poll(timeout=delay):
-                game.action_queue.append(ctx.render_pipe.recv())
-                game.apply_actions()
+                action = ctx.render_pipe.recv()
+                _apply_action(action, game)
 
                 CG.ev_mgr.flush(game)
                 break
@@ -103,8 +110,8 @@ async def _play_round(ctx: ControllerContext):
 
         # Validate and apply actions
         while ctx.render_pipe.poll():
-            game.action_queue.append(ctx.render_pipe.recv())
-        game.apply_actions()
+            action = ctx.render_pipe.recv()
+            _apply_action(action, game)
 
         # Update game state
         is_round_end = _update_game_state(ctx)
@@ -169,3 +176,51 @@ def _move_units(ctx: ControllerContext):
         if unit.dist >= unit.ppath.length - 1:
             ctx.game.unit_mgr.set_status(unit, UnitStatus.DEAD)
             ctx.game.health -= 1
+
+
+def _apply_action(action: GameActions, game: GameModel):
+    match action:
+        case BuyTowerAction(TowerCls, id_player, kwargs):
+            player = game.players[id_player]
+            if player.gold >= TowerCls.cost:
+                player.gold -= TowerCls.cost
+                tower = TowerCls.create(**kwargs)
+                game.add_tower(tower)
+            else:
+                print("Not enough gold to buy tower")
+        case UpgradeTowerAction(id_player, id_tower, trait):
+            player = game.players[id_player]
+
+            tower = game.towers[id_tower]
+            match trait:
+                case "damage":
+                    cost = 7
+                    if player.gold < cost:
+                        print("Not enough gold to upgrade tower")
+                        return
+
+                    tower.damage = int(1.1 * tower.damage)
+                case "range":
+                    cost = 15
+                    if player.gold < cost:
+                        print("Not enough gold to upgrade tower")
+                        return
+
+                    tower.range = PyramidalRange(tower.range.radius + 1)
+                case "speed":
+                    cost = 7
+                    if player.gold < cost:
+                        print("Not enough gold to upgrade tower")
+                        return
+
+                    tower.attack_speed *= 1.1
+
+            player.gold -= cost
+        case SellTowerAction(id_player, id_tower):
+            player = game.players[id_player]
+            tower = game.towers[id_tower]
+
+            player.gold += tower.cost
+
+            tower.delete()
+            del game.towers[id_tower]

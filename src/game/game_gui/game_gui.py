@@ -1,9 +1,6 @@
-from typing import Callable, ClassVar
+from typing import ClassVar
 
 from direct.gui.DirectGui import DGG
-from direct.interval.FunctionInterval import Func
-from direct.interval.LerpInterval import LerpFunc
-from direct.interval.MetaInterval import Sequence
 
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.sidebar.sidebar import Sidebar
@@ -36,24 +33,8 @@ class GameGui(BetterDirectFrame):
         self._intervals = dict()
 
         # On window resize, reposition / resize everything
+        self.recalculate_layout()
         self.accept("aspectRatioChanged", lambda: self.recalculate_layout())
-
-        # When a tower is clicked, swap out the sidebar with the tower description
-        self._sidebar_visible = True
-        self.accept(
-            "showTowerDetails",
-            lambda: [
-                self._hide_sidebar(),
-                self._show_tower_details(),
-            ],
-        )
-        self.accept(
-            "hideTowerDetails",
-            lambda: [
-                self._hide_tower_details(),
-                self._show_sidebar(),
-            ],
-        )
 
     def recalculate_layout(self):
         """Set origin to top-left and fill screen"""
@@ -81,13 +62,12 @@ class GameGui(BetterDirectFrame):
         w = self.SIDEBAR_WIDTH * vw
         h = vh
 
+        tl_x = vw - w
+        tl_y = 0
+
+        self.sidebar.set_xy((tl_x, tl_y))
         self.sidebar.set_frame_size((w, h))
         self.sidebar.recalculate_layout()
-
-        if self._sidebar_visible:
-            self._show_sidebar(animate=False)
-        else:
-            self._hide_sidebar(animate=False)
 
     def _layout_details_pane(self):
         vw = get_w(self)
@@ -96,105 +76,12 @@ class GameGui(BetterDirectFrame):
         w = self.DETAILS_WIDTH * vw
         h = vh
 
+        tl_x = vw - w
+        tl_y = 0
+
+        self.details_pane.set_xy((tl_x, tl_y))
         self.details_pane.set_frame_size((w, h))
         self.details_pane.recalculate_layout()
-
-        if not self._sidebar_visible:
-            self._show_tower_details(animate=False)
-        else:
-            self._hide_tower_details(animate=False)
-
-    def _show_sidebar(self, animate: bool = True):
-        self._sidebar_visible = True
-
-        def cb():
-            vw = get_w(self)
-            w = self.SIDEBAR_WIDTH * vw
-            start_x = vw
-            start_y = 0
-
-            self.sidebar.set_xy((start_x, start_y))
-
-            def inner(t: float):
-                current_x = vw - w * t
-                self.sidebar.set_pos((current_x, 0, start_y))
-
-            return inner
-
-        self._run_animation(self.sidebar, cb(), animate)
-
-    def _hide_sidebar(self, animate: bool = True):
-        self._sidebar_visible = False
-
-        def cb():
-            start_x = self.sidebar.get_pos()[0]
-            start_y = self.sidebar.get_pos()[2]
-            end_x = get_w(self)
-            width = end_x - start_x
-
-            def inner(t: float):
-                current_x = start_x + width * t
-                self.sidebar.set_pos((current_x, 0, start_y))
-
-            return inner
-
-        self._run_animation(self.sidebar, cb(), animate)
-
-    def _show_tower_details(self, animate: bool = True):
-        print("_show_tower_details()")
-
-        def cb():
-            vw = get_w(self)
-            w = self.DETAILS_WIDTH * vw
-            start_x = vw
-            start_y = 0
-
-            self.details_pane.set_xy((start_x, start_y))
-
-            def inner(t: float):
-                current_x = vw - w * t
-                self.details_pane.set_pos((current_x, 0, start_y))
-
-            return inner
-
-        self._run_animation(self.details_pane, cb(), animate)
-
-    def _hide_tower_details(self, animate: bool = True):
-        print("_hide_tower_details()")
-
-        def cb():
-            start_x = self.details_pane.get_pos()[0]
-            start_y = self.details_pane.get_pos()[2]
-            end_x = get_w(self)
-            width = end_x - start_x
-
-            def inner(t: float):
-                current_x = start_x + width * t
-                self.details_pane.set_pos((current_x, 0, start_y))
-
-            return inner
-
-        self._run_animation(self.details_pane, cb(), animate)
-
-    def _run_animation(
-        self,
-        target: Sidebar | TowerDetailsPane,
-        cb: Callable[[float], None],
-        animate: bool,
-    ):
-        Sequence(
-            Func(lambda: target.basic_status.hide()),
-            Func(lambda: target.wave_status.hide()),
-            LerpFunc(
-                cb,
-                duration=0.35 if animate else 0,
-                fromData=0,
-                toData=1,
-                blendType="easeIn",
-            ),
-            Func(lambda: target.basic_status.show()),
-            Func(lambda: target.wave_status.show()),
-        ).start()
 
     def delete(self):
         super().delete()
