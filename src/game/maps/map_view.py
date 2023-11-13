@@ -1,5 +1,3 @@
-from typing import ClassVar
-
 from hsluv import hsluv_to_rgb
 from panda3d.core import NodePath
 
@@ -9,8 +7,6 @@ from utils.types import Point2
 
 
 class MapView:
-    model: ClassVar[NodePath] = loader.loadModel("data/assets/board.gltf")
-
     pnode: NodePath
 
     def __init__(self):
