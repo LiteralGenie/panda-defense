@@ -1,0 +1,63 @@
+{
+    "paths": {
+        "1": {
+            "id": 1,
+            "start": [3, 11],
+            "segments": [
+                {
+                    "dir": "-y",
+                    "dist": 6
+                },
+                {
+                    "dir": "-x",
+                    "dist": 3
+                },
+                {
+                    "dir": "-y",
+                    "dist": 5
+                },
+                {
+                    "dir": "x",
+                    "dist": 5
+                },
+                {
+                    "dir": "-y",
+                    "dist": 14
+                }
+            ]
+        }
+    },
+
+    "rounds": [
+        {
+            "waves": [
+                {
+                    "id": 1,
+                    "id_path": 1,
+                    "enemies": 15,
+                    "spawn_delay_ticks": 4
+                }
+            ]
+        },
+        {
+            "waves": [
+                {
+                    "id": 2,
+                    "id_path": 1,
+                    "enemies": 25,
+                    "spawn_delay_ticks": 2
+                }
+            ]
+        },
+        {
+            "waves": [
+                {
+                    "id": 3,
+                    "id_path": 1,
+                    "enemies": 105,
+                    "spawn_delay_ticks": 1
+                }
+            ]
+        }
+    ]
+}

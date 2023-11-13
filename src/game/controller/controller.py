@@ -44,7 +44,7 @@ async def play_game(
     SG.state = GameState(on_event=CG.ev_mgr.add)
 
     # init game model
-    players = [PlayerModel.create(id=id_player, gold=50)]
+    players = [PlayerModel.create(id=id_player, gold=500)]
     game = GameModel.create(scenario, first_tick, players[0].id, players)
 
     # init cache

@@ -16,7 +16,7 @@ class UnitStatus(Enum):
 
 
 class UnitModel(StatefulClass):
-    max_health: ClassVar[int] = 150
+    max_health: ClassVar[int] = 200
     _state_category: ClassVar[StateCategory] = "UNIT"
 
     id: int = StatefulProp(read_only=True)  # type: ignore

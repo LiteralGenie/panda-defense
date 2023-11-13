@@ -14,7 +14,7 @@ class BasicTowerModel(TowerModel):
         return super().create(
             attack_speed=0.5,
             attack_speed_guage=0,
-            damage=50,
+            damage=45,
             pos=pos,
             range=deepcopy(cls.default_range),
         )

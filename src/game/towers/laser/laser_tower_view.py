@@ -55,7 +55,7 @@ class LaserTowerView(TowerView):
     def _subscribe_events(self):
         def on_next(ev: GameEvent):
             match ev:
-                case RenderLaserAttack(id_tower, id_targets, axis):
+                case RenderLaserAttack(id_tower, id_targets):
                     if self.id != id_tower:
                         return
 

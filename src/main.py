@@ -1,3 +1,4 @@
+import json
 import pathlib
 import time
 from multiprocessing import Pipe, Process
@@ -7,55 +8,7 @@ from panda3d.core import loadPrcFile
 
 from game.controller.controller import play_game
 from game.events.event_manager import TickEvents
-from game.scenario import Path, Round, Scenario, Segment, Wave
-
-
-def build_test_scenario():
-    path = Path(
-        id=1,
-        start=(0, 10),
-        segments=[
-            Segment(dir="-y", dist=20),
-        ],
-    )
-
-    rounds = [
-        Round(
-            waves=[
-                Wave(
-                    id=1,
-                    enemies=15,
-                    id_path=path["id"],
-                    spawn_delay_ticks=4,
-                )
-            ]
-        ),
-        Round(
-            waves=[
-                Wave(
-                    id=2,
-                    enemies=15,
-                    id_path=path["id"],
-                    spawn_delay_ticks=2,
-                )
-            ]
-        ),
-        Round(
-            waves=[
-                Wave(
-                    id=3,
-                    enemies=105,
-                    id_path=path["id"],
-                    spawn_delay_ticks=1,
-                )
-            ]
-        ),
-    ]
-
-    return Scenario(
-        rounds=rounds,
-        paths={path["id"]: path},
-    )
+from game.scenario import Scenario, parse_scenario
 
 
 def run_renderer(
@@ -109,8 +62,10 @@ def run_game(
 
 if __name__ == "__main__":
     first_tick = time.time()
-    scenario = build_test_scenario()
     parent_conn, child_conn = Pipe()
+
+    fp_scenario = pathlib.Path(__file__).parent / "data" / "scenarios" / "1_test.json"
+    scenario: Scenario = parse_scenario(json.load(open(fp_scenario)))
 
     game = Process(
         target=run_game,

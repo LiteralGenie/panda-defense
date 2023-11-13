@@ -20,7 +20,7 @@ class ParameterizedPath:
     def __init__(self, path: Path):
         self.id = path["id"]
 
-        pos = path["start"]
+        pos: Point2 = tuple(path["start"])  # type: ignore
         dir = _dir_to_pt(path["segments"][0]["dir"])
         self.points = [PointWithDirection(pos=pos, dir=dir)]
 

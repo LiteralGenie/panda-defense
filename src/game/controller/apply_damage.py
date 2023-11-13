@@ -97,7 +97,6 @@ def apply_damage(ctx: ControllerContext):
                     RenderLaserAttack(
                         tower.id,
                         [unit.id for unit in tgts],
-                        axis=axis,
                     )
                 )
         else:
