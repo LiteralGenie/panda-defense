@@ -14,7 +14,7 @@ class LaserTowerModel(TowerModel):
         return super().create(
             attack_speed=0.25,
             attack_speed_guage=0,
-            damage=25,
+            damage=20,
             pos=pos,
             range=deepcopy(cls.default_range),
         )

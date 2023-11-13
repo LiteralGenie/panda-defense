@@ -80,15 +80,21 @@
         {
             "waves": [
                 {
-                    "id": 1,
+                    "id": 11,
                     "id_path": 1,
                     "enemies": 15,
                     "spawn_delay_ticks": 4
                 },
                 {
-                    "id": 11,
+                    "id": 12,
                     "id_path": 2,
                     "enemies": 15,
+                    "spawn_delay_ticks": 2
+                },
+                {
+                    "id": 13,
+                    "id_path": 3,
+                    "enemies": 30,
                     "spawn_delay_ticks": 4
                 }
             ]
@@ -96,30 +102,42 @@
         {
             "waves": [
                 {
-                    "id": 2,
+                    "id": 21,
                     "id_path": 1,
                     "enemies": 25,
                     "spawn_delay_ticks": 2
                 },
                 {
-                    "id": 21,
+                    "id": 22,
                     "id_path": 2,
                     "enemies": 50,
                     "spawn_delay_ticks": 1
+                },
+                {
+                    "id": 23,
+                    "id_path": 3,
+                    "enemies": 50,
+                    "spawn_delay_ticks": 2
                 }
             ]
         },
         {
             "waves": [
                 {
-                    "id": 3,
+                    "id": 31,
                     "id_path": 1,
                     "enemies": 105,
                     "spawn_delay_ticks": 1
                 },
                 {
-                    "id": 31,
+                    "id": 32,
                     "id_path": 2,
+                    "enemies": 105,
+                    "spawn_delay_ticks": 1
+                },
+                {
+                    "id": 33,
+                    "id_path": 3,
                     "enemies": 105,
                     "spawn_delay_ticks": 1
                 }
