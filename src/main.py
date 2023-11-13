@@ -64,7 +64,7 @@ if __name__ == "__main__":
     first_tick = time.time()
     parent_conn, child_conn = Pipe()
 
-    fp_scenario = pathlib.Path(__file__).parent / "data" / "scenarios" / "1_test.json"
+    fp_scenario = pathlib.Path(__file__).parent / "data" / "scenarios" / "2_multi.json"
     scenario: Scenario = parse_scenario(json.load(open(fp_scenario)))
 
     game = Process(

@@ -34,7 +34,7 @@
                 {
                     "id": 1,
                     "id_path": 1,
-                    "enemies": 1,
+                    "enemies": 15,
                     "spawn_delay_ticks": 4
                 }
             ]

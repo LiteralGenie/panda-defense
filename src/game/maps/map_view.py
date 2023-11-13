@@ -54,9 +54,9 @@ class MapView:
                 tile.instance_to(t)
 
         # Draw path tiles
-        base_color = (49, 60, 43)
+        base_color = (25, 40, 66)
         sat_step = (100 - base_color[1]) / (len(ppaths))
-        lum_step = -1
+        lum_step = -0.5
 
         for i, ppath in enumerate(ppaths):
             for j, pos in enumerate(ppath):
@@ -65,7 +65,7 @@ class MapView:
                     base_color[1] + i * sat_step,
                     base_color[2] + j * lum_step,
                 )
-                tile_color_rgb = hsluv_to_rgb(list(tile_color)) + (0.5,)  # type: ignore
+                tile_color_rgb = hsluv_to_rgb(list(tile_color)) + (0.75,)  # type: ignore
                 tile = self.load_tile(tile_color_rgb)
 
                 t = pnode.attachNewNode("")
