@@ -20,16 +20,24 @@ class ParameterizedPath:
     def __init__(self, path: Path):
         self.id = path["id"]
 
-        pos: Point2 = tuple(path["start"])  # type: ignore
+        pos = path["start"]
         dir = _dir_to_pt(path["segments"][0]["dir"])
         self.points = [PointWithDirection(pos=pos, dir=dir)]
 
-        for segment in path["segments"]:
+        for idx_segment, segment in enumerate(path["segments"]):
             (step_x, step_y) = _dir_to_pt(segment["dir"])
 
-            for _ in range(1, segment["dist"]):
+            for idx_pos in range(1, segment["dist"]):
+                # On final tile of segment, change the direction
+                is_last_pos = idx_pos == segment["dist"] - 1
+                is_last_segment = idx_segment == len(path["segments"]) - 1
+                if is_last_pos and not is_last_segment:
+                    next_segment = path["segments"][idx_segment + 1]
+                    dir = _dir_to_pt(next_segment["dir"])
+                else:
+                    dir = (step_x, step_y)
+
                 pos = (pos[0] + step_x, pos[1] + step_y)
-                dir = (step_x, step_y)
                 self.points.append(PointWithDirection(pos=pos, dir=dir))
 
         self.length = len(self.points)

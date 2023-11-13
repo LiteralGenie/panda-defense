@@ -10,7 +10,7 @@ class Segment(TypedDict):
 
 class Path(TypedDict):
     id: int
-    start: list[int]
+    start: tuple[int, int]
     segments: list[Segment]
 
 
@@ -34,4 +34,8 @@ def parse_scenario(raw_scenario: Any) -> Scenario:
     """I forgot JSON objects cant have numeric keys so need to convert it here"""
 
     raw_scenario["paths"] = {int(k): v for k, v in raw_scenario["paths"].items()}
+
+    for path in raw_scenario["paths"].values():
+        path["start"] = tuple(path["start"])
+
     return raw_scenario
