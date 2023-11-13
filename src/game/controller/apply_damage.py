@@ -71,12 +71,18 @@ def apply_damage(ctx: ControllerContext):
                             (">=", mn),
                             ("<=", mx),
                         ],
+                        y=[
+                            ("=", pt.pos[1]),
+                        ],
                     )
                 else:
                     mn: int = tower.pos[1] - tower.range.radius  # type: ignore
                     mx: int = tower.pos[1] + tower.range.radius  # type: ignore
                     tgts = ctx.game.unit_mgr.select(
                         status=UnitStatus.ALIVE,
+                        x=[
+                            ("=", pt.pos[0]),
+                        ],
                         y=[
                             (">=", mn),
                             ("<=", mx),
