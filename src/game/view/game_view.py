@@ -12,7 +12,10 @@ from game.player.player_model import PlayerModel
 from game.scenario import Scenario
 from game.shared_globals import SG
 from game.state.game_state import GameState, StateCreated, StateDeleted, StateUpdated
+from game.towers.basic.basic_tower_model import BasicTowerModel
 from game.towers.basic.basic_tower_view import BasicTowerView
+from game.towers.laser.laser_tower_model import LaserTowerModel
+from game.towers.laser.laser_tower_view import LaserTowerView
 from game.units.unit_view import UnitView
 from game.view.game_view_cache import GameViewData
 from game.view.game_view_globals import GVG, GameViewGlobals, GameViewMetaInfo
@@ -90,7 +93,12 @@ class GameView:
                 model = PlayerModel(ev.id)
                 GVG.data.models.players[model.id] = model
             case "TOWER":
-                view = BasicTowerView(ev.id)
+                if ev.cls is BasicTowerModel:
+                    view = BasicTowerView(ev.id)
+                elif ev.cls is LaserTowerModel:
+                    view = LaserTowerView(ev.id)
+                else:
+                    raise Exception("Unknown tower model", ev.cls)
                 GVG.data.views.towers[view.id] = view
                 GVG.data.models.towers[view.id] = view.model
             case "UNIT":

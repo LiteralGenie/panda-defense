@@ -10,9 +10,11 @@ from panda3d.core import (
     TransparencyAttrib,
 )
 
+from utils.types import Color
+
 
 def build_rect(
-    color: tuple[float, float, float, float],
+    color: Color | tuple[Color, Color, Color, Color],
     width: float = 1,
     height: float = 1,
     centered: bool = True,
@@ -38,10 +40,11 @@ def build_rect(
     vertex.add_data3((x_mx, y_mx, 0))
     vertex.add_data3((x_mn, y_mx, 0))
 
-    color_writer.add_data4(color)
-    color_writer.add_data4(color)
-    color_writer.add_data4(color)
-    color_writer.add_data4(color)
+    (c1, c2, c3, c4) = (color,) * 4 if not isinstance(color[0], tuple) else color
+    color_writer.add_data4(c1)
+    color_writer.add_data4(c2)
+    color_writer.add_data4(c3)
+    color_writer.add_data4(c4)
 
     prim = GeomTriangles(Geom.UH_static)
     prim.addVertices(3, 1, 0)
@@ -54,7 +57,7 @@ def build_rect(
     node.addGeom(geom)
 
     path = NodePath(node)
-    if color[3] < 1:
+    if any(c[3] < 1 for c in [c1, c2, c3, c4]):
         path.set_transparency(TransparencyAttrib.M_alpha)
 
     # simplepbr requires material and use_normal_maps flag

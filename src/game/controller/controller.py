@@ -21,7 +21,9 @@ from game.player.player_model import PlayerModel
 from game.scenario import Scenario
 from game.shared_globals import SG
 from game.state.game_state import GameState
-from game.towers.tower_range import PyramidalRange
+from game.towers.basic.basic_tower_model import BasicTowerModel
+from game.towers.tower_range.pyramidal_range import PyramidalRange
+from game.towers.tower_range.square_range import SquareRange
 from game.units.unit_manager import UnitManager
 from game.units.unit_model import UnitModel, UnitStatus
 
@@ -206,7 +208,10 @@ def _apply_action(action: GameActions, game: GameModel):
                         print("Not enough gold to upgrade tower")
                         return
 
-                    tower.range = PyramidalRange(tower.range.radius + 1)
+                    if isinstance(tower, BasicTowerModel):
+                        tower.range = PyramidalRange(tower.range.radius + 1)
+                    else:
+                        tower.range = SquareRange(tower.range.radius + 1)
                 case "speed":
                     cost = 7
                     if player.gold < cost:

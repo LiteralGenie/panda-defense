@@ -12,6 +12,10 @@ from game.game_gui.status_list.gold_status import GoldStatus
 from game.game_gui.status_list.health_status import HealthStatus
 from game.game_gui.status_list.round_status import RoundStatus
 from game.game_gui.status_list.status_list import StatusList
+from game.towers.basic.basic_tower_model import BasicTowerModel
+from game.towers.basic.basic_tower_view import BasicTowerView
+from game.towers.laser.laser_tower_model import LaserTowerModel
+from game.towers.laser.laser_tower_view import LaserTowerView
 from utils.gui_utils import get_h
 
 
@@ -38,12 +42,27 @@ class Sidebar(BetterDirectFrame):
 
         self.container = BetterDirectFrame(self)
 
+        self._init_components()
+
+        # When a tower is clicked, swap out the sidebar with the tower description
+        self._is_visible = True
+        self.accept("showTowerDetails", lambda _: self._hide_container())
+        self.accept("hideTowerDetails", lambda: self._show_container())
+
+    def _init_components(self):
+        towers = [
+            (BasicTowerModel, BasicTowerView),
+            (LaserTowerModel, LaserTowerView),
+        ]
         self.tower_grid = TowerGrid(
             self.container,
             num_cols=self.GRID_COLS,
         )
-        for _ in range(7):
+        for i in range(7):
+            Model, View = towers[i % len(towers)]
             self.tower_grid.create_tile(
+                TowerModelCls=Model,
+                TowerViewCls=View,
                 recalculate_layout=False,
             )
 
@@ -63,11 +82,6 @@ class Sidebar(BetterDirectFrame):
                 BuildTimerStatus(self),
             ],
         )
-
-        # When a tower is clicked, swap out the sidebar with the tower description
-        self._is_visible = True
-        self.accept("showTowerDetails", lambda _: self._hide_container())
-        self.accept("hideTowerDetails", lambda: self._show_container())
 
     def recalculate_layout(self):
         self._layout_container()

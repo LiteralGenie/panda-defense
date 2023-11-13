@@ -4,7 +4,7 @@ from typing import Any, ClassVar, Self
 from game.id_manager import IdManager
 from game.state.game_state import StateCategory
 from game.state.stateful_class import StatefulClass, StatefulProp
-from game.towers.tower_range import TowerRange
+from game.towers.tower_range.tower_range import TowerRange
 from utils.types import Point2
 
 

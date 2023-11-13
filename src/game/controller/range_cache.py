@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from game.parameterized_path import ParameterizedPath
-from game.towers.tower_range import TowerRange
+from game.towers.tower_range.tower_range import TowerRange
 from game.units.unit_model import UnitModel
 from utils.misc_utils import find_insertion_index, split_with_lookback
 from utils.types import Point2

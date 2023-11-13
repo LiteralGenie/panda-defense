@@ -1,5 +1,3 @@
-from math import modf
-
 from direct.actor.Actor import Actor
 from direct.interval.FunctionInterval import Func, Wait
 from direct.interval.Interval import Interval
@@ -15,7 +13,6 @@ from game.state.game_state import StateUpdated
 from game.units.health_bar.health_bar import HealthBar
 from game.units.unit_model import UnitModel, UnitStatus
 from game.view.game_view_globals import GVG
-from utils.types import Point2f
 
 
 class UnitView:
@@ -83,7 +80,7 @@ class UnitView:
                                     Func(lambda: self.delete()),
                                 ).start()
                         case UnitModel.health.key:  # type: ignore
-                            percent = value / self.model.max_health
+                            percent = max(value / self.model.max_health, 0)
                             self._health_bar.set_percent(percent, SG.state.until_tick)
                         case _:
                             pass
@@ -100,7 +97,7 @@ class UnitView:
 
         self._intervals["pos"] = self.pnode.posInterval(  # type: ignore
             SG.state.until_tick,
-            self.interpolated_pos + (0,),
+            self.model.interpolated_pos + (0,),
         )
         self._intervals["pos"].start()  # type: ignore
 
@@ -125,16 +122,3 @@ class UnitView:
         GVG.resource_mgr.preload_actor(
             "glTF-Sample-Models/2.0/BoomBox/glTF/BoomBox.gltf"
         )
-
-    @property
-    def interpolated_pos(self) -> Point2f:
-        frac, idx = modf(self.model.dist)
-        idx = int(idx)
-
-        pt = self.model.ppath.points[idx]
-
-        new_pos = (
-            pt.pos[0] + frac * pt.dir[0],
-            pt.pos[1] + frac * pt.dir[1],
-        )
-        return new_pos

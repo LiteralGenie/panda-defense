@@ -1,14 +1,15 @@
+from math import atan2, pi, sqrt
 from typing import ClassVar
 
 from direct.interval.FunctionInterval import Func
 from direct.interval.Interval import Interval
-from direct.interval.LerpInterval import LerpHprInterval, LerpPosInterval
+from direct.interval.LerpInterval import LerpFunc
 from direct.interval.MetaInterval import Parallel, Sequence
 from panda3d.core import NodePath
 from reactivex.abc import DisposableBase
 
 from game.events.event_manager import GameEvent
-from game.events.render_event import RenderTowerAttack
+from game.events.render_event import RenderLaserAttack
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.shared_globals import SG
 from game.state.game_state import StateDeleted, StateUpdated
@@ -16,12 +17,11 @@ from game.towers.basic.basic_tower_model import BasicTowerModel
 from game.towers.tower_model import TowerModel
 from game.towers.tower_view import TowerView
 from game.view.game_view_globals import GVG
-from game.view.procgen.pyramid import build_pyramid
 from game.view.procgen.square import build_rect
 
 
-class BasicTowerView(TowerView):
-    display_name: ClassVar[str] = "Basic Tower"
+class LaserTowerView(TowerView):
+    display_name: ClassVar[str] = "Laser Tower"
 
     _active_bullet: NodePath | None
     _range_preview: NodePath | None
@@ -55,38 +55,50 @@ class BasicTowerView(TowerView):
     def _subscribe_events(self):
         def on_next(ev: GameEvent):
             match ev:
-                case RenderTowerAttack(id_tower, id_targets):
+                case RenderLaserAttack(id_tower, id_targets, axis):
                     if self.id != id_tower:
                         return
 
-                    for id in id_targets:
-                        unit = GVG.data.views.units[id]
-                        pos = unit.model.interpolated_pos
+                    units = [GVG.data.views.units[id] for id in id_targets]
+                    x_min = min(unit.model.interpolated_pos[0] for unit in units)
+                    x_max = max(unit.model.interpolated_pos[0] for unit in units)
+                    width = x_max - x_min
 
-                        # create bullet
-                        bullet = NodePath("bullet")
-                        self.bullet.instance_to(bullet)
-                        bullet.reparent_to(render)
+                    y_min = min(unit.model.interpolated_pos[1] for unit in units)
+                    y_max = max(unit.model.interpolated_pos[1] for unit in units)
+                    height = y_max - y_min
 
-                        # translation + rotation
-                        self._intervals["bullet"] = Sequence(
-                            Parallel(
-                                LerpPosInterval(
-                                    bullet,
-                                    duration=SG.state.until_tick,
-                                    pos=pos + (1,),
-                                    startPos=self.model.pos + (0,),
-                                ),
-                                LerpHprInterval(
-                                    bullet,
-                                    duration=SG.state.until_tick,
-                                    hpr=(90, 0, 0),
-                                ),
-                            ),
-                            Func(lambda: bullet.remove_node()),
-                        )
-                        self._intervals["bullet"].start()
-                        self._active_bullet = bullet
+                    # create bullet
+                    bullet = NodePath("bullet")
+                    self.bullet.instance_to(bullet)
+                    bullet.reparent_to(render)
+                    bullet.set_pos(self.model.pos + (0,))
+
+                    def cb(t: float):
+                        x = x_min + t * width
+                        y = y_min + t * height
+
+                        x_rel = x - self.model.pos[0]
+                        y_rel = y - self.model.pos[1]
+
+                        length = sqrt((x_rel**2) + (y_rel**2))
+                        bullet.set_sx(length)
+
+                        angle = atan2(y_rel, x_rel) * 180 / pi
+                        bullet.set_h(angle)
+
+                    # translation + rotation
+                    self._intervals["bullet"] = Sequence(
+                        LerpFunc(
+                            cb,
+                            duration=SG.state.until_tick,
+                            fromData=0,
+                            toData=1,
+                        ),
+                        Func(lambda: bullet.hide()),
+                    )
+                    self._intervals["bullet"].start()
+                    self._active_bullet = bullet
                 case StateUpdated("TOWER", id, key, _):
                     if id != self.id:
                         return
@@ -129,43 +141,53 @@ class BasicTowerView(TowerView):
     @property
     def actor(cls):
         pnode = GVG.resource_mgr.load_actor(
-            "glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf"
+            "glTF-Sample-Models/2.0/AntiqueCamera/glTF/AntiqueCamera.gltf"
         )
 
-        pnode.getChild(0).setScale(20)
+        pnode.getChild(0).setScale(0.25)
         return pnode
 
     @classmethod
     def preload_actor(cls):
         GVG.resource_mgr.preload_actor(
-            "glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf"
+            "glTF-Sample-Models/2.0/AntiqueCamera/glTF/AntiqueCamera.gltf"
         )
 
     @classmethod
     @property
     def placeholder(cls):
         pnode = GVG.resource_mgr.load_actor(
-            "glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf"
+            "glTF-Sample-Models/2.0/AntiqueCamera/glTF/AntiqueCamera.gltf"
         )
-        pnode.getChild(0).setScale(20)
+        pnode.getChild(0).setScale(0.25)
         return pnode
 
     @classmethod
     def preload_placeholder(cls):
         GVG.resource_mgr.preload_actor(
-            "glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf"
+            "glTF-Sample-Models/2.0/AntiqueCamera/glTF/AntiqueCamera.gltf"
         )
 
     @classmethod
     @property
     def bullet(cls):
         def factory():
-            bullet = build_pyramid()
-            bullet.set_scale(0.25)
-            bullet.set_p(30)
+            bullet = build_rect(
+                color=(
+                    (0.65, 0.5, 0.2, 1),
+                    (0.5, 0, 0, 1),
+                    (0.5, 0, 0, 1),
+                    (0.65, 0.5, 0.2, 1),
+                ),
+                height=1,
+                width=1,
+                centered=False,
+            )
+            bullet.set_pos((0, 0, 1))
+            bullet.set_sy(0.25)
             return bullet
 
-        return GVG.resource_mgr.load_or_register("basic_bullet", factory)
+        return GVG.resource_mgr.load_or_register("laser_bullet", factory)
 
     def delete(self):
         super().delete()

@@ -1,10 +1,12 @@
 from enum import Enum
+from math import modf
 from typing import Any, ClassVar, Self
 
 from game.id_manager import IdManager
 from game.parameterized_path import ParameterizedPath
 from game.state.game_state import StateCategory
 from game.state.stateful_class import StatefulClass, StatefulProp
+from utils.types import Point2f
 
 
 class UnitStatus(Enum):
@@ -59,3 +61,16 @@ class UnitModel(StatefulClass):
         instance = super().load(id)
         instance.ppath = ppath
         return instance
+
+    @property
+    def interpolated_pos(self) -> Point2f:
+        frac, idx = modf(self.dist)
+        idx = int(idx)
+
+        pt = self.ppath.points[idx]
+
+        new_pos = (
+            pt.pos[0] + frac * pt.dir[0],
+            pt.pos[1] + frac * pt.dir[1],
+        )
+        return new_pos

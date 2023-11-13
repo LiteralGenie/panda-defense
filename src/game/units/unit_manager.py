@@ -6,6 +6,7 @@ from game.units.unit_model import UnitModel, UnitStatus
 from utils.where_builder import WhereBuilder
 
 _Id = int
+_Op = Literal["<=", "=", ">="]
 
 
 class _Filters(TypedDict):
@@ -14,6 +15,8 @@ class _Filters(TypedDict):
 
     dist: NotRequired[float]
     status: NotRequired[UnitStatus]
+    x: NotRequired[list[tuple[_Op, NotRequired[int]]]]
+    y: NotRequired[list[tuple[_Op, NotRequired[int]]]]
 
 
 class UnitManager:
@@ -61,6 +64,14 @@ class UnitManager:
         if status := filters.get("status"):
             wb.add("status = ?", [status.value])
 
+        if xs := filters.get("x"):
+            for op, val in xs:
+                wb.add(f"x {op} ?", [val])
+
+        if ys := filters.get("y"):
+            for op, val in ys:
+                wb.add(f"y {op} ?", [val])
+
         asc_or_desc = "DESC" if descending else "ASC"
 
         where, values = wb.print()
@@ -93,6 +104,8 @@ class UnitManager:
                 id_path     INTEGER,
 
                 dist        REAL,
+                x           INTEGER,
+                y           INTEGER,
                 status      TEXT
             )
             """
@@ -101,14 +114,24 @@ class UnitManager:
         return db
 
     def _insert(self, unit: UnitModel):
+        pos = unit.interpolated_pos
+
         self._db.execute(
             """
             INSERT OR REPLACE INTO units
-                (id, id_wave, id_path, dist, status)
+                (id, id_wave, id_path, dist, x, y, status)
             VALUES
-                (?, ?, ?, ?, ?)
+                (?, ?, ?, ?, ?, ?, ?)
             """,
-            [unit.id, unit.id_wave, unit.ppath.id, unit.dist, unit.status.value],
+            [
+                unit.id,
+                unit.id_wave,
+                unit.ppath.id,
+                unit.dist,
+                int(pos[0]),
+                int(pos[1]),
+                unit.status.value,
+            ],
         )
 
     def __iter__(self) -> Iterator[UnitModel]:

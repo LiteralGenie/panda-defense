@@ -1,11 +1,11 @@
-from typing import ClassVar
+from typing import ClassVar, Type
 
 from panda3d.core import TextNode
 
 from game.game_gui.better_direct_frame import BetterDirectFrame
 from game.game_gui.sidebar.tower_tile import TowerTile
-from game.towers.basic.basic_tower_model import BasicTowerModel
-from game.towers.basic.basic_tower_view import BasicTowerView
+from game.towers.tower_model import TowerModel
+from game.towers.tower_view import TowerView
 from utils.gui_utils import get_w
 
 
@@ -35,14 +35,19 @@ class TowerGrid(BetterDirectFrame):
         for i in range(len(self.cells)):
             self._recalculate_child_layout(i)
 
-    def create_tile(self, recalculate_layout: bool = True):
+    def create_tile(
+        self,
+        TowerModelCls: Type[TowerModel],
+        TowerViewCls: Type[TowerView],
+        recalculate_layout: bool = True,
+    ):
         idx = len(self.cells)
 
         self.cells.append(
             TowerTile(
                 self,
-                BasicTowerModel,
-                BasicTowerView,
+                TowerModelCls,
+                TowerViewCls,
                 text=f"T{idx}",
                 text_scale=0.05,
                 text_align=TextNode.ACenter,
