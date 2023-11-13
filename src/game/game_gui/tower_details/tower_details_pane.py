@@ -43,10 +43,7 @@ class TowerDetailsPane(BetterDirectFrame):
     _is_visible: bool
 
     def __init__(self, parent: "GameGui"):
-        super().__init__(
-            parent,
-            state=DGG.NORMAL,
-        )
+        super().__init__(parent)
 
         self.active_tower = None
 
