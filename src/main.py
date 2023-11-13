@@ -48,7 +48,7 @@ def run_renderer(
     r.run()
 
 
-def run_game(
+def run_controller(
     first_tick: float,
     scenario: Scenario,
     id_player: int,
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     scenario: Scenario = parse_scenario(json.load(open(fp_scenario)))
 
     game = Process(
-        target=run_game,
+        target=run_controller,
         args=(
             first_tick,
             scenario,

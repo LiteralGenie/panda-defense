@@ -1,6 +1,5 @@
-from typing import Any, ClassVar, Self
+from typing import ClassVar, Self
 
-from game.events.game_actions import GameActions
 from game.id_manager import IdManager
 from game.player.player_model import PlayerModel
 from game.scenario import Round, Scenario
@@ -14,7 +13,6 @@ from game.units.unit_model import UnitModel
 class GameModel(StatefulClass):
     _state_category: ClassVar[StateCategory] = "GAME"
 
-    action_queue: list[GameActions]
     scenario: Scenario = StatefulProp(read_only=True)  # type: ignore
 
     first_tick: float = StatefulProp(read_only=True)  # type: ignore
@@ -41,7 +39,6 @@ class GameModel(StatefulClass):
         id = IdManager.create()
         instance = cls(id)
 
-        instance.action_queue = []
         instance.players = {pl.id: pl for pl in players}
         instance.towers = dict()
         instance.unit_mgr = UnitManager()
@@ -73,7 +70,3 @@ class GameModel(StatefulClass):
 
     def add_unit(self, unit: UnitModel):
         self.unit_mgr.add(unit)
-
-    def add_action(self, action: Any):
-        self.action_queue.append(action)
-        # todo: validate
