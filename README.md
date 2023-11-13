@@ -2,7 +2,9 @@ A very small tower-defense game built with the [Panda3D](https://www.panda3d.org
 
 Mostly as a learning exercise.
 
-https://www.youtube.com/watch?v=rh-obSMSaN8
+Gameplay video: https://www.youtube.com/watch?v=rh-obSMSaN8
+
+<img src="https://github.com/LiteralGenie/panda-defense/assets/24236225/14ed1a78-83d6-4f18-b5d7-dd128139dc33" width="75%" />
 
 # Setup
 
@@ -23,6 +25,8 @@ Windows:
 1. `./venv/bin/activate`
 1. `python -m pip install -r .\requirements.txt`
 1. `python .\src\main.py`
+
+The enemies / paths can be configured by editing `src/data/scenarios/2_multi.json`.
 
 # Architecture
 
